@@ -1,21 +1,29 @@
 <?php
 /*
 Plugin Name: Tainacan
-Plugin URI: 
-Description: Lorem Ipsum
+Plugin URI:
+Description: New tainacan version 0.01   
 Author: MediaLab UFG
 Version: 10.9.8.7.6.5.4
 */
 
 
+function tainacan_components_register() {
+    wp_register_script('tainacan-web-components', plugins_url('components/tainacan-web-components.js', __FILE__), [],'0.1', true);
+    wp_enqueue_script('tainacan-web-components');
+}
+add_action( 'wp_enqueue_scripts', 'tainacan_components_register' );
+add_action( 'admin_enqueue_scripts', 'tainacan_components_register' );
+
+
 class TainacanCollections {
-    
+
     const POST_TYPE = 'tainacan-collections';
-    
+
     function __construct() {
         add_action('init', array(&$this, 'register_post_types'));
     }
-    
+
     function register_post_types() {
         $labels = array(
             'name' => 'Collections',
@@ -51,7 +59,7 @@ class TainacanCollections {
         );
         register_post_type(self::POST_TYPE, $args);
     }
-    
+
     function add($title) {
         $post = [
             'post_title' => $title,
@@ -59,11 +67,11 @@ class TainacanCollections {
         ];
         return wp_insert_post($post);
     }
-    
+
     function getCollectionById($id) {
         return get_post($id);
     }
-    
+
 }
 
 global $TainacanCollections;

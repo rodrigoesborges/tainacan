@@ -10,5 +10,6 @@ mkdir $destination
 cp -R src/* $destination/
 rm -rf $destination/scss
 cd tainacan-web-components
+npm install
 npm run build
 cp dist/tainacan-web-components.js $destination/components/

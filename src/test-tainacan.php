@@ -7,14 +7,18 @@ Author: MediaLab UFG
 Version: 10.9.8.7.6.5.4
 */
 
+class TainacanFieldTypes{
 
-function tainacan_components_register() {
-    wp_register_script('tainacan-web-components', plugins_url('components/tainacan-web-components.js', __FILE__), [],'0.1', true);
-    wp_enqueue_script('tainacan-web-components');
+    function __construct() {
+        add_action( 'wp_enqueue_scripts',  array(&$this, 'components_register') );
+        add_action( 'admin_enqueue_scripts',  array(&$this, 'components_register') );
+    }
+
+    function components_register() {
+        wp_register_script('tainacan-web-components', plugins_url('components/tainacan-web-components.js', __FILE__), [],'0.1', true);
+        wp_enqueue_script('tainacan-web-components');
+    }
 }
-add_action( 'wp_enqueue_scripts', 'tainacan_components_register' );
-add_action( 'admin_enqueue_scripts', 'tainacan_components_register' );
-
 
 class TainacanCollections {
 
@@ -76,3 +80,6 @@ class TainacanCollections {
 
 global $TainacanCollections;
 $TainacanCollections = new TainacanCollections();
+
+global $TainacanFieldTypes;
+$TainacanFieldTypes = new TainacanFieldTypes();

@@ -13,6 +13,7 @@ class Textarea_Field_Type extends Field_Type {
 
     function __construct(){
         $this->primitive_type = 'date';
+        parent::__construct();
     }
 
     /**

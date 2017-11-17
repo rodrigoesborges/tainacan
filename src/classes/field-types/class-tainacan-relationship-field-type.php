@@ -13,6 +13,7 @@ class Relationship_Field_Type extends Field_Type {
 
     function __construct(){
         $this->primitive_type = '';
+        parent::__construct();
     }
 
     /**

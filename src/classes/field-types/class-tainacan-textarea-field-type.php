@@ -9,10 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class TainacanFieldType
  */
-class Field_Type extends Field_Type {
+class Textarea_Field_Type extends Field_Type {
 
     function __construct(){
         $this->primitive_type = 'string';
+        parent::__construct();
     }
 
     /**

@@ -8,8 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class TainacanFieldType
+ * Date_Type because Date is reseved
  */
-class Textarea extends Field_Type {
+class Date extends Field_Type {
 
     function __construct(){
         $this->primitive_type = 'date';
@@ -25,3 +26,4 @@ class Textarea extends Field_Type {
         return '<tainacan-date name="'.$metadata->get_name().'"></tainacan-date>';
     }
 }
+new Date();

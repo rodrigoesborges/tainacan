@@ -25,3 +25,4 @@ class Relationship extends Field_Type {
         return '<tainacan-relationship name="'.$metadata->get_name().'"></tainacan-relationship>';
     }
 }
+new Relationship();

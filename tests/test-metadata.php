@@ -70,4 +70,36 @@ class Metadata extends \WP_UnitTestCase {
         $this->assertEquals('Tainacan\Field_Types\Text', $test->get_field_type());
         $this->assertEquals($test->get_field_type_object(), $type);
     }
+    
+    function teste_fields_types(){
+    	global $Tainacan_Collections, $Tainacan_Metadatas;
+    	
+    	$collection = new \Tainacan\Entities\Collection();
+    	$metadata = new \Tainacan\Entities\Metadata();
+    	$type = new \Tainacan\Field_Types\Text();
+    	
+    	$collection->set_name('teste');
+    	$collection = $Tainacan_Collections->insert($collection);
+    	
+    	$types = \Tainacan\Field_Types\Field_Type::get_all_types();
+    	//$types = array_unique($types);
+    	var_dump($types);
+    	$this->assertEquals(8, count($types));
+    	
+    	/*setando os valores na classe do metadado
+    	$metadata->set_name('metadado');
+    	$metadata->set_collection_id( $collection->get_id() );
+    	$metadata->set_field_type_object( $type );
+    	
+    	
+    	//inserindo o metadado
+    	$metadata = $Tainacan_Metadatas->insert($metadata);
+    	
+    	$test = $Tainacan_Metadatas->get_metadata_by_id($metadata->get_id());
+    	
+    	$this->assertEquals($test->get_name(), 'metadado');
+    	$this->assertEquals($test->get_collection_id(), $collection->get_id());
+    	$this->assertEquals('Tainacan\Field_Types\Text', $test->get_field_type());
+    	$this->assertEquals($test->get_field_type_object(), $type);*/
+    }
 }

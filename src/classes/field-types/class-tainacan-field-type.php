@@ -6,6 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+global $Tainacan_Field_Types;
+
 /**
  * Class TainacanFieldType
  */
@@ -14,7 +16,7 @@ abstract class Field_Type  {
     var $primitive_type;
 
     function __construct() {
-    	$this->register_type();
+    	$this->register_type($this);
     }
     
     abstract function render( $metadata );
@@ -31,15 +33,24 @@ abstract class Field_Type  {
         return $this->primitive_type;
     }
     
-    function register_type() {
+    /**
+     * 
+     * @param Field_Type $obj
+     * 
+     */
+    function register_type($obj) {
     	global $Tainacan_Field_Types;
     	if(! is_array($Tainacan_Field_Types)) {
     		$Tainacan_Field_Types = array();
     	}
-    	$Tainacan_Field_Types[] = get_class();
+    	$Tainacan_Field_Types[] = get_class($obj);
     }
     
-    function get_all_types()
+    /**
+     * Return all registered types
+     * @return array
+     */
+    public static function get_all_types()
     {
     	global $Tainacan_Field_Types;
     	return $Tainacan_Field_Types;

@@ -25,3 +25,4 @@ class Textarea extends Field_Type {
         return '<tainacan-textarea name="'.$metadata->get_name().'"></tainacan-textarea>';
     }
 }
+new Textarea();

@@ -25,3 +25,4 @@ class Radio extends Field_Type {
         return '<tainacan-radio name="'.$metadata->get_name().'"></tainacan-radio>';
     }
 }
+new Radio();

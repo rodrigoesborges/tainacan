@@ -25,3 +25,4 @@ class Checkbox extends Field_Type {
         return '<tainacan-checkbox name="'.$metadata->get_name().'"></tainacan-checkbox>';
     }
 }
+new Checkbox();

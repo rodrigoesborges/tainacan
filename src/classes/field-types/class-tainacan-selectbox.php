@@ -25,3 +25,4 @@ class Selectbox extends Field_Type {
         return '<tainacan-selectbox name="'.$metadata->get_name().'"></tainacan-selectbox>';
     }
 }
+new Selectbox();

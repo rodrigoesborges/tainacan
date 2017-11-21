@@ -25,3 +25,4 @@ class Text extends Field_Type {
         return '<tainacan-text name="'.$metadata->get_name().'"></tainacan-text>';
     }
 }
+new Text();

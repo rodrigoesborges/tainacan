@@ -25,3 +25,4 @@ class Numeric extends Field_Type {
         return '<tainacan-numeric name="'.$metadata->get_name().'"></tainacan-numeric>';
     }
 }
+new Numeric();

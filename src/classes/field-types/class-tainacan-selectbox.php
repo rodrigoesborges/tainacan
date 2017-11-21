@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class TainacanFieldType
  */
-class Relationship_Field_Type extends Field_Type {
+class Selectbox extends Field_Type {
 
     function __construct(){
         $this->primitive_type = '';
@@ -22,6 +22,6 @@ class Relationship_Field_Type extends Field_Type {
      */
 
     function render( $metadata ){
-        return '<tainacan-relationship name="'.$metadata->get_name().'"></tainacan-relationship>';
+        return '<tainacan-selectbox name="'.$metadata->get_name().'"></tainacan-selectbox>';
     }
 }

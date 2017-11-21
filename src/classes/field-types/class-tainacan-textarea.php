@@ -9,10 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class TainacanFieldType
  */
-class Radio_Field_Type extends Field_Type {
+class Textarea extends Field_Type {
 
     function __construct(){
-        $this->primitive_type = '';
+        $this->primitive_type = 'string';
         parent::__construct();
     }
 
@@ -22,6 +22,6 @@ class Radio_Field_Type extends Field_Type {
      */
 
     function render( $metadata ){
-        return '<tainacan-radio name="'.$metadata->get_name().'"></tainacan-radio>';
+        return '<tainacan-textarea name="'.$metadata->get_name().'"></tainacan-textarea>';
     }
 }

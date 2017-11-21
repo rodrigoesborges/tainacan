@@ -9,10 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class TainacanFieldType
  */
-class Checkbox_Field_Type extends Field_Type {
+class Text extends Field_Type {
 
     function __construct(){
-        $this->primitive_type = 'date';
+        $this->primitive_type = 'string';
         parent::__construct();
     }
 
@@ -22,6 +22,6 @@ class Checkbox_Field_Type extends Field_Type {
      */
 
     function render( $metadata ){
-        return '<tainacan-checkbox name="'.$metadata->get_name().'"></tainacan-checkbox>';
+        return '<tainacan-text name="'.$metadata->get_name().'"></tainacan-text>';
     }
 }

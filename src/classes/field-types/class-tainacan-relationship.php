@@ -9,10 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class TainacanFieldType
  */
-class Textarea_Field_Type extends Field_Type {
+class Relationship extends Field_Type {
 
     function __construct(){
-        $this->primitive_type = 'date';
+        $this->primitive_type = '';
         parent::__construct();
     }
 
@@ -22,6 +22,6 @@ class Textarea_Field_Type extends Field_Type {
      */
 
     function render( $metadata ){
-        return '<tainacan-date name="'.$metadata->get_name().'"></tainacan-date>';
+        return '<tainacan-relationship name="'.$metadata->get_name().'"></tainacan-relationship>';
     }
 }

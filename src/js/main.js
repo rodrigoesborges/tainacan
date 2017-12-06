@@ -16,6 +16,7 @@ const app = new Vue({
 
     // Propriedades do aplicativo
     data: {
+        queryString:null,
         user: 'Anônimo',
         text: null,
         messages: [],
@@ -27,6 +28,7 @@ const app = new Vue({
     created: function() {
         // Inicia a conexão com o websocket
         this.connect();
+        this.iniQueryString();
     },
 
     // Métodos do aplicatvo
@@ -54,32 +56,38 @@ const app = new Vue({
             };
 
             // Evento que será chamado quando recebido dados do servidor
-            self.ws.onmessage = function(e){
-                let data = JSON.parse(e.data);
-                if( data.isReload ){
-                    setTimeout(() => {
-                        console.log('reload');
+            self.ws.onmessage = e => {
+                const data = JSON.parse(e.data);
+                if( self.queryString.post &&  data.post.ID &&  this.queryString.post == data.post.ID){
+                    location.reload();
+                }else if( self.queryString.post_type &&  data.post.post_type &&  self.queryString.post_type == data.post.post_type ){
+                    location.reload();
+                }else if( data.ids ){
+                    let ids = data.ids;
+                    if( self.queryString.post &&  ids.indexOf( parseInt( self.queryString.post ) ) >= 0 ){
                         location.reload();
-                    },1000);
+                    }
                 }
             };
 
         },
 
         // Método responsável por adicionar uma mensagem de usuário
-        addMessage: function(data) {
-            this.messages.push(data);
-            this.scrollDown();
-        },
+        //addMessage: function(data) {
+           // this.messages.push(data);
+           // this.scrollDown();
+        //},
 
         // Método responsável por adicionar uma notificação de sucesso
         addSuccessNotification: function(text) {
-            this.addMessage({color: 'green', text: text});
+            //this.addMessage({color: 'green', text: text});
+            console.log( text );
         },
 
         // Método responsável por adicionar uma notificação de erro
         addErrorNotification: function(text) {
-            this.addMessage({color: 'red', text: text});
+            //this.addMessage({color: 'red', text: text});
+            console.log( text );
         },
 
         // Método responsável por enviar uma mensagem
@@ -126,14 +134,30 @@ const app = new Vue({
             //var container = this.$el.querySelector('.update-nag');
             //container.scrollTop = container.scrollHeight;
         },
+        parseQueryString( query ){
+            var vars = query.split("&");
+            var query_string = {};
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                // If first entry with this name
+                if (typeof query_string[pair[0]] === "undefined") {
+                    query_string[pair[0]] = decodeURIComponent(pair[1]);
+                    // If second entry with this name
+                } else if (typeof query_string[pair[0]] === "string") {
+                    var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+                    query_string[pair[0]] = arr;
+                    // If third or later entry with this name
+                } else {
+                    query_string[pair[0]].push(decodeURIComponent(pair[1]));
+                }
+            }
+            return query_string;
+        },
+        iniQueryString(){
+            let query = window.location.search.substring(1);
+            this.queryString = this.parseQueryString( query );
+        }
 
     }
 
-});
-
-
-jQuery( '#publish' ).click(() => {
-    console.log('publish');
-    app.text = 'Publicou post';
-    app.sendMessage();
 });

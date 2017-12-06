@@ -4,7 +4,8 @@
     "type": "wordpress-plugin",
     "require": {
         "respect/validation": "^1.1",
-        "cboden/ratchet": "dev-master"
+        "cboden/ratchet": "dev-master",
+        "textalk/websocket": "dev-master"
     },
     "minimum-stability": "dev",
     "config": {

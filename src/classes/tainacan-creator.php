@@ -7,6 +7,7 @@ const REPOSITORIES_DIR = __DIR__ . '/repositories/';
 const TRAITS_DIR 	   = __DIR__ . '/traits/';
 const VENDOR_DIR 	   = __DIR__ . '/../vendor/';
 const ENDPOINTS_DIR    = __DIR__ . '/../api/endpoints/';
+const SOCKETS_DIR    = __DIR__ . '/../sockets/';
 
 const DIRS = [
     CLASSES_DIR,
@@ -19,6 +20,7 @@ const DIRS = [
 ];
 
 require_once(VENDOR_DIR . 'autoload.php');
+require_once(SOCKETS_DIR . 'class-tainacan-hook-actions.php');
 
 spl_autoload_register('tainacan_autoload');
 

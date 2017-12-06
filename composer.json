@@ -3,7 +3,8 @@
     "description": "Transforme seu site wordpress em um repositório digital.",
     "type": "wordpress-plugin",
     "require": {
-        "respect/validation": "^1.1"
+        "respect/validation": "^1.1",
+        "cboden/ratchet": "dev-master"
     },
     "minimum-stability": "dev",
     "config": {

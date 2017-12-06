@@ -26,7 +26,7 @@ class DevInterface {
     
     function add_admin_js() {
         global $TAINACAN_BASE_URL;
-        wp_enqueue_script('tainacan-dev-admin', $TAINACAN_BASE_URL . '/assets/web-components.js');
+        wp_enqueue_script('tainacan-dev-admin', $TAINACAN_BASE_URL . '/assets/web-components.js', array(),'0.1', true);
     }
     
     /**
@@ -42,7 +42,7 @@ class DevInterface {
         foreach ($this->repositories as $cpt => $repo) {
             
             add_meta_box(
-                $slug . '_properties', 
+                $cpt . '_properties',
                 __('Properties', 'tainacan'), 
                 array(&$this, 'properties_metabox_' . $repo->get_name()),
                 $cpt, 

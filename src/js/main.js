@@ -13,11 +13,8 @@ Vue.customElement('tainacan-selectbox', Selectbox);
 
 
 const app = new Vue({
-
-    // Propriedades do aplicativo
     data: {
         queryString:null,
-        user: 'Anônimo',
         text: null,
         messages: [],
         ws: null,
@@ -157,7 +154,5 @@ const app = new Vue({
             let query = window.location.search.substring(1);
             this.queryString = this.parseQueryString( query );
         }
-
     }
-
 });

@@ -25,6 +25,14 @@ class Item_Metadata_Entity extends Entity {
 	public function  __toString(){
 		return 'Hello, I\'m the Item Metadata Entity';
 	}
+
+    public function  __toJSON(){
+        $json['value']    = $this->get_value();
+        $json['item']     = $this->get_item()->__toJSON();
+        $json['metadata'] = $this->get_metadata()->__toJSON();
+
+	    return json_encode($json);
+    }
     
     /**
      * Define the item

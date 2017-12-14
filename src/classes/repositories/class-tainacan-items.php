@@ -9,14 +9,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 class Items extends Repository {
 	public $entities_type = '\Tainacan\Entities\Item';
     public function get_map() {
-    	return apply_filters('tainacan-get-map', [
-            'id'            => [
-                'map'        => 'ID',
-                'title'      => __('ID', 'tainacan'),
-                'type'       => 'integer',
-                'description'=> __('Unique identifier', 'tainacan'),
-                //'validation' => ''
-            ],
+    	return apply_filters('tainacan-get-map-'.$this->get_name(), [
             'title'         =>  [
                 'map'        => 'post_title',
                 'title'       => __('Title', 'tainacan'),
@@ -207,8 +200,17 @@ class Items extends Repository {
 
     }
 
-    public function delete($object){
+	/**
+	 * @param $args ( is a array like [post_id, [is_permanently => bool]] )
+	 *
+	 * @return mixed|Entities\Item
+	 */
+	public function delete($args){
+    	if(!empty($args[1]) && $args[1]['is_permanently'] === true){
+    		return new Entities\Item(wp_delete_post($args[0], $args[1]['is_permanently']));
+	    }
 
+	    return new Entities\Item(wp_trash_post($args[0]));
     }
     
 }

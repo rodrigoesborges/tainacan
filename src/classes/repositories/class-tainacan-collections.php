@@ -11,14 +11,7 @@ use Tainacan\Entities\Collection;
 class Collections extends Repository {
 	public $entities_type = '\Tainacan\Entities\Collection';
     public function get_map() {
-        return apply_filters('tainacan-get-map', [
-            'id'             => [
-                'map'        => 'ID',
-                'title'       => __('ID', 'tainacan'),
-	            'type'       => 'integer',
-                'description'=> __('Unique identifier', 'tainacan'),
-                //'validation' => v::numeric(),
-            ],
+    	return apply_filters('tainacan-get-map-'.$this->get_name(), [
             'name'           =>  [
                 'map'        => 'post_title',
                 'title'       => __('Name', 'tainacan'),
@@ -154,7 +147,7 @@ class Collections extends Repository {
     }
     
     /**
-     * @param Tainacan\Entities\Collection $collection
+     * @param \Tainacan\Entities\Collection $collection
      * @return \Tainacan\Entities\Collection
      * {@inheritDoc}
      * @see \Tainacan\Repositories\Repository::insert()
@@ -169,8 +162,17 @@ class Collections extends Repository {
 
     }
 
-    public function delete($object){
+	/**
+	 * @param $args ( is a array like [post_id, [is_permanently => bool]] )
+	 *
+	 * @return mixed|Collection
+	 */
+	public function delete($args){
+	    if(!empty($args[1]) && $args[1]['is_permanently'] === true){
+		    return new Entities\Collection(wp_delete_post($args[0], $args[1]['is_permanently']));
+	    }
 
+	    return new Entities\Collection(wp_trash_post($args[0]));
     }
 
     /**

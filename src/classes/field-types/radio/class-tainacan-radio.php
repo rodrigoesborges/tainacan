@@ -16,12 +16,13 @@ class Radio extends Field_Type {
     }
 
     /**
-     * @param $metadata
+     * @param $itemMetadata \Tainacan\Entities\Item_Metadata_Entity The instace of the entity itemMetadata
      * @return string
      */
 
-    public function render( $metadata ){
-        return '<tainacan-radio name="'.$metadata->get_name().'"></tainacan-radio>';
+    public function render( $itemMetadata ){
+        $options = ( isset( $this->options['options'] ) ) ? $this->options['options'] : '';
+        return '<tainacan-radio  options="'.$options.'" name="'.$itemMetadata->get_metadata()->get_name().'"></tainacan-radio>';
     }
 
     /**
@@ -32,10 +33,10 @@ class Radio extends Field_Type {
         <tr>
             <td>
                 <label><?php echo __('Options','tainacan'); ?></label><br/>
-                <small><?php echo __('Insert the options, separate by ";" for the metadata value','tainacan'); ?></small>
+                <small><?php echo __('Insert the options, separate by lines for the metadata value','tainacan'); ?></small>
             </td>
             <td>
-                <textarea name="tnc_metadata_options"><?php echo ( $this->options ) ? $this->options : ''; ?></textarea>
+                <textarea name="field_type_radio[options]"><?php echo ( isset( $this->options['options'] ) ) ? $this->options['options'] : ''; ?></textarea>
             </td>
         </tr>
         <?php

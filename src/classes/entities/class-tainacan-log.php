@@ -16,8 +16,7 @@ class Log extends Entity {
 	 */
 	protected $repository = 'Tainacan_Logs';
 	
-	public function __construct($which=0)
-	{
+	public function __construct($which=0) {
 		parent::__construct($which);
 		
 		if( is_int($which) && $which == 0) {
@@ -29,15 +28,6 @@ class Log extends Entity {
 	public function  __toString(){
 		return 'Hello, my title is '. $this->get_title();
 	}
-
-    /**
-     * Return the Log ID
-     *
-     * @return integer
-     */
-    function get_id() {
-        return $this->get_mapped_property('id');
-    }
 
     /**
      * Return the Log title

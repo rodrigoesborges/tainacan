@@ -4,7 +4,15 @@ namespace Tainacan\Tests\Factories;
 
 class Entity_Factory {
 
+	/**
+	 * 
+	 * @var \Tainacan\Entities\Entity
+	 */
 	private   $entity;
+	/**
+	 * 
+	 * @var \Tainacan\Repositories\Repository
+	 */
 	protected $repository;
 	protected $entity_type;
 	protected $repository_type;
@@ -21,12 +29,12 @@ class Entity_Factory {
 	 * @return mixed
 	 * @throws \ErrorException
 	 */
-	public function create_entity($type, $args = [], $is_validated_and_in_db = false){
+	public function create_entity($type, $args = [], $is_validated_and_in_db = false, $publish = false){
 		ini_set('display_errors', 1);
 
 		try {
 			if(empty($type)){
-				throw new \InvalidArgumentException(__('The type can\'t be empty'));
+				throw new \InvalidArgumentException('The type can\'t be empty');
 			} elseif(!strrchr($type, '_')){
 				$type = ucfirst(strtolower($type));
 			} else {
@@ -46,6 +54,10 @@ class Entity_Factory {
 
 			$this->entity     = new $this->entity_type();
 			$this->repository = new $this->repository_type();
+			
+			if($publish) {
+				$this->entity->set_status('publish');
+			}
 
 			if (!empty($args) && $is_validated_and_in_db) {
 				foreach ($args as $attribute => $content) {
@@ -62,7 +74,7 @@ class Entity_Factory {
 				if ($this->entity->validate()) {
 					$this->entity = $this->repository->insert($this->entity);
 				} else {
-					throw new \ErrorException( __( 'The entity wasn\'t validated.' ) );
+					throw new \ErrorException('The entity wasn\'t validated.' . print_r( $this->entity->get_errors(), true));
 				}
 
 			} elseif (!empty($args) && !$is_validated_and_in_db){
@@ -79,36 +91,31 @@ class Entity_Factory {
 
 			} elseif (empty($args) && !$is_validated_and_in_db) {
 				try {
-					$this->entity->set_name( "$type" . random_int( 0, 10000 ) . " for test" );
+					$this->entity->set_name( "$type " . random_int( 0, 10000 ) . " for test" );
 					$this->entity->set_description( 'It is only for test' );
 				} catch (\Error $exception){
-					$this->entity->set_title( "$type" . random_int( 0, 10000 ) . " for test" );
+					$this->entity->set_title( "$type " . random_int( 0, 10000 ) . " for test" );
 					$this->entity->set_description( 'It is only for test' );
 				}
 
 			} elseif (empty($args) && $is_validated_and_in_db) {
 				try {
-					$this->entity->set_name( "$type" . random_int( 0, 10000 ) . " for test" );
+					$this->entity->set_name( "$type " . random_int( 0, 10000 ) . " for test" );
 					$this->entity->set_description( 'It is only for test' );
 				} catch (\Error $exception){
-					$this->entity->set_title( "$type" . random_int( 0, 10000 ) . " for test" );
+					$this->entity->set_title( "$type " . random_int( 0, 10000 ) . " for test" );
 					$this->entity->set_description( 'It is only for test' );
 				}
 
 				$this->entity->validate();
-				if ($this->entity->validate()) {
-					$this->entity = $this->repository->insert( $this->entity );
-				} else {
-					throw new \ErrorException( __( 'The entity wasn\'t validated.' ) );
-				}
-
+				$this->entity = $this->repository->insert( $this->entity );
 			} else {
-				throw new \InvalidArgumentException( __( 'One or more arguments are invalid.', 'tainacan' ) );
+				throw new \InvalidArgumentException('One or more arguments are invalid.');
 			}
 		} catch (\Error $exception){
 			echo "\n" . $exception->getMessage() . "\n";
 		}
-
+		
 		return $this->entity;
 	}
 }

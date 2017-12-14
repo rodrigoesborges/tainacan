@@ -16,12 +16,17 @@ class Checkbox extends Field_Type {
     }
 
     /**
-     * @param $metadata
+     * @param $itemMetadata \Tainacan\Entities\Item_Metadata_Entity The instace of the entity itemMetadata
      * @return string
      */
 
-    public function render( $metadata ){
-        return '<tainacan-checkbox name="'.$metadata->get_name().'"></tainacan-checkbox>';
+    public function render( $itemMetadata ){
+        $options = ( isset( $this->options['options'] ) ) ? $this->options['options'] : '';
+        return '<tainacan-checkbox options="'.$options.'" 
+                                   metadata_id ="'.$itemMetadata->get_metadata()->get_id().'" 
+                                   item_id="'.$itemMetadata->get_item()->get_id().'"    
+                                   value=\''.json_encode( $itemMetadata->get_value() ).'\'
+                                   name="'.$itemMetadata->get_metadata()->get_name().'"></tainacan-checkbox>';
     }
 
     /**
@@ -35,7 +40,7 @@ class Checkbox extends Field_Type {
                 <small><?php echo __('Insert the options, separate by lines for the metadata value','tainacan'); ?></small>
             </td>
             <td>
-                <textarea name="tnc_metadata_options"><?php echo ( $this->options ) ? $this->options : ''; ?></textarea>
+                <textarea name="field_type_checkbox[options]"><?php echo ( isset( $this->options['options'] ) ) ? $this->options['options'] : ''; ?></textarea>
             </td>
         </tr>
         <?php

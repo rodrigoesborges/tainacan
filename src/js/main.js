@@ -1,6 +1,8 @@
 import Vue from 'vue'
 // include vue-custom-element plugin to Vue
 import VueCustomElement from 'vue-custom-element';
+import store from './store/store';
+
 
 Vue.use(VueCustomElement);
 
@@ -22,6 +24,7 @@ Vue.customElement('tainacan-date', Date);
 
 
 const app = new Vue({
+    store,
     data: {
         queryString:null,
         text: null,
@@ -45,7 +48,7 @@ const app = new Vue({
             var self = this;
 
             // Conectando
-            self.ws = new WebSocket('ws://localhost:8080');
+            self.ws = new WebSocket('ws://192.168.20.32:8080');
 
             // Evento que será chamado ao abrir conexão
             self.ws.onopen = function() {
@@ -64,7 +67,13 @@ const app = new Vue({
             // Evento que será chamado quando recebido dados do servidor
             self.ws.onmessage = e => {
                 const data = JSON.parse(e.data);
-                if( self.queryString.post &&  data.post.ID &&  this.queryString.post == data.post.ID){
+
+                console.log(data,this.$store.getters['item/getMetadata']);
+
+                //router of actions
+                if(data.isItem && self.queryString.post  &&  data.post &&  this.queryString.post == data.post.ID){
+                    this.$store.dispatch('item/updateMetadata', { item_id: data.post.ID, metadata_id: data.metadata_id, values: data.value });
+                }else if( self.queryString.post &&  data.post.ID &&  this.queryString.post == data.post.ID){
                     location.reload();
                 }else if( self.queryString.post_type &&  data.post.post_type &&  self.queryString.post_type == data.post.post_type ){
                     location.reload();

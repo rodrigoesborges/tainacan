@@ -13,3 +13,4 @@ node_modules
 npm-debug.log
 src/assets/web-components.js
 last-js-build.md5
+composer.lock

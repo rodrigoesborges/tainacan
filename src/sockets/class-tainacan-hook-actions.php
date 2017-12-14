@@ -16,6 +16,7 @@ class Hook_Actions{
     public function __construct(){
         add_action( 'wp_insert_post', array(&$this, 'broadcast_new_post'), 10, 3);
         add_action( 'transition_post_status',  array(&$this, 'broadcast_new_status'), 10, 3 );
+        add_action( 'updated_post_meta',  array(&$this, 'broadcast_alter_metadata'), 10, 4 );
     }
 
     /**
@@ -55,6 +56,17 @@ class Hook_Actions{
         }else{
             $this->send_message([ 'post' => $post, 'isReload' => true, 'metas' => get_metadata('post', $post_id) ]);
         }
+    }
+
+    public function broadcast_alter_metadata( $meta_id, $post_id, $meta_key, $meta_value ){
+        global $Tainacan_Metadatas;
+        $post = get_post( $post_id );
+        $metadata = $Tainacan_Metadatas->fetch( $meta_key );
+
+        if ( strpos($post->post_type, 'tnc_col_') === false || $metadata === null)
+            return;
+
+        return $this->send_message([ 'post' => $post, 'metadata_id' =>  $meta_key, 'value' => $meta_value,'isItem' => true ]);
     }
 
     function broadcast_new_status( $new_status, $old_status, $post ) {

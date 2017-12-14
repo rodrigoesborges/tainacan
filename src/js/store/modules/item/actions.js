@@ -11,9 +11,9 @@ export const sendMetadata = ( { commit }, { item_id, metadata_id, values }) => {
             commit('removeError', { metadata_id: metadata_id });
         })
         .catch(error => {
-            console.log( 'error',error.response.data[1] );
+            console.log( 'error',error.response);
             commit('setSingleMetadata', { item_id: item_id, metadata_id: metadata_id, values: values });
-            commit('setError', { item_id: item_id, metadata_id: metadata_id, value: values, error: error.response.data[0].errors  });
+            commit('setError', { item_id: item_id, metadata_id: metadata_id, value: values, error: error.response.data.errors  });
         });
 };
 

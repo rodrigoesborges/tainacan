@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: wpApiSettings.root
+    baseURL: wp_settings.root
 });
 
-//instance.defaults.headers.common['something'] = 'none';
+instance.defaults.headers.common['X-WP-Nonce'] = wp_settings.nonce;
 
 export default instance;

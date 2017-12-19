@@ -1,6 +1,5 @@
 import Vue from 'vue';
 
-
 export const setItem = ( state, item ) => {
     state.item = item;
 }
@@ -12,7 +11,8 @@ export const setMetadata = ( state, metadata) => {
 export const setSingleMetadata = ( state, metadata) => {
     let index = state.metadata.findIndex(itemMetadata => itemMetadata.metadata_id === metadata.metadata_id);
     if ( index >= 0){
-        Vue.set(state.metadata, index, metadata)
+        //state.metadata[index] = metadata;
+        Vue.set( state.metadata, index, metadata );
     }else{
         state.metadata.push( metadata );
     }
@@ -21,7 +21,8 @@ export const setSingleMetadata = ( state, metadata) => {
 export const setError = ( state, metadata ) => {
     let index = state.error.findIndex(itemMetadata => itemMetadata.metadata_id === metadata.metadata_id);
     if ( index >= 0){
-        Vue.set(state.error, index, metadata)
+        //state.error[index] = metadata;
+        Vue.set( state.error, index, metadata );
     }else{
         state.error.push( metadata );
     }

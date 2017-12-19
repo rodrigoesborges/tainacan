@@ -30,7 +30,7 @@
         methods: {
             getValue(){
                 let metadata = this.$store.getters['item/getMetadata'].find(metadata => metadata.metadata_id === this.metadata_id );
-                console.log(metadata);
+                console.log(metadata, 'getValue on Text component');
                 if( metadata ){
                     return  metadata.values;
                 }

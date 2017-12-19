@@ -7,27 +7,34 @@ use Ratchet\ConnectionInterface;
 class Listener implements MessageComponentInterface {
 
     protected $clients;
+    protected $subscriptions;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
+        $this->subscriptions = [];
     }
 
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-
         echo "New connection! ({$conn->resourceId})\n";
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {
-        $numRecv = count($this->clients) - 1;
-        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
+    public function onMessage(ConnectionInterface $from, $rawMsg) {
+        $msg = json_decode( $rawMsg );
 
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($msg);
+        if( isset( $msg->isSubscription ) ){
+            $this->subscriptions[ $from->resourceId ][ $msg->type ] = $msg->value ;
+            echo  $from->resourceId.' connected to the topic type: '.$msg->type.' Value: '.$msg->value."\n" ;
+        }else if( isset( $msg->type ) && isset( $msg->value ) ){
+            foreach ($this->clients as $client) {
+                if ($from === $client)
+                    continue;
+
+                if( isset(  $this->subscriptions[ $client->resourceId ][ $msg->type ] ) && $this->subscriptions[ $client->resourceId ][ $msg->type ] == $msg->value ){
+                    $client->send($rawMsg);
+                    echo  $from->resourceId.' is going to receive a message to the topic type: '.$msg->type.' Value: '.$msg->value."\n" ;
+                }
             }
         }
     }

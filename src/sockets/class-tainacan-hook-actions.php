@@ -52,9 +52,9 @@ class Hook_Actions{
                 }
             }
 
-            $this->send_message([ 'post' => $post, 'isReload' => true, 'metas' => $metas, 'ids' => $ids ]);
+            $this->send_message([ 'type'=> 'post', 'value' => 'tainacan-metadata' , 'post' => $post, 'isReload' => true, 'metas' => $metas, 'ids' => $ids ]);
         }else{
-            $this->send_message([ 'post' => $post, 'isReload' => true, 'metas' => get_metadata('post', $post_id) ]);
+            $this->send_message([ 'type'=> 'post', 'value' => $post->post_type , 'post' => $post, 'isReload' => true, 'metas' => get_metadata('post', $post_id) ]);
         }
     }
 
@@ -66,7 +66,7 @@ class Hook_Actions{
         if ( strpos($post->post_type, 'tnc_col_') === false || $metadata === null)
             return;
 
-        return $this->send_message([ 'post' => $post, 'metadata_id' =>  $meta_key, 'value' => $meta_value,'isItem' => true ]);
+        return $this->send_message([ 'type'=> 'post', 'value' => $post_id, 'metadata_id' =>  $meta_key, 'metadata_value' => $meta_value ]);
     }
 
     function broadcast_new_status( $new_status, $old_status, $post ) {
@@ -75,7 +75,7 @@ class Hook_Actions{
             return;
 
         if ( $new_status != $old_status ) {
-            $this->send_message([ 'post' => $post, 'isReload' => true ]);
+            //$this->send_message([ 'post' => $post, 'isReload' => true ]);
         }
     }
 

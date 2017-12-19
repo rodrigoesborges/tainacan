@@ -35,7 +35,8 @@ export const eventBus = new Vue({
             if( metadata ){
                 for(let singleMetadata of metadata){
                     const eventElement = this.getComponentById( singleMetadata.metadata_id );
-                    eventElement.value =  singleMetadata.values;
+                    if( eventElement.value )
+                        eventElement.value =  singleMetadata.values;
                 }
             }
         },

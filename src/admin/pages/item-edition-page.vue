@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Item creation</h2>
+        <h2>Item Edition</h2>
         <el-form ref="form" :model="form" :rules="rules" label-width="120px">
             <el-form-item label="Título" prop="title">
                 <el-input v-model="form.title"></el-input>
@@ -38,7 +38,7 @@
                         :metadata_id="metadata.metadata.id"
                         :value="metadata.value"></component>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">Criar</el-button>
+                <el-button type="primary" @click="onSubmit">Salvar</el-button>
                 <el-button>Cancelar</el-button>
             </el-form-item>
         </el-form>
@@ -49,7 +49,7 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-    name: 'ItemCreationPage',
+    name: 'ItemEditionPage',
     data(){
         return {
             itemId: Number,

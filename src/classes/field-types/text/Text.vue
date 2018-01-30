@@ -1,7 +1,7 @@
 <template>
-        <el-form-item :label="name" :prop="validateObject()">
-            <el-input v-model="valueInput" @blur="changeValue"></el-input>
-        </el-form-item>
+    <el-form-item :label="name" :prop="validateObject()">
+        <el-input v-model="valueInput" @blur="changeValue"></el-input>
+    </el-form-item>
 </template>
 
 <script>

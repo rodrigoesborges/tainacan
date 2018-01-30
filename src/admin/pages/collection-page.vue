@@ -7,11 +7,11 @@
                     <span>{{ collection.name }}</span>
                     <div class="bottom clearfix">
                         <time class="time">{{collection.description}}</time>
-                        <router-link tag="el-button" class="primary" :to="{ path: `/collections/${collection.id}/items/create`, params: { collection_id: collection.id }}">Criar Item</router-link>
+                        <router-link tag="el-button" class="primary" :to="{ path: `/collection/${collection.id}/items/edit`, params: { collection_id: collection.id }}">Criar Item</router-link>
                     </div>
                     <items-list :collectionId="collectionId"></items-list>
                     <div class="bottom clearfix">
-                        <router-link tag="el-button" :to="{ path: `/collections/${collection.id}/items/`, params: { collection_id: collection.id }}">Ver todos os itens</router-link>
+                        <router-link tag="el-button" :to="{ path: `/collection/${collection.id}/items/`, params: { collection_id: collection.id }}">Ver todos os itens</router-link>
                     </div>
                 </div>
             </el-card>     

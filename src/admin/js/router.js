@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 
 import AdminPage from '../admin.vue'
 import CollectionPage from '../pages/collection-page.vue'
-import ItemCreationPage from '../pages/item-creation-page.vue'
+import ItemPage from '../pages/item-page.vue'
+import ItemEditionPage from '../pages/item-edition-page.vue'
 
 import CollectionsList from '../components/collections-list.vue'
 import ItemsList from '../components/items-list.vue'
@@ -18,7 +19,8 @@ const routes = [
         ],
         meta: { title: 'Collection Page' }
     },
-    { path: '/collections/:id/items/create', component: ItemCreationPage, meta: {title: 'Create Item'} },
+    { path: '/collection/:id/items/edit', component: ItemEditionPage, meta: {title: 'Edit Item'} },
+    { path: '/collection/:collection_id/items/:id', component: ItemPage, meta: {title: 'Item Page'} },
     { path: '*', redirect: '/'}
 ]
 

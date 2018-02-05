@@ -1,7 +1,7 @@
 <template>
-    <el-input :value="inputValue" 
-    @blur="onBlur"
-    @input="onInput($event)"></el-input>
+    <input v-on:submit.prevent class="uk-input" 
+        :value="inputValue" 
+        @blur="onBlur"/>
 </template>
 
 <script>
@@ -15,10 +15,6 @@
             onBlur() {
                 this.$emit('blur');
             },
-            onInput($event) {
-                this.inputValue = $event;
-                this.$emit('input', this.inputValue);
-            }
         }
     }
 </script>

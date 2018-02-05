@@ -1,58 +1,42 @@
 <template>
     <div>
-        <h2 v-text="pageTitle"></h2><span class="uk-label" @submit.prevent=" " v-if="item != null && item != undefined" :class="'uk-label-' + getStatusColor(item.status)" v-text="item.status"></span>
-        <form class="uk-form-horizontal uk-margin-large" :model="form" label-width="120px">
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-horizontal-text">Título</label>
-                <div class="uk-form-controls">
-                    <input class="uk-input" type="text" placeholder="Insira o título" v-model="form.title"/>
-                </div>
-            </div>
-
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-horizontal-text">Descrição</label>
-                <div  class="uk-form-controls">
-                    <input class="uk-textarea" type="textarea" placeholder="Insira uma descrição do Item." v-model="form.description"/>
-                </div>
-            </div>
-
-            <div class="uk-margin"> 
-                <label class="uk-form-label" for="form-horizontal-select">Status</label>
-                <div class="uk-form-controls">
-                    <select class="uk-select" v-model="form.status" placeholder="Selecione um status">
-                        <option
-                        v-for="statusOption in statusOptions"
-                        :key="statusOption.value"
-                        :label="statusOption.label"
-                        :value="statusOption.value"
-                        :disabled="statusOption.disabled">
-                        </option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-horizontal-custom">Imagem</label>
-                <div class="js-upload uk-placeholder uk-form-controls uk-text-center">
-                    <span uk-icon="icon: cloud-upload"></span>
-                    <span class="uk-text-middle">Arraste uma imagem aqui</span>
-                    <div uk-form-custom>
-                        <input type="file" multiple>
-                        <span class="uk-link"> clique aqui para enviar.</span>
-                    </div>
-                </div>
-                <progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>
-            </div>
-            
+        <h2 v-text="pageTitle"></h2><el-tag v-if="collection != null && collection != undefined" :type="getStatusColor(collection.status)" v-text="collection.status"></el-tag>
+        <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+            <el-form-item label="Título" prop="title">
+                <el-input v-model="form.title"></el-input>
+            </el-form-item>
+            <el-form-item label="Descrição">
+                <el-input type="textarea" v-model="form.description"></el-input>
+            </el-form-item>
+            <el-form-item label="Status">
+                <el-select v-model="form.status" placeholder="Selecione um status">
+                    <el-option
+                    v-for="statusOption in statusOptions"
+                    :key="statusOption.value"
+                    :label="statusOption.label"
+                    :value="statusOption.value"
+                    :disabled="statusOption.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="Imagem">
+                <el-upload
+                    class="upload-demo"
+                    drag
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove">
+                    <i class="el-icon-upload"></i>
+                    <div class="el-upload__text">Arraste uma imagem aqui <em>ou clique para enviar</em></div>
+                    <div class="el-upload__tip" slot="tip">imagens em formato jpg/png</div>
+                </el-upload>
+            </el-form-item>
             <tainacan-form-item v-for="(field, index) in fieldList" v-bind:key="index" :field="field"></tainacan-form-item>
-
-            <div class="uk-margin">
-                <div class="uk-form-controls">
-                    <button class="uk-button uk-button-primary" @submit.prevent="onSubmit">Salvar</button>
-                    <button class="uk-button uk-button-default">Cancelar</button>
-                </div>
-            </div>
-        </form>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">Salvar</el-button>
+                <el-button>Cancelar</el-button>
+            </el-form-item>
+        </el-form>
     </div>
 </template>
 
@@ -60,15 +44,13 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-    name: 'ItemEditionPage',
+    name: 'CollectionEditionPage',
     data(){
         return {
-            itemId: Number,
-            item: null,
             collectionId: Number,
+            collection: null,
             pageTitle: '',
             form: {
-                collectionId: Number,
                 title: '',
                 status: '',
                 description: ''
@@ -89,26 +71,26 @@ export default {
             }],
             rules: {
                 title: [
-                    { required: true, message: 'Por favor forneça um título para o Item.', trigger: 'blur' }
+                    { required: true, message: 'Please input Activity name', trigger: 'blur' }
                 ],
             }
         }
     },
     methods: {
-        ...mapActions('item', [
+        ...mapActions('collection', [
             'sendItem',
             'updateItem',
             'fetchFields',
             'sendField',
             'fetchItem'
         ]),
-        ...mapGetters('item',[
+        ...mapGetters(,[
             'getFields',
             'getItem'
         ]),
         onSubmit() {
             // Puts loading on Draft Item creation
-            //let loadingInstance = this.$loading({ text: 'Salvando item ...' });
+            let loadingInstance = this.$loading({ text: 'Salvando item ...' });
 
             let data = {item_id: this.itemId, title: this.form.title, description: this.form.description, status: this.form.status};
             this.updateItem(data).then(updatedItem => {    
@@ -120,7 +102,7 @@ export default {
                 this.form.description = this.item.description;
                 this.form.status = this.item.status;
 
-                //loadingInstance.close();
+                loadingInstance.close();
             });
         },
         getStatusColor(status) {
@@ -128,18 +110,18 @@ export default {
                 case 'publish': 
                     return 'success'
                 case 'draft':
-                    return 'default'
+                    return 'info'
                 case 'private': 
                     return 'warning'
                 case 'trash':
                     return 'danger'
                 default:
-                    return 'default'
+                    return 'info'
             }
         },
         createNewItem() {
             // Puts loading on Draft Item creation
-            //let loadingInstance = this.$loading({ text: 'Criando item rascunho...' });
+            let loadingInstance = this.$loading({ text: 'Criando item rascunho...' });
 
             // Creates draft Item
             let data = {collection_id: this.form.collectionId, title: '', description: '', status: 'draft'};
@@ -153,16 +135,16 @@ export default {
                 this.form.description = this.item.description;
                 this.form.status = this.item.status;
 
-                this.loadMetadata();
+                this.loadMetadata(loadingInstance);
                 
             })
             .catch(error => console.log(error));
         },
-        loadMetadata() {
-            //loadingInstance = this.$loading({ text: 'Carregando metadados...'});
+        loadMetadata(loadingInstance) {
+            loadingInstance = this.$loading({ text: 'Carregando metadados...'});
             // Obtains Item Field
             this.fetchFields(this.itemId).then(res => {
-               //loadingInstance.close();
+               loadingInstance.close();
             });
         }
     },
@@ -178,13 +160,13 @@ export default {
 
         if (this.$route.fullPath.split("/").pop() == "new") {
 
-            this.pageTitle = "Criar Item";
+            this.pageTitle = "Criar Coleção";
             this.createNewItem();
 
         } else if (this.$route.fullPath.split("/").pop() == "edit") {
 
-            this.pageTitle = "Editar Item";
-            //let loadingInstance = this.$loading({ text: 'Carregando item...'});
+            this.pageTitle = "Editar Coleção";  
+            let loadingInstance = this.$loading({ text: 'Carregando item...'});
 
             // Obtains current Item ID from URL
             this.pathArray = this.$route.fullPath.split("/").reverse(); 
@@ -198,7 +180,7 @@ export default {
                 this.form.description = this.item.description;
                 this.form.status = this.item.status;
 
-                //loadingInstance.close();
+                loadingInstance.close();
             });
         }
         

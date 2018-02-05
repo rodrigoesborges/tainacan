@@ -1,11 +1,7 @@
 <template>
-    <el-date-picker
-             type="date"
-              format="dd/MM/yyyy"
-              value-format="dd/MM/yyyy"
+    <input type="text" data-uk-datepicker="{format:'DD.MM.YYYY'}"
               :value="dateValue"
-              @blur="onBlur"
-              @input="onInput($event)"></el-date-picker>
+              @blur="onBlur">
 </template>
 
 <script>
@@ -23,10 +19,6 @@
         methods: {
             onBlur() {
                 this.$emit('blur');
-            },
-            onInput($event) {
-                this.dateValue = $event;
-                this.$emit('input', this.dateValue);
             }
         }
     }

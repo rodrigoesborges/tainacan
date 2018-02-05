@@ -1,14 +1,15 @@
 <template>
-    <div>
-        <el-form-item :label="field.field.name" :prop="validateObject()">
+    <div class="uk-margin">
+        <div class="uk-form-controls" :prop="validateObject()">
+            <label  class="uk-form-label" for="form-horizontal-custom">{{field.field.name}}</label>
             <component :is="extractFieldType(field.field.field_type)" v-model="inputs[0]" :field="field" @blur="changeValue()"></component>
             <div v-if="field.field.multiple == 'yes'">
                 <div v-if="index > 0" v-for="(input, index) in inputsList " v-bind:key="index" class="multiple-inputs">
-                    <component :is="extractFieldType(field.field.field_type)" v-model="inputs[index]" :field="field" @blur="changeValue()"></component><el-button v-if="index > 0" @click="removeInput(index)">-</el-button>
-                </div> 
-                <el-button @click="addInput">+</el-button>
+                    <component :is="extractFieldType(field.field.field_type)" v-model="inputs[index]" :field="field" @blur="changeValue()"></component><button  class="uk-button uk-button-default"  v-if="index > 0" @click.prevent="removeInput(index)">-</button>
+                </div>
+                <button class="uk-button uk-button-primary" @click.prevent="addInput">+</button>
             </div>
-        </el-form-item>
+        </div>
     </div>
 </template>
 

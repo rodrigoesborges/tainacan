@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 import ElementUI from 'element-ui'
+import * as UIkit from 'uikit';
 
 import AdminPage from '../admin.vue'
 //import { eventBus } from '../../js/event-bus-web-components'

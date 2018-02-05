@@ -16,6 +16,19 @@ $--color-secondary: #01295c;
 @import "../../assets/css/fonts/material-icons.css";
 @import "../../../node_modules/element-ui/packages/theme-chalk/src/index";
 
+//------------------------------ UIKIT
+
+// 1. Your custom variables and variable overwrites.
+$global-link-color: #DA7D02;
+$global-primary-background: #25a189;
+
+// 2. Import default variables and available mixins.
+@import "../../../node_modules/uikit/src/scss/variables-theme.scss";
+@import "../../../node_modules/uikit/src/scss/mixins-theme.scss";
+
+// 4. Import UIkit.
+@import "./../../../node_modules/uikit/src/scss/uikit-theme.scss";
+
 body.tainacan-admin-page #adminmenumain {
     display: none;
 }

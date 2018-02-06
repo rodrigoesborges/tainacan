@@ -23,10 +23,8 @@
                         <option
                         v-for="statusOption in statusOptions"
                         :key="statusOption.value"
-                        :label="statusOption.label"
                         :value="statusOption.value"
-                        :disabled="statusOption.disabled">
-                        </option>
+                        :disabled="statusOption.disabled">{{statusOption.label }}</option>
                     </select>
                 </div>
             </div>

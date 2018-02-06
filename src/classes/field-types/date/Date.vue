@@ -7,6 +7,7 @@
 <script>
     import lang from 'element-ui/lib/locale/lang/pt-br'
     import locale from 'element-ui/lib/locale'
+    import * as DatePicker from '../../../../node_modules/uikit/dist/js/components/datepicker.js'
 
     locale.use(lang)
 

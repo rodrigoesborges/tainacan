@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2 v-text="pageTitle"></h2><span class="uk-label" @submit.prevent=" " v-if="item != null && item != undefined" :class="'uk-label-' + getStatusColor(item.status)" v-text="item.status"></span>
+        <h2 v-text="pageTitle"></h2><span class="uk-label" v-if="item != null && item != undefined" :class="'uk-label-' + getStatusColor(item.status)" v-text="item.status"></span>
         <form class="uk-form-horizontal uk-margin-large" :model="form" label-width="120px">
             <div class="uk-margin">
                 <label class="uk-form-label" for="form-horizontal-text">Título</label>
@@ -24,7 +24,7 @@
                         v-for="statusOption in statusOptions"
                         :key="statusOption.value"
                         :value="statusOption.value"
-                        :disabled="statusOption.disabled">{{statusOption.label }}</option>
+                        :disabled="statusOption.disabled">{{ statusOption.label }}</option>
                     </select>
                 </div>
             </div>

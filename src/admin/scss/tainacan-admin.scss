@@ -16,6 +16,15 @@ $--color-secondary: #01295c;
 @import "../../assets/css/fonts/material-icons.css";
 @import "../../../node_modules/element-ui/packages/theme-chalk/src/index";
 
+// ============= BOOTSTRAP TESTS =======================
+
+$theme-colors: (
+  "primary": #25a189,
+  "danger": #01295c
+);
+
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+
 body.tainacan-admin-page #adminmenumain {
     display: none;
 }

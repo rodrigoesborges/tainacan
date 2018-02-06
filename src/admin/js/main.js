@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
 import ElementUI from 'element-ui'
-
+import 'bootstrap';
 import AdminPage from '../admin.vue'
 //import { eventBus } from '../../js/event-bus-web-components'
 import store from '../../js/store/store'

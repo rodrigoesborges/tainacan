@@ -1,25 +1,28 @@
 <template>
     <div>
-        <h2>Item creation</h2><el-tag v-if="item != null && item != undefined" :type="getStatusColor(item.status)" v-text="item.status"></el-tag>
-        <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-            <el-form-item label="Título" prop="title">
-                <el-input v-model="form.title"></el-input>
-            </el-form-item>
-            <el-form-item label="Descrição">
-                <el-input type="textarea" v-model="form.description"></el-input>
-            </el-form-item>
-            <el-form-item label="Status">
-                <el-select v-model="form.status" placeholder="Selecione um status">
-                    <el-option
+        <h2>Item creation</h2>
+        <span class="badge" v-if="item != null && item != undefined" :class="'badge-' + getStatusColor(item.status)" v-text="item.status"></span>
+        <form ref="form" :model="form" :rules="rules" label-width="120px">
+            <div class="form-group row">
+                <label for="titleInput">Título</label>
+                <input type="text" v-model="form.title" class="form-control" id="titleInput" placeholder="Insira o título do Item."/>
+            </div> 
+            <div class="form-group row"> 
+                <label for="descriptionInput">Descrição</label>
+                <input type="textarea" v-model="form.description" class="form-control" id="descriptionInput" placeholder="Insira uma descrição para o item."/>      
+            </div>
+            <div class="form-group row"> 
+                <label for="statusSelect">Status</label>
+                <select v-model="form.status" class="form-control" placeholder="Selecione um status">
+                    <option
                     v-for="statusOption in statusOptions"
                     :key="statusOption.value"
-                    :label="statusOption.label"
                     :value="statusOption.value"
-                    :disabled="statusOption.disabled">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="Imagem">
+                    :disabled="statusOption.disabled">{{statusOption.label}}
+                    </option>
+                </select>
+            </div>
+            <!--<el-form-item label="Imagem">
                 <el-upload
                     class="upload-demo"
                     drag
@@ -30,13 +33,13 @@
                     <div class="el-upload__text">Arraste uma imagem aqui <em>ou clique para enviar</em></div>
                     <div class="el-upload__tip" slot="tip">imagens em formato jpg/png</div>
                 </el-upload>
-            </el-form-item>
+            </el-form-item> -->
             <tainacan-form-item v-for="(field, index) in fieldList" v-bind:key="index" :field="field"></tainacan-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="onSubmit">Salvar</el-button>
-                <el-button>Cancelar</el-button>
-            </el-form-item>
-        </el-form>
+            <div class="form-group row">
+                <button class="btn btn-primary" @click="onSubmit">Salvar</button>
+                <button  class="btn">Cancelar</button>
+            </div>
+        </form>
     </div>
 </template>
 

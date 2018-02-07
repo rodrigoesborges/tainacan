@@ -1,7 +1,10 @@
 import Vue from 'vue'
 
 import ElementUI from 'element-ui'
-import 'bootstrap';
+
+import 'bootstrap'
+import 'moment'
+import '../../../node_modules/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker'
 import AdminPage from '../admin.vue'
 //import { eventBus } from '../../js/event-bus-web-components'
 import store from '../../js/store/store'

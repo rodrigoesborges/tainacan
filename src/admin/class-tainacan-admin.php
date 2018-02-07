@@ -14,7 +14,7 @@ class Admin {
         add_filter( 'admin_body_class', array(&$this, 'admin_body_class') );
 	    add_action('admin_enqueue_scripts', array(&$this, 'add_user_admin_js'));
 
-
+        
     }
     
     function add_admin_menu() {
@@ -54,8 +54,8 @@ class Admin {
 		$components = ( has_filter( 'tainacan_register_web_components' ) ) ? apply_filters('tainacan_register_web_components') : [];
 
 		wp_enqueue_script('wp-settings',$TAINACAN_BASE_URL . '/js/wp-settings.js');
-
-		$settings = [
+        
+        $settings = [
 			'root' => esc_url_raw( rest_url() ).'tainacan/v2',
 			'nonce' => wp_create_nonce( 'wp_rest' ),
 			'components' => $components

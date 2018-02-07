@@ -24,6 +24,7 @@ $theme-colors: (
 );
 
 @import "../../../node_modules/bootstrap/scss/bootstrap";
+@import "../../../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css";
 
 body.tainacan-admin-page #adminmenumain {
     display: none;

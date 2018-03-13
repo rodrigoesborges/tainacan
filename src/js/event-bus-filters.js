@@ -23,6 +23,10 @@ export const eventFilterBus = new Vue({
                 });
             }
         },
+        getErrors( filter_id ){
+            let error = this.errors.find( errorItem => errorItem.field_id === filter_id );
+            return ( error ) ? error.errors : false
+        },
 
         /* Dev interfaces methods */
 

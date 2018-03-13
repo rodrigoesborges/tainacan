@@ -50,6 +50,13 @@ class Item extends Entity {
 	}
 
 	/**
+	 * @param $id
+	 */
+	function set_featured_img_id($id){
+		$this->set_mapped_property('featured_image_id', $id );
+	}
+
+	/**
 	 * @return mixed|null
 	 */
 	function get_attachments(){

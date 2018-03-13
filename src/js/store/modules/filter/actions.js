@@ -20,7 +20,11 @@ export const set_postquery_attribute = ({ commit }, filter, value ) => {
 };
 
 export const add_metaquery = ( { commit }, filter  ) => {
-    commit('addMetaQuery', filter  );
+    if( filter && filter.value.length === 0 ){
+        commit('removeMetaQuery', filter  );
+    } else {
+        commit('addMetaQuery', filter  );
+    }
 };
 
 export const remove_metaquery = ( { commit }, filter  ) => {
@@ -164,4 +168,4 @@ export const fetchFilterTypes = ({ commit} ) => {
             reject(error);
         });
     });
-}
+}   

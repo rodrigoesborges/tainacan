@@ -4,7 +4,7 @@
             <div class="header-item">
                 <router-link tag="button" class="button is-secondary"
                         :to="{ path: $routerHelper.getNewItemPath(collectionId) }">
-                    {{ $i18n.get('new') + ' ' + $i18n.get('item') }}
+                    {{ $i18n.getFrom('items', 'new_item') }}
                 </router-link>
             </div>
             <div class="header-item">
@@ -29,6 +29,7 @@
         <div class="columns above-subheader">
             <aside class="column filters-menu">
                 <h3>{{ $i18n.get('filters') }}</h3>
+                <filters-items-list></filters-items-list>
             </aside>
             <div class="column table-container">
                 <items-list
@@ -83,6 +84,7 @@
 
 <script>
 import ItemsList from '../../components/lists/items-list.vue';
+import FiltersItemsList from '../../components/lists/filters-items-list.vue';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
@@ -100,7 +102,8 @@ export default {
         }
     },
     components: {
-        ItemsList
+        ItemsList,
+        FiltersItemsList
     },
     methods: {
         ...mapActions('collection', [

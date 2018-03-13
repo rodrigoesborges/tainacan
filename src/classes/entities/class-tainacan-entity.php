@@ -209,13 +209,13 @@ class Entity {
                 foreach ($prop_value as $val) {
                     if (!$validation->validate($val)) {
 
-                        $this->add_error('invalid', $message);
+                        $this->add_error($prop, $message);
                         $is_valid = false;
                     }
                 }
             } else {
                 if (!$validation->validate($prop_value)) {
-                	$this->add_error('invalid', $message);
+                	$this->add_error($prop, $message);
 	                $is_valid = false;
                 }
             }

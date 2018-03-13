@@ -9,11 +9,25 @@
             </div>
             
             <ul class="menu-list">
-                <li><router-link tag="a" to="/collections" :class="activeRoute == 'CollectionsPage' ? 'is-active':''">
-                    <b-icon size="is-small" icon="folder"></b-icon> <span class="menu-text">{{ $i18n.get('collections')}}</span>
+                <li class="search-area">
+                    <b-field>
+                        <b-input 
+                            :placeholder="$i18n.get('search')"
+                            type="search"
+                            size="is-small"
+                            icon="magnify">
+                        </b-input>
+                    </b-field>
+                    <router-link tag="a" to="">
+                        <b-icon size="is-small" icon="magnify"></b-icon> <span class="menu-text">{{ $i18n.get('advanced_search')}}</span>
+                    </router-link>
+                </li>
+                <li class="separator"></li>
+                <li><router-link tag="a" to="/collections" :class="activeRoute == 'CollectionsPage' || isCompressed ? 'is-active':''">
+                    <b-icon size="is-small" icon="folder-multiple"></b-icon> <span class="menu-text">{{ $i18n.get('collections')}}</span>
                 </router-link></li>
                 <li><router-link tag="a" to="/items" :class="activeRoute == 'ItemsPage' ? 'is-active':''">
-                    <b-icon size="is-small" icon="cube-outline"></b-icon> <span class="menu-text">{{ $i18n.get('items')}}</span>
+                    <b-icon size="is-small" icon="file-multiple"></b-icon> <span class="menu-text">{{ $i18n.get('items')}}</span>
                 </router-link></li>
                 <li class="separator"></li>
                 <li><router-link tag="a" to="/fields" :class="activeRoute == 'FieldsPage' ? 'is-active':''">
@@ -26,7 +40,7 @@
                     <b-icon size="is-small" icon="shape"></b-icon> <span class="menu-text">{{ $i18n.get('categories')}}</span>
                 </router-link></li>
                 <li><router-link tag="a" to="/events" :class="activeRoute == 'EventsPage' ? 'is-active':''">
-                    <b-icon size="is-small" icon="calendar"></b-icon> <span class="menu-text">{{ $i18n.get('events')}}</span>
+                    <b-icon size="is-small" icon="bell"></b-icon> <span class="menu-text">{{ $i18n.get('events')}}</span>
                 </router-link></li>
             </ul>
         </aside>
@@ -58,19 +72,19 @@ export default {
 
 <style lang="scss" scoped>
 
-    @import "../scss/_variables.scss";
+    @import "../../scss/_variables.scss";
 
     #primary-menu {
         background-color: $secondary;
         padding: 0px; 
         -webkit-transition: max-width 0.2s linear; /* Safari */
         transition: max-width 0.2s linear; 
-        max-width: 222px;
+        max-width: $side-menu-width;
         z-index: 99;
 
         .menu-header {
             background-color: rgba(0,0,0,0.1);
-            height: 78px; 
+            height: $header-height; 
             a { padding: 1.45em 2.5em }
             .icon {
                 position: absolute;
@@ -91,13 +105,21 @@ export default {
             height: 2px;
             background-color: $separator-color;
             width: 100%;
+            margin: 1.75em 0;
         }
         li{
+            &.search-area {
+                visibility: visible;
+                opacity: 1;
+                padding-top: 1.8em;
+                .field { padding: 0 1.8em 0.5em; }
+                .menu-text { font-size: 0.85em; }
+            }
             a {
                 color: white;
                 white-space: nowrap;
                 overflow: hidden;
-                padding: 1em 1.8em;
+                padding: 0.75em 1.8em;
                 line-height: 1.5em;
                 border-radius: 0px;
                 -webkit-transition: padding 0.2s linear; /* Safari */
@@ -134,8 +156,13 @@ export default {
                     opacity: 0;
                 }
             }
+            .search-area {   
+                visibility: hidden; 
+                opacity: 0;
+            }
             a { 
-                padding: 1em 0.8em;
+                padding-left: 0.8em;
+                padding-right: 0.8em;
                 color: rgba(255,255,255,0.4);
             }
             .menu-text {   
@@ -161,11 +188,13 @@ export default {
                         visibility: visible !important; 
                         opacity: 1 !important;
                     }
+                    
                 }
             }
             .separator {
                 width: 2px;
                 height: auto;
+                margin: 0;
             }
             a{ padding: 1em 0.8em !important;}
             .menu-text {

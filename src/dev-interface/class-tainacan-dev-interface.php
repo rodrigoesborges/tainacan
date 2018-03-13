@@ -14,7 +14,6 @@ class DevInterface {
         add_action('add_meta_boxes', array(&$this, 'register_metaboxes'));
         add_action('save_post', array(&$this, 'save_post'), 10, 2);
         add_action('admin_enqueue_scripts', array(&$this, 'add_admin_js'));
-        add_action('admin_enqueue_scripts', array(&$this, 'add_admin_css'));
 
         add_filter('post_type_link', array(&$this, 'permalink_filter'), 10, 3);
         
@@ -41,11 +40,6 @@ class DevInterface {
 
         wp_enqueue_script( 'tainacan-dev-admin', $TAINACAN_BASE_URL . '/assets/dev_admin-components.js', [] , null, true);
 	    wp_localize_script( 'tainacan-dev-admin', 'tainacan_plugin', $settings );
-    }
-
-    function add_admin_css() {
-        global $TAINACAN_BASE_URL;
-        wp_enqueue_style('tainacan-dev-admin-styles', $TAINACAN_BASE_URL . '/assets/css/tainacan-admin.css' );
     }
     
     /**
@@ -475,7 +469,7 @@ class DevInterface {
                     } elseif($prop == 'field_type_options' || $prop == 'filter_type_options') {
                         continue;
                     } elseif ($prop == 'filter_type') {
-                        $class = '\Tainacan\Filter_Types\\'.$value;
+                        $class = str_replace('\\\\','\\','\Tainacan\Filter_Types\\'.$value );
                         update_post_meta($post_id, 'filter_type_options', $_POST['filter_type_'.strtolower( $value ) ] );
                         update_post_meta($post_id, 'filter_type',  wp_slash( get_class( new $class() ) ) );
                     } elseif ($mapped['map'] == 'meta' || $mapped['map'] == 'meta_multi') {

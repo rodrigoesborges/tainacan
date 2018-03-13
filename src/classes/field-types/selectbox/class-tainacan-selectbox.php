@@ -14,6 +14,7 @@ class Selectbox extends Field_Type {
         parent::__construct();
         parent::set_primitive_type('string');
         $this->component = 'tainacan-selectbox';
+        $this->form_component = 'tainacan-form-selectbox';
     }
 
     /**
@@ -32,19 +33,19 @@ class Selectbox extends Field_Type {
     }
 
     /**
-     * generate the fields for this field type
+     * @param \Tainacan\Entities\Field $field
+     * @return array|bool true if is validate or array if has error
      */
-    public function form(){
-        ?>
-        <tr>
-            <td>
-                <label><?php echo __('Options','tainacan'); ?></label><br/>
-                <small><?php echo __('Insert the options, separate by lines for the field value','tainacan'); ?></small>
-            </td>
-            <td>
-                <textarea name="field_type_options[options]"><?php echo $this->get_option('options'); ?></textarea>
-            </td>
-        </tr>
-        <?php
+    public function validate_options(\Tainacan\Entities\Field $field) {
+        if ( !in_array($field->get_status(), apply_filters('tainacan-status-require-validation', ['publish','future','private'])) )
+            return true;
+
+        if ( empty($this->get_option('options')) ) {
+            return [
+                'options' => __('Options is required','tainacan')
+            ];
+        }
+
+        return true;
     }
 }

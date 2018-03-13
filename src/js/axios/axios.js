@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const instance = axios.create({
+export const tainacan = axios.create({
     baseURL: tainacan_plugin.root
 });
 
-instance.defaults.headers.common['X-WP-Nonce'] = tainacan_plugin.nonce;
+tainacan.defaults.headers.common['X-WP-Nonce'] = tainacan_plugin.nonce;
 
-export default instance;
+export const wp = axios.create({
+    baseURL: tainacan_plugin.root_wp_api
+});
+
+wp.defaults.headers.common['X-WP-Nonce'] = tainacan_plugin.nonce;
+
+export default { tainacan, wp };

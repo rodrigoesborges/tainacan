@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1>Fields List and Edition Component</h1>
         <b-loading :active.sync="isLoadingFieldTypes"></b-loading>
         <div class="columns">
             <div class="column">
@@ -13,59 +12,45 @@
                         :options="{group: { name:'fields', pull: false, put: true }, 'handle': '.handle', chosenClass: 'sortable-chosen', filter: '.not-sortable-item'}">
                         <div  
                             class="active-field-item" 
-                            :class="{'not-sortable-item': field.id == undefined || isRepositoryLevel }" 
+                            :class="{'not-sortable-item': field.id == undefined, 'not-focusable-item': openedFieldId == field.id, 'inherited-field': field.collection_id != collectionId}" 
                             v-for="(field, index) in activeFieldList" :key="index">
-                            <div>
-                                <div class="handle">
-                                    {{ field.name }}
-                                    <span class="label-details"><span class="loading-spinner" v-if="field.id == undefined"></span> <b-tag v-if="field.status != undefined">{{field.status}}</b-tag></span>
-                                    <b-icon type="is-gray" class="is-pulled-right" icon="drag"></b-icon>
-                                    <a @click.prevent="removeField(field)" v-if="field.id != undefined"><b-icon icon="delete"></b-icon></a>
-                                    <a @click.prevent="editField(field)" v-if="field.id != undefined"><b-icon icon="pencil" v-if="field.id != undefined"></b-icon></a>
-                                </div>
-                                <div v-if="openedFieldId == field.id">
-                                    <form v-on:submit.prevent="saveEdition($event, field)">    
-                                        <b-field :label="$i18n.get('label_status')">
-                                            <b-select
-                                                    id="tainacan-select-status"
-                                                    name="status"
-                                                    :value="editForm"
-                                                    :placeholder="$i18n.get('instruction_select_a_status')">
-                                                <option value="private">{{ $i18n.get('publish')}}</option>
-                                                <option value="private">{{ $i18n.get('private')}}</option>
-                                            </b-select>
-                                        </b-field>
-
-                                        <div v-html="field.edit_form"></div>
-                                        
-                                        <div class="field is-grouped">
-                                            <div class="control">
-                                                <button class="button is-link" type="submit">Submit</button>
-                                            </div>
-                                            <div class="control">
-                                                <button class="button is-text" @click.prevent="cancelEdition(field)" slot="trigger">Cancel</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
+                            <div class="handle">
+                                <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
+                                <span class="field-name">{{ field.name }}</span>
+                                <span v-if="field.id !== undefined" class="label-details">{{ $i18n.get(field.field_type_object.component)}}</span><span class="loading-spinner" v-if="field.id == undefined"></span>
+                                <span class="controls" v-if="field.id !== undefined">
+                                    <b-switch size="is-small" v-model="field.disabled" @input="onChangeEnable($event, index)">{{ field.disabled ? $i18n.get('label_disabled') : $i18n.get('label_enabled') }}</b-switch>
+                                    <a @click.prevent="removeField(field)">
+                                        <b-icon icon="delete"></b-icon>
+                                    </a>
+                                    <a @click.prevent="editField(field)">
+                                        <b-icon icon="pencil"></b-icon>
+                                    </a>
+                                </span>
                             </div>
+                            <b-field v-if="openedFieldId == field.id">
+                                <field-edition-form 
+                                    :collectionId="collectionId"
+                                    :isRepositoryLevel="isRepositoryLevel"
+                                    @onEditionFinished="onEditionFinished()"
+                                    @onEditionCanceled="onEditionCanceled()"
+                                    :field="editForm"></field-edition-form>
+                            </b-field>
                         </div>
-                        
-                        <!-- <div class="not-sortable-item" slot="footer">{{ $i18n.get('instruction_dragndrop_fields_collection') }}</div> -->
                     </draggable> 
                 </b-field>
             </div>
             <div class="column">
-                <b-field :label="$i18n.get('label_available_fields')">
+                <b-field :label="$i18n.get('label_available_field_types')">
                     <div class="columns box available-fields-area" >
                         <draggable class="column" :list="availableFieldList" :options="{ sort: false, group: { name:'fields', pull: 'clone', put: false, revertClone: true }}">
                             <div class="available-field-item" v-if="index % 2 == 0" v-for="(field, index) in availableFieldList" :key="index">
-                                {{ field.name }}  <b-icon type="is-gray" class="is-pulled-right" icon="drag"></b-icon>
+                                {{ field.name }}  <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
                             </div>
                         </draggable>
                         <draggable class="column" :list="availableFieldList" :options="{ sort: false, group: { name:'fields', pull: 'clone', put: false, revertClone: true }}">
                             <div class="available-field-item" v-if="index % 2 != 0" v-for="(field, index) in availableFieldList" :key="index">
-                                {{ field.name }}  <b-icon type="is-gray" class="is-pulled-right" icon="drag"></b-icon>
+                                {{ field.name }}  <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
                             </div>       
                         </draggable> 
                    </div>
@@ -77,6 +62,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import FieldEditionForm from './../edition/field-edition-form.vue';
 
 export default {
     name: 'FieldsList',
@@ -88,9 +74,12 @@ export default {
             isLoadingFieldTypes: true,
             isLoadingFields: false,
             isLoadingField: false,
-            editForm: {},
-            openedFieldId: ''
+            openedFieldId: '',
+            editForm: {}
         }
+    },
+    components: {
+        FieldEditionForm
     },
     methods: {
         ...mapActions('fields', [
@@ -114,27 +103,21 @@ export default {
                     this.updateFieldsOrder(); 
             }
         },
-        saveEdition($event, field) {
-            this.openedFieldId = field.id;
-            
-            let data = []
-            for (let i = 0; i < $event.target.length; i++) {
-                let input = {};
-                input[$event.target[i].name] =  $event.target[i].value;
-                data.push(input);
-            }
-            console.log(data);
-        },
-        cancelEdition(field) {
-            this.editForm = {};
-            this.openedFieldId = '';
-        },
         updateFieldsOrder() {
             let fieldsOrder = [];
             for (let field of this.activeFieldList) {
-                fieldsOrder.push({'id': field.id, 'enabled': true});
+                fieldsOrder.push({'id': field.id, 'enabled': !field.disabled});
             }
             this.updateCollectionFieldsOrder({ collectionId: this.collectionId, fieldsOrder: fieldsOrder });
+        },
+        onChangeEnable($event, index) {
+            this.activeFieldList[index].disabled = $event;
+            let fieldsOrder = [];
+            for (let field of this.activeFieldList) {
+                fieldsOrder.push({'id': field.id, 'enabled': !field.disabled});
+            }
+            this.updateCollectionFieldsOrder({ collectionId: this.collectionId, fieldsOrder: fieldsOrder });
+
         },
         addNewField(newField, newIndex) {
             this.sendField({collectionId: this.collectionId, name: newField.name, fieldType: newField.className, status: 'auto-draft', isRepositoryLevel: this.isRepositoryLevel})
@@ -149,6 +132,8 @@ export default {
 
                 if (!this.isRepositoryLevel)
                     this.updateFieldsOrder();
+
+                this.editField(field);
             })
             .catch((error) => {
                 console.log(error);
@@ -168,11 +153,23 @@ export default {
             });
         },
         editField(field) {
-            if (this.openedFieldId == field.id)
+            if (this.openedFieldId == field.id) {
                 this.openedFieldId = '';
-            else
+                this.editForm = {};
+            } else {
                 this.openedFieldId = field.id;
+                this.editForm = JSON.parse(JSON.stringify(field));
+                this.editForm.status = 'publish';
+            }            
+        },
+        onEditionFinished() {
+            this.openedFieldId = '';
+            this.fetchFields({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel});
+        },
+        onEditionCanceled() {
+            this.openedFieldId = '';
         }
+
     },
     computed: {
         availableFieldList() {
@@ -184,7 +181,7 @@ export default {
     },
     created() {
         this.isLoadingFieldTypes = true;
-        this.isLoadingFields = true;      
+        this.isLoadingFields = true;
 
         this.fetchFieldTypes()
             .then((res) => {
@@ -195,7 +192,11 @@ export default {
             });
 
         this.isRepositoryLevel = this.$route.name == 'FieldsPage' ? true : false;
-        this.collectionId = this.$route.params.collectionId;
+        if (this.isRepositoryLevel)
+            this.collectionId = 'default';
+        else
+            this.collectionId = this.$route.params.collectionId;
+        
 
         this.fetchFields({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel})
             .then((res) => {
@@ -210,7 +211,7 @@ export default {
 
 <style lang="scss" scoped>
 
-    @import "../scss/_variables.scss";
+    @import "../../scss/_variables.scss";
 
     .active-fields-area {
         min-height: 40px;
@@ -227,19 +228,25 @@ export default {
 
         .active-field-item {
             background-color: white;
-            padding: 0.2em 0.5em;
+            padding: 0.4em;
             margin: 10px;
             border-radius: 5px;
             border: 1px solid gainsboro;
-            display: block;
+            display: block; 
+            transition: top 0.2s ease;
             cursor: grab;
-            .icon { float: right }
+        
+            .field-name {
+                text-overflow: ellipsis;
+                overflow-x: hidden;
+                white-space: nowrap;
+            }
             .label-details {
                 font-weight: normal;
                 font-style: italic;
                 color: gray;
             }
-
+            .controls { float: right }
             .loading-spinner {
                 animation: spinAround 500ms infinite linear;
                 border: 2px solid #dbdbdb;
@@ -251,22 +258,26 @@ export default {
                 height: 1em; 
                 width: 1em;
             }
-
-            &.not-sortable-item {
-                color: gray;
+            &.not-sortable-item, &.not-sortable-item:hover, &.not-focusable-item, &.not-focusable-item:hover {
+                box-shadow: none !important;
+                top: 0px !important;
                 cursor: default;
+            }
+            &.inherited-field {
+                color: gray;
             }
         }
         .active-field-item:hover {
-            box-shadow: 0px 0px 2px #777;
+            box-shadow: 0 3px 4px rgba(0,0,0,0.25);
+            position: relative;
+            top: -2px;
         }
 
         .sortable-chosen {
             background-color: $primary-lighter;
-            padding: 0.2em 0.5em;
             margin: 10px;
             border-radius: 5px;
-            border: 2px dashed $primary-light;
+            border: 1px dashed $primary-light;
             display: block; 
         }
     }
@@ -277,19 +288,25 @@ export default {
         background-color: whitesmoke;
 
         .available-field-item {
-            padding: 0.2em 0.5em;
+            padding: 0.4em;
             margin: 10px 10% 10px 0px;
             border-radius: 5px;
             background-color: white;
             border: 1px solid gainsboro;
             width: 100%;
             cursor: grab;
+            top: 0;
+            transition: top 0.2s ease;
         }
         .available-field-item:hover {
             border: 1px solid lightgrey;
-            box-shadow: 0px 0px 2px #777;
+            box-shadow: 2px 3px 4px rgba(0,0,0,.25);
+            position: relative;
+            top: -2px;
+            left: -2px;
         }
     }
+
 </style>
 
 

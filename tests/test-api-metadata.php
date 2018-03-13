@@ -280,10 +280,8 @@ class TAINACAN_REST_Metadata_Controller extends TAINACAN_UnitApiTestCase {
 		#### UPDATE FIELD IN COLLECTION ####
         
 		$values = json_encode([
-			'values'      => [
-				'name'        => 'Dia/Mês/Ano',
-				'description' => 'Continua descrevendo o dado do campo.'
-			]
+			'name'        => 'Dia/Mês/Ano',
+			'description' => 'Continua descrevendo o dado do campo.'
 		]);
 
 		$request = new \WP_REST_Request(
@@ -387,10 +385,8 @@ class TAINACAN_REST_Metadata_Controller extends TAINACAN_UnitApiTestCase {
 		);
 
 		$new_attributes = json_encode([
-			'values' => [
-				'name'        => 'No name',
-				'description' => 'NOP!'
-			]
+			'name'        => 'No name',
+			'description' => 'NOP!'
 		]);
 
 		$request = new \WP_REST_Request(
@@ -478,6 +474,18 @@ class TAINACAN_REST_Metadata_Controller extends TAINACAN_UnitApiTestCase {
 			$this->namespace . '/collection/' . $collection->get_id() . '/fields/' . $field->get_id()
 		);
 		$request->set_query_params($query);
+
+		//=======================
+
+		// Set no one user
+		wp_set_current_user(0);
+
+		$response1 = $this->server->dispatch($request);
+
+		$data1 = $response1->get_data();
+
+		$this->assertCount(1, $data1);
+		$this->assertEquals('12/12/2017', $data1[0]['mvalue']);
 
 		//=======================
 

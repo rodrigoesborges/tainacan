@@ -41,31 +41,38 @@ class TAINACAN_REST_Collections_Controller extends TAINACAN_REST_Controller {
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => array($this, 'get_items'),
                 'permission_callback' => array($this, 'get_items_permissions_check'),
-	            //'args'                => $this->get_item_schema()
+	            'args'                => $this->get_collection_params(),
             ),
 	        array(
 		        'methods'             => WP_REST_Server::CREATABLE,
 		        'callback'            => array($this, 'create_item'),
 		        'permission_callback' => array($this, 'create_item_permissions_check'),
-		        //'args'                => $this->get_endpoint_args_for_item_schema(WP_REST_Server::CREATABLE),
+		        'args'                => $this->get_item_schema()
 	        ),
         ));
         register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<collection_id>[\d]+)', array(
             array(
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => array($this, 'get_item'),
-                //'args'                => $this->get_collection_params(),
                 'permission_callback' => array($this, 'get_item_permissions_check'),
+	            'args'                => $this->get_item_schema()
             ),
             array(
                 'methods'             => WP_REST_Server::EDITABLE,
                 'callback'            => array($this, 'update_item'),
                 'permission_callback' => array($this, 'update_item_permissions_check'),
+                'args'                => $this->get_item_schema()
             ),
             array(
                 'methods'             => WP_REST_Server::DELETABLE,
                 'callback'            => array($this, 'delete_item'),
                 'permission_callback' => array($this, 'delete_item_permissions_check'),
+	            'args'                => array(
+	            	'body_args' => array(
+		                'description' => __('To delete permanently, in body you can pass \'is_permanently\' as true. By default this will only trash collection'),
+			            'default'     => 'false'
+		            ),
+	            )
             ),
         ));
     }
@@ -133,11 +140,20 @@ class TAINACAN_REST_Collections_Controller extends TAINACAN_REST_Controller {
 	 */
 	public function prepare_item_for_response($item, $request){
         if(!empty($item)){
-            $item_arr = $item->__toArray();
 
-            if($request['context'] === 'edit'){
-            	$item_arr['current_user_can_edit'] = $item->can_edit();
-            }
+        	if(!isset($request['fetch_only'])) {
+
+		        $item_arr = $item->__toArray();
+
+		        if ( $request['context'] === 'edit' ) {
+			        $item_arr['current_user_can_edit'] = $item->can_edit();
+		        }
+
+	        } else {
+        		$attributes_to_filter = $request['fetch_only'];
+
+        		$item_arr = $this->filter_object_by_attributes($item, $attributes_to_filter);
+	        }
 
             return $item_arr;
         }
@@ -359,28 +375,39 @@ class TAINACAN_REST_Collections_Controller extends TAINACAN_REST_Controller {
     }
 
 	/**
-	 * @param string $method
-	 *
-	 * @return array|mixed|void
-	 */
-	public function get_endpoint_args_for_item_schema( $method = WP_REST_Server::CREATABLE ) {
-	    $args = [
-	    	'Object' => [
-	    		'type'        => 'JSON',
-			    'description' => 'A Collection object'
-		    ]
-	    ];
-
-	    return $args;
-    }
-
-	/**
 	 * @return array|mixed|void
 	 */
 	public function get_item_schema() {
-		$args = $this->collections_repository->get_map();
+		$schema['$schema'] = 'http://json-schema.org/draft-07/schema#';
+		$schema['title'] = $this->collection->get_post_type();
+		$schema['type']  = 'object';
 
-		return $args;
+		$schema['properties'] = $this->collections_repository->get_map();
+
+		return $schema;
+    }
+
+	/**
+	 *
+	 * Return the queries supported when getting a collection of objects
+	 *
+	 * @param null $object_name
+	 *
+	 * @return array
+	 */
+    public function get_collection_params($object_name = null) {
+    	$query_params['context']['default'] = 'view';
+
+	    $query_params = array_merge($query_params, parent::get_collection_params('collection'));
+
+	    $query_params['name'] = array(
+	    	'description' => __('Limit result set to collection with specific name.'),
+		    'type'        => 'string',
+	    );
+
+	    $query_params = array_merge($query_params, parent::get_meta_queries_params());
+
+	    return $query_params;
     }
 }
 

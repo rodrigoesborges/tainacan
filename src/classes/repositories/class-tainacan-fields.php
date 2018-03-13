@@ -172,10 +172,14 @@ class Fields extends Repository {
             ],
         ]);
     }
-
-    public function register_post_type() {
-        $labels = array(
-            'name'               => __('Field', 'tainacan'),
+	
+	/**
+	 * Get the labels for the custom post type of this repository
+	 * @return array Labels in the format expected by register_post_type()
+	 */
+	public function get_cpt_labels() {
+		return array(
+			'name'               => __('Field', 'tainacan'),
             'singular_name'      => __('Field', 'tainacan'),
             'add_new'            => __('Add new', 'tainacan'),
             'add_new_item'       => __('Add new Field', 'tainacan'),
@@ -188,7 +192,10 @@ class Fields extends Repository {
             'parent_item_colon'  => __('Parent Field:', 'tainacan'),
             'menu_name'          => __('Fields', 'tainacan')
         );
+	}
 
+    public function register_post_type() {
+        $labels = $this->get_cpt_labels();
         $args = array(
             'labels'              => $labels,
             'hierarchical'        => true,
@@ -333,7 +340,7 @@ class Fields extends Repository {
         return $this->order_result(
             $this->fetch( $args, $output ),
             $collection,
-            isset( $args['disabled_fields'] ) ? $args['disabled_fields'] : false
+            isset( $args['include_disabled'] ) ? $args['include_disabled'] : false
         );
     }
 
@@ -344,10 +351,10 @@ class Fields extends Repository {
      *
      * @param $result Response from method fetch
      * @param Entities\Collection $collection
-     * @param bool $disabled_fields Disabled fields wont appear on list collection fields
+     * @param bool $include_disabled Wether to include disabled fields in the results or not
      * @return array or WP_Query ordinate
      */
-    public function order_result( $result, Entities\Collection $collection, $disabled_fields = false ){
+    public function order_result( $result, Entities\Collection $collection, $include_disabled = false ){
         $order = $collection->get_fields_order();
         if($order) {
             $order = ( is_array($order) ) ? $order : unserialize($order);
@@ -363,9 +370,11 @@ class Fields extends Repository {
                     if( $index !== false ) {
 
                         // skipping fields disabled if the arg is set
-                        if( $disabled_fields && !$order[$index]['enable'] ){
-                           continue;
-                        }
+                        if( !$include_disabled && isset( $order[$index]['enable'] ) && !$order[$index]['enable'] ) {
+						   continue;
+					   } elseif ($include_disabled && isset( $order[$index]['enable'] ) && !$order[$index]['enable']) {
+						   $item->set_disabled_for_collection(true);
+					   }
 
                         $result_ordinate[$index] = $item;
                     } else {
@@ -404,6 +413,22 @@ class Fields extends Repository {
         }
         return $result;
     }
+	
+	/**
+     * @param \Tainacan\Entities\Field $field
+     * @return \Tainacan\Entities\Field
+     * {@inheritDoc}
+     * @see \Tainacan\Repositories\Repository::insert()
+     */
+    public function insert($field){
+        global $Tainacan_Fields;
+
+    	$this->pre_update_category_field($field);
+        $new_field = parent::insert($field);
+
+        $this->update_category_field($new_field);
+    	return $new_field;
+    }
 
 	/**
 	 * @param $object
@@ -417,6 +442,7 @@ class Fields extends Repository {
     }
 
     public function delete($field_id){
+		$this->delete_category_field($field_id);
 		return new Entities\Field( wp_trash_post( $field_id ) );
     }
 
@@ -600,36 +626,131 @@ class Fields extends Repository {
 		// Clear the result cache
 		$wpdb->flush();
 
-		$item_post_type = "%{$collection_id}_item";
+		$item_post_type = "%%{$collection_id}_item";
 
-		$sql_string = (current_user_can( "read_private_tnc_col_{$collection_id}_items" ) && current_user_can( 'read_private_tainacan-collections' )) ? $wpdb->prepare(
-			"SELECT item_id, field_id, mvalue 
-				FROM (
-					SELECT ID as item_id
-					FROM $wpdb->posts
-					WHERE post_type LIKE %s
-				) items
-				JOIN (
-					SELECT meta_key as field_id, meta_value as mvalue, post_id
-					FROM $wpdb->postmeta
-				) metas
-				ON items.item_id = metas.post_id AND metas.field_id = %s", $item_post_type, $field_id
-		) : $wpdb->prepare(
-			"SELECT item_id, field_id, mvalue 
-				FROM (
-					SELECT ID as item_id
-					FROM $wpdb->posts
-					WHERE post_type LIKE %s AND post_status <> 'private'
-				) items
-				JOIN (
-					SELECT meta_key as field_id, meta_value as mvalue, post_id
-					FROM $wpdb->postmeta
-				) metas
-				ON items.item_id = metas.post_id AND metas.field_id = %s", $item_post_type, $field_id
-		);
+		$collection = new Entities\Collection($collection_id);
+		$capabilities = $collection->get_capabilities();
 
-		$results = $wpdb->get_results($sql_string, ARRAY_A);
+		$results = [];
+
+		// If no has logged user or actual user can not read private posts
+		if(get_current_user_id() === 0 || !current_user_can( $capabilities->read_private_posts)) {
+			$args = [
+				'exclude_from_search' => false,
+				'public'              => true,
+				'private'             => false,
+				'internal'            => false,
+			];
+
+			$post_statuses = get_post_stati( $args, 'names', 'and' );
+
+			foreach ($post_statuses as $post_status) {
+				$sql_string = $wpdb->prepare(
+					"SELECT item_id, field_id, mvalue 
+				  		FROM (
+			  				SELECT ID as item_id
+		  					FROM $wpdb->posts
+	  						WHERE post_type LIKE %s AND post_status = %s
+  						) items
+						JOIN (
+						  	SELECT meta_key as field_id, meta_value as mvalue, post_id
+					  	  	FROM $wpdb->postmeta
+				  		) metas
+			  			ON items.item_id = metas.post_id AND metas.field_id = %d",
+					$item_post_type, $post_status, $field_id
+				);
+
+				$pre_result = $wpdb->get_results( $sql_string, ARRAY_A );
+
+				if (!empty($pre_result)) {
+					$results[] = $pre_result[0];
+				}
+			}
+		} elseif ( current_user_can( $capabilities->read_private_posts) ) {
+			$args = [
+				'exclude_from_search' => false,
+			];
+
+			$post_statuses = get_post_stati( $args, 'names', 'and' );
+
+			foreach ($post_statuses as $post_status) {
+				$sql_string = $wpdb->prepare(
+					"SELECT item_id, field_id, mvalue 
+		  	        	FROM (
+	  	  		        	SELECT ID as item_id
+  	  			        	FROM $wpdb->posts
+  				        	WHERE post_type LIKE %s AND post_status = %s
+					  	) items
+					  	JOIN (
+					    	SELECT meta_key as field_id, meta_value as mvalue, post_id
+							FROM $wpdb->postmeta
+					  	) metas
+					  	ON items.item_id = metas.post_id AND metas.field_id = %d",
+					$item_post_type, $post_status, $field_id
+				);
+
+				$pre_result = $wpdb->get_results( $sql_string, ARRAY_A );
+
+				if (!empty($pre_result)) {
+					$results[] = $pre_result[0];
+				}
+			}
+		}
 
 		return $results;
+	}
+	
+	/**
+	 * Stores the value of the taxonomy_id option to use on update_category_field method.
+	 *
+	 */
+	private function pre_update_category_field($field) {
+		$field_type = $field->get_field_type_object();
+		$current_tax = '';
+		if ($field_type->get_primitive_type() == 'term') {
+			
+			$options = $this->get_mapped_property($field, 'field_type_options');
+			$field_type->set_options($options);
+			$current_tax = $field_type->get_option('taxonomy_id');
+		}
+		$this->current_taxonomy = $current_tax;
+	}
+	
+	/**
+	 * Triggers hooks when saving a Category Field, indicating wich taxonomy was added or removed from a collection.
+	 *
+	 * This is used by Taxonomies repository to update the collections_ids property of the taxonomy as
+	 * a field type category is inserted or removed
+	 * 
+	 * @param  [type] $field [description]
+	 * @return [type]        [description]
+	 */
+	private function update_category_field($field) {
+		$field_type = $field->get_field_type_object();
+		$new_tax = '';
+		
+		if ($field_type->get_primitive_type() == 'term') {
+			$new_tax = $field_type->get_option('taxonomy_id');
+		}
+		
+		if ($new_tax != $this->current_taxonomy) {
+			if (!empty($this->current_taxonomy)) {
+				do_action('tainacan-taxonomy-removed-from-collection', $this->current_taxonomy, $field->get_collection());
+			}
+			if (!empty($new_tax)) {
+				do_action('tainacan-taxonomy-added-to-collection', $new_tax, $field->get_collection());
+			}
+				
+		}
+	}
+	
+	private function delete_category_field($field_id) {
+		$field = $this->fetch($field_id);
+		$field_type = $field->get_field_type_object();
+		if ($field_type->get_primitive_type() == 'term') {
+			$removed_tax = $field_type->get_option('taxonomy_id');
+			if (!empty($removed_tax))
+				do_action('tainacan-taxonomy-removed-from-collection', $removed_tax, $field->get_collection());
+		}
 	}
 }

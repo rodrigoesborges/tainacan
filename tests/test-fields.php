@@ -194,7 +194,7 @@ class Fields extends TAINACAN_UnitTestCase {
      */
     function test_metadata_field_type(){
         global $Tainacan_Fields;
-        $this->assertEquals( 8, sizeof( $Tainacan_Fields->fetch_field_types() ) );
+        $this->assertEquals( 7, sizeof( $Tainacan_Fields->fetch_field_types() ) );
     }
 
 
@@ -259,10 +259,14 @@ class Fields extends TAINACAN_UnitTestCase {
         $update_collection = $Tainacan_Collections->update( $collection );
         
         $fields_ordinate = $Tainacan_Fields->fetch_by_collection( $update_collection, [], 'OBJECT' );
-        $this->assertEquals( 'field3', $fields_ordinate[0]->get_name() );
+        $this->assertEquals( 'field2', $fields_ordinate[0]->get_name() );
 
-        $fields_ordinate_enabled = $Tainacan_Fields->fetch_by_collection( $update_collection, [ 'disabled_fields' => true ], 'OBJECT' );
-        $this->assertEquals( 'field2', $fields_ordinate_enabled[0]->get_name() );
+        $fields_ordinate_enabled = $Tainacan_Fields->fetch_by_collection( $update_collection, [ 'include_disabled' => true ], 'OBJECT' );
+        $this->assertEquals( 'field3', $fields_ordinate_enabled[0]->get_name() );
+		
+		$this->assertTrue($fields_ordinate_enabled[0]->get_disabled_for_collection());
+		$this->assertFalse($fields_ordinate_enabled[1]->get_disabled_for_collection());
+		$this->assertFalse($fields_ordinate_enabled[2]->get_disabled_for_collection());
     }
     
     function test_unique_slugs() {
@@ -354,6 +358,7 @@ class Fields extends TAINACAN_UnitTestCase {
         $invalidField->set_name('test');
         $invalidField->set_description('test');
         $invalidField->set_collection($collection);
+        $invalidField->set_status('publish');
         $invalidField->set_field_type('Tainacan\Field_Types\Relationship');
         $invalidField->set_field_type_options(['collection_id' => 'string']);
         

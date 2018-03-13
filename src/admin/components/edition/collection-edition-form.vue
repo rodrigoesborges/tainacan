@@ -1,25 +1,36 @@
 <template>
-    <div>
-        <h1 class="is-size-3">{{ pageTitle }}  <b-tag v-if="collection != null && collection != undefined" :type="'is-' + getStatusColor(collection.status)" v-text="collection.status"></b-tag></h1>
-        <form label-width="120px">
-            <b-field :label="$i18n.get('label_title')">
+    <div class="page-container primary-page">
+        <b-tag v-if="collection != null && collection != undefined" :type="'is-' + getStatusColor(collection.status)" v-text="collection.status"></b-tag>
+        <form class="tainacan-form" label-width="120px">
+            <b-field 
+                :label="$i18n.get('label_name')"
+                :type="editFormErrors['name'] != undefined ? 'is-danger' : ''" 
+                :message="editFormErrors['name'] != undefined ? editFormErrors['name'] : ''">
                 <b-input
                     id="tainacan-text-name"
-                    v-model="form.name">
+                    v-model="form.name"
+                    @focus="clearErrors('name')">
                 </b-input>
             </b-field>
-            <b-field :label="$i18n.get('label_description')">
+            <b-field 
+                    :label="$i18n.get('label_description')"
+                    :type="editFormErrors['description'] != undefined ? 'is-danger' : ''" 
+                    :message="editFormErrors['description'] != undefined ? editFormErrors['description'] : ''">
                 <b-input
                         id="tainacan-text-description"
                         type="textarea"
                         v-model="form.description"
-                        >
+                        @focus="clearErrors('description')">
                 </b-input>
             </b-field>
-            <b-field :label="$i18n.get('label_status')">
+            <b-field 
+                :label="$i18n.get('label_status')"
+                :type="editFormErrors['status'] != undefined ? 'is-danger' : ''" 
+                :message="editFormErrors['status'] != undefined ? editFormErrors['status'] : ''">
                 <b-select
                         id="tainacan-select-status"
                         v-model="form.status"
+                        @focus="clearErrors('status')"
                         :placeholder="$i18n.get('instruction_select_a_status')">
                     <option
                             v-for="statusOption in statusOptions"
@@ -30,10 +41,13 @@
                 </b-select>
             </b-field>
             <b-field
+                    :type="editFormErrors['image'] != undefined ? 'is-danger' : ''" 
+                    :message="editFormErrors['image'] != undefined ? editFormErrors['image'] : ''"
                     :label="$i18n.get('label_image')">
                 <b-upload v-model="form.files"
                           multiple
-                          drag-drop>
+                          drag-drop
+                          @focus="clearErrors('image')">
                     <section class="section">
                         <div class="content has-text-centered">
                             <p>
@@ -52,10 +66,11 @@
                 class="button"
                 type="button"
                 @click="cancelBack">{{ $i18n.get('cancel') }}</button>
-            <a
+            <button
                 id="button-submit-collection-creation"
-                @click="onSubmit"
-                class="button is-success is-hovered">{{ $i18n.get('save') }}</a>
+                @click.prevent="onSubmit"
+                class="button is-primary">{{ $i18n.get('save') }}</button>
+            <p class="help is-danger">{{formErrorMessage}}</p>
         </form>
 
         <b-loading :active.sync="isLoading" :canCancel="false">
@@ -66,10 +81,9 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-    name: 'CollectionEditionPage',
+    name: 'CollectionEditionForm',
     data(){
         return {
-            pageTitle: '',
             collectionId: Number,
             collection: null,
             isLoading: false,
@@ -92,7 +106,9 @@ export default {
                 }, {
                 value: 'trash',
                 label: this.$i18n.get('trash')
-            }]
+            }],
+            editFormErrors: {},
+            formErrorMessage: '',
         }
     },
     methods: {
@@ -119,8 +135,19 @@ export default {
                 this.form.status = this.collection.status;
 
                 this.isLoading = false;
+                this.formErrorMessage = '';
+                this.editFormErrors = {};
 
                 this.$router.push(this.$routerHelper.getCollectionPath(this.collectionId));
+            })
+            .catch((errors) => {
+                for (let error of errors.errors) {     
+                    for (let attribute of Object.keys(error))
+                        this.editFormErrors[attribute] = error[attribute];
+                }
+                this.formErrorMessage = errors.error_message;
+
+                this.isLoading = false;
             });
         },
         getStatusColor(status) {
@@ -151,12 +178,17 @@ export default {
                 // Fill this.form data with current data.
                 this.form.name = this.collection.name;
                 this.form.description = this.collection.description;
-                this.form.status = this.collection.status;
+                
+                // Pre-fill status with publish to incentivate it
+                this.form.status = 'publish';
 
                 this.isLoading = false;
                 
             })
             .catch(error => console.log(error));
+        },
+        clearErrors(attribute) {
+            this.editFormErrors[attribute] = undefined;
         },
         cancelBack(){
             this.$router.push(this.$routerHelper.getCollectionsPath());
@@ -165,11 +197,9 @@ export default {
     created(){
 
         if (this.$route.fullPath.split("/").pop() == "new") {
-            this.pageTitle = this.$i18n.get('title_create_collection');
             this.createNewCollection();
         } else if (this.$route.fullPath.split("/").pop() == "edit") {
 
-            this.pageTitle = this.$i18n.get('title_collection_edition');
             this.isLoading = true;
 
             // Obtains current Collection ID from URL

@@ -14,8 +14,9 @@ class Relationship extends Field_Type {
     function __construct(){
         // call field type constructor
         parent::__construct();
-        parent::set_primitive_type('');
+        parent::set_primitive_type('item');
         $this->component = 'tainacan-relationship';
+        $this->form_component = 'tainacan-form-relationship';
     }
 
     /**
@@ -31,78 +32,18 @@ class Relationship extends Field_Type {
                             value=\''.json_encode( $itemMetadata->get_value() ).'\'  
                             name="'.$itemMetadata->get_field()->get_name().'"></tainacan-relationship>';
     }
-
-    /**
-     * generate the fields for this field type
-     */
-    public function form(){
-        ?>
-        <tr>
-            <td>
-                <label><?php echo __('Collection related','tainacan'); ?></label><br/>
-                <small><?php echo __('Select the collection to fetch items','tainacan'); ?></small>
-            </td>
-            <td>
-                <?php Helpers\HtmlHelpers::collections_dropdown( $this->options['collection_id'], 'field_type_relationship[collection_id]' ); ?>
-            </td>
-        </tr>
-        <?php if( $this->options['collection_id'] ): ?>
-            <tr>
-                <td>
-                    <label><?php echo __('Field for search','tainacan'); ?></label><br/>
-                    <small><?php echo __('Selected field to help in the search','tainacan'); ?></small>
-                </td>
-                <td>
-                    <?php Helpers\HtmlHelpers::metadata_checkbox_list(
-                        $this->options['collection_id'],
-                        ( isset( $this->options['search'] ) ) ? $this->options['search'] : '',
-                        'field_type_relationship[search][]'
-                    ) ?>
-                </td>
-            </tr>
-        <?php endif; ?>
-        <tr>
-            <td>
-                <label><?php echo __('Allow repeated items','tainacan'); ?></label><br/>
-                <small><?php echo __('Allow/Block selected items in this relationship','tainacan'); ?></small>
-            </td>
-            <td>
-                <?php Helpers\HtmlHelpers::radio_field( ( isset( $this->options['repeated'] ) ) ? $this->options['repeated'] : 'yes', 'field_type_relationship[repeated]' ) ?>
-            </td>
-        </tr>
-        <?php if( isset( $this->options['collection_id'] ) ): ?>
-            <?php
-
-            //filter only related field
-            $args = array( 'meta_query' => array ( array(
-                'key'     => 'field_type',
-                'value'   => 'Tainacan\Field_Types\Relationship',
-            ) ) );
-
-            ?>
-            <tr>
-                <td>
-                    <label><?php echo __('Inverse','tainacan'); ?></label><br/>
-                    <small><?php echo __('Select the relationship inverse for this field','tainacan'); ?></small>
-                </td>
-                <td>
-                    <?php Helpers\HtmlHelpers::metadata_dropdown(
-                            $this->options['collection_id'],
-                            ( isset( $this->options['inverse'] ) ) ? $this->options['inverse'] : '',
-                            'field_type_relationship[inverse]',
-                            $args
-                          ) ?>
-                </td>
-            </tr>
-        <?php endif; ?>
-        <?php
-    }
     
     public function validate_options(\Tainacan\Entities\Field $field) {
-        // TODO: This is just a sample validation to test validation workflow for field types. Must redo it
+        if ( !in_array($field->get_status(), apply_filters('tainacan-status-require-validation', ['publish','future','private'])) )
+            return true;
+
         if (!empty($this->get_option('collection_id')) && !is_numeric($this->get_option('collection_id'))) {
             return [
-                'collection_id' => 'Collection ID invalid'
+                'collection_id' => __('Collection ID invalid','tainacan')
+            ];
+        } else if( empty($this->get_option('collection_id'))) {
+            return [
+                'collection_id' => __('Collection related is required','tainacan')
             ];
         }
         return true;

@@ -35,12 +35,18 @@ class Collections extends Repository {
 			    'default'     => '',
 			    'description' => __('The posts status', 'tainacan')
 		    ],
-		    'author_id'          => [
+		    'author_id'       => [
 		    	'map'         => 'post_author',
-			    'title'       => __('Author', 'tainacan'),
+			    'title'       => __('Author ID', 'tainacan'),
 			    'type'        => 'string',
 			    'description' => __('The collection author\'s user ID (numeric string)', 'tainacan')
 		    ],
+            'author_name'     => [
+            	'map'         => 'author_name',
+	            'title'       => __('Author name', 'tainacan'),
+	            'type'        => 'string',
+	            'description' => __('The collection author\'s user name')
+            ],
             'creation_date'   => [
             	'map'         => 'post_date',
 	            'title'       => __('Creation Date', 'tainacan'),
@@ -134,51 +140,34 @@ class Collections extends Repository {
             'fields_order'           =>  [
                 'map'        => 'meta',
                 'title'      => __('Ordination fields', 'tainacan'),
-                'type'       => 'string',
+                'type'       => 'array',
                 'description'=> __('Collection fields ordination', 'tainacan'),
                 //'validation' => v::stringType(),
             ],
             'filters_order'           =>  [
                 'map'        => 'meta',
                 'title'      => __('Ordination filters', 'tainacan'),
-                'type'       => 'string',
+                'type'       => 'array',
                 'description'=> __('Collection filters ordination', 'tainacan'),
                 //'validation' => v::stringType(),
             ],
-            /*
-            
-            Isnt it just post status private?
-            
-            'privacy'           =>  [
-                'map'        => 'meta',
-                'name'       => __('Privacy', 'tainacan'),
-                'description'=> __('Collection privacy, defines wether a collection is visible to the public or not', 'tainacan'),
-                //'validation' => v::stringType(),
-            ],
-            */
-    
-            /**
-             * Properties yet to be implemented
-             *
-             * Moderators (a property attached to the collection or to the user?)
-             * geo field?
-             *
-             *
-             * 
-             */
             'moderators_ids' =>  [
                 'map'         => 'meta_multi',
                 'title'       => __('Moderators', 'tainacan'),
-                'type'        => 'string',
+                'type'        => 'array',
                 'description' => __('The IDs of users assigned as moderators of this collection', 'tainacan'),
                 'validation'  => ''
             ],
 
         ]);
     }
-
-    public function register_post_type() {
-        $labels = array(
+	
+	/**
+	 * Get the labels for the custom post type of this repository
+	 * @return array Labels in the format expected by register_post_type()
+	 */
+	public function get_cpt_labels() {
+		return array(
             'name'               => __('Collections', 'tainacan'),
             'singular_name'      => __('Collection', 'tainacan'),
             'add_new'            => __('Add new', 'tainacan'),
@@ -192,6 +181,10 @@ class Collections extends Repository {
             'parent_item_colon'  => __('Parent Collection:', 'tainacan'),
             'menu_name'          => __('Collections', 'tainacan')
         );
+	}
+
+    public function register_post_type() {
+        $labels = $this->get_cpt_labels();
         $args = array(
             'labels'              => $labels,
             'hierarchical'        => true,
@@ -299,7 +292,8 @@ class Collections extends Repository {
     }
     
     function pre_update_moderators($collection) {
-        $current_moderators = $this->get_mapped_property($collection, 'moderators_ids');
+        // make sure we get the current value from database
+		$current_moderators = $this->get_mapped_property($collection, 'moderators_ids');
         $this->current_moderators = is_array($current_moderators) ? $current_moderators : [];
         
     }

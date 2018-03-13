@@ -1,7 +1,5 @@
 <?php
 
-use Tainacan\Capabilities;
-
 const ENTITIES_DIR 	   = __DIR__ . '/entities/';
 const FIELD_TYPES_DIR  = __DIR__ . '/field-types/';
 const FILTER_TYPES_DIR = __DIR__ . '/filter-types/';
@@ -60,7 +58,11 @@ function tainacan_autoload($class_name){
 	    }
 
         if( in_array('Field_Types', $class_path) || in_array('Filter_Types', $class_path) ){
-            $dir.= strtolower(str_replace('_', '-' , $class_name)).'/';
+            if(  in_array('Filter_Types', $class_path) && in_array('Category', $class_path) ){
+                $dir = strtolower( $dir );
+            } else {
+                $dir.= strtolower(str_replace('_', '-' , $class_name)).'/';
+            }
         }
 
         $file = $dir . 'class-tainacan-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
@@ -87,7 +89,6 @@ $Tainacan_Fields->register_field_type('Tainacan\Field_Types\Date');
 $Tainacan_Fields->register_field_type('Tainacan\Field_Types\Numeric');
 $Tainacan_Fields->register_field_type('Tainacan\Field_Types\Selectbox');
 $Tainacan_Fields->register_field_type('Tainacan\Field_Types\Relationship');
-$Tainacan_Fields->register_field_type('Tainacan\Field_Types\Radio');
 $Tainacan_Fields->register_field_type('Tainacan\Field_Types\Category');
 
 global $Tainacan_Filters;
@@ -97,6 +98,11 @@ $Tainacan_Filters = new \Tainacan\Repositories\Filters();
 $Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Custom_Interval');
 $Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Selectbox');
 $Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Autocomplete');
+$Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Taginput');
+$Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Checkbox');
+$Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Category\Taginput');
+$Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Category\Checkbox');
+$Tainacan_Filters->register_filter_type('Tainacan\Filter_Types\Category\Selectbox');
 
 global $Tainacan_Taxonomies;
 $Tainacan_Taxonomies = new \Tainacan\Repositories\Taxonomies();
@@ -109,7 +115,5 @@ $Tainacan_Terms = new \Tainacan\Repositories\Terms();
 
 global $Tainacan_Logs;
 $Tainacan_Logs = new \Tainacan\Repositories\Logs();
-
-new Capabilities();
 
 ?>

@@ -2,7 +2,7 @@ import axios from '../../../axios/axios';
 
 export const fetchItems = ({ commit, state }, { collectionId, page, itemsPerPage }) => {
     return new Promise ((resolve, reject) => {
-        axios.get('/collection/'+collectionId+'/items?paged='+page+'&perpage='+itemsPerPage)
+        axios.tainacan.get('/collection/'+collectionId+'/items?paged='+page+'&perpage='+itemsPerPage)
         .then(res => {
             let items = res.data;
             commit('setItems', items);
@@ -14,7 +14,7 @@ export const fetchItems = ({ commit, state }, { collectionId, page, itemsPerPage
 
 export const deleteItem = ({ commit }, item_id ) => {
     return new Promise((resolve, reject) => {
-        axios.delete('/items/' + item_id)
+        axios.tainacan.delete('/items/' + item_id)
         .then( res => {
             commit('deleteItem', { id: item_id });
             resolve( res );
@@ -27,7 +27,7 @@ export const deleteItem = ({ commit }, item_id ) => {
 
 export const fetchCollections = ({commit} , { page, collectionsPerPage }) => {
     return new Promise((resolve, reject) => {
-        axios.get('/collections?paged='+page+'&perpage='+collectionsPerPage)
+        axios.tainacan.get('/collections?paged='+page+'&perpage='+collectionsPerPage)
         .then(res => {
             let collections = res.data;
             commit('setCollections', collections);
@@ -42,7 +42,7 @@ export const fetchCollections = ({commit} , { page, collectionsPerPage }) => {
 
 export const fetchCollection = ({ commit }, id) => {
     return new Promise((resolve, reject) =>{ 
-        axios.get('/collections/' + id)
+        axios.tainacan.get('/collections/' + id)
         .then(res => {
             let collection = res.data;
             commit('setCollection', collection);
@@ -54,9 +54,23 @@ export const fetchCollection = ({ commit }, id) => {
     });
 }
 
+export const fetchCollectionName = ({ commit }, id) => {
+    return new Promise((resolve, reject) =>{ 
+        axios.tainacan.get('/collections/' + id + '?fetch_only=name')
+        .then(res => {
+            let collectionName = res.data;
+            commit('setCollectionName', collectionName.name);
+            resolve( collectionName.name );
+        })
+        .catch(error => {
+            reject(error);
+        })
+    });
+}
+
 export const deleteCollection = ({ commit }, id) => {
     return new Promise((resolve, reject) =>{ 
-        axios.delete('/collections/' + id)
+        axios.tainacan.delete('/collections/' + id)
         .then(res => {
             let collection = res.data;
             commit('deleteCollection', collection);
@@ -70,7 +84,7 @@ export const deleteCollection = ({ commit }, id) => {
 
 export const updateCollection = ({ commit }, { collection_id, name, description, status }) => {
     return new Promise((resolve, reject) => {
-        axios.patch('/collections/' + collection_id, {
+        axios.tainacan.patch('/collections/' + collection_id, {
             name: name,
             description: description,
             status: status 
@@ -78,7 +92,7 @@ export const updateCollection = ({ commit }, { collection_id, name, description,
             commit('setCollection', { id: collection_id, name: name, description: description, status: status });
             resolve( res.data );
         }).catch( error => { 
-            reject( error.response );
+            reject({ error_message: error['response']['data'].error_message, errors: error['response']['data'].errors });
         });
 
     });
@@ -86,7 +100,7 @@ export const updateCollection = ({ commit }, { collection_id, name, description,
 
 export const sendCollection = ( { commit }, { name, description, status }) => {
     return new Promise(( resolve, reject ) => {
-        axios.post('/collections/', {
+        axios.tainacan.post('/collections/', {
             name: name,
             description: description,
             status: status

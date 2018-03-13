@@ -17,7 +17,8 @@ class Category extends Field_Type {
         $this->set_default_options([
             'allow_new_terms' => false
         ]);
-        
+
+        $this->form_component = 'tainacan-form-category';
         // TODO: Set component depending on options. If multiple is checkbox. if single, select. etc.
         $this->component = 'tainacan-category';
     }
@@ -36,46 +37,6 @@ class Category extends Field_Type {
                                        value=\''.json_encode( $itemMetadata->get_value() ).'\'
                                        name="'.$itemMetadata->get_field()->get_name().'"></tainacan-selectbox>';
     }
-
-    /**
-     * generate the fields for this field type
-     */
-    public function form(){
-        global $Tainacan_Taxonomies;
-        $taxonomies = $Tainacan_Taxonomies->fetch([], 'OBJECT')
-        
-        // TODO: form incomplete and not tested
-        
-        ?>
-		<div class="field">
-			<label class="label">
-				<?php _e('Category','tainacan'); ?>
-			</label>
-			
-			<div class="control">
-				<div class="select">
-					<select name="field_type_options[taxonomy_id]">
-						<?php foreach ($taxonomies as $tax): ?>
-							
-							<option value="<?php echo $tax->get_db_identifier(); ?>" <?php selected($this->get_option('taxonomy_id'), $tax->get_db_identifier()); ?> ><?php echo $tax->get_name(); ?></option>
-							
-						<?php endforeach; ?>
-					</select>
-				</div>
-			</div>
-		</div>
-		
-		<div class="field">
-			<div class="control">
-				<label class="checkbox">
-					<input type="checkbox" name="field_type_options[allow_new_terms]" <?php checked(true, $this->get_option('allow_new_terms')); ?> >
-					Allow
-				</label>
-			</div>
-		</div>
-		
-        <?php
-    }
 	
 	public function validate_options(\Tainacan\Entities\Field $field) {
 		
@@ -92,14 +53,19 @@ class Category extends Field_Type {
 			'field_type' => 'Tainacan\\Field_Types\\Category'
 		], 'OBJECT');
 		
-		$category_fields = array_map(function ($field) {
-			$fto = $field->get_field_type_object();
-			return $fto->get_option('taxonomy_id');
+		$category_fields = array_map(function ($field_map) {
+			$fto = $field_map->get_field_type_object();
+			return [ $field_map->get_id() => $fto->get_option('taxonomy_id') ];
 		}, $category_fields);
-		
-		if (in_array($this->get_option('taxonomy_id'), $category_fields)) {
-			return ['taxonomy_id' => __('You can not have 2 Category Fields using the same category in a collection', 'tainacan')];
-		}
+
+		if( is_array( $category_fields ) ){
+            foreach ($category_fields as $field_id => $category_field) {
+                if ( is_array( $category_field ) && key($category_field) != $field->get_id()
+                    && in_array($this->get_option('taxonomy_id'), $category_field)) {
+                    return ['taxonomy_id' => __('You can not have 2 Category Fields using the same category in a collection', 'tainacan')];
+                }
+		    }
+        }
 		
 		return true;
 		

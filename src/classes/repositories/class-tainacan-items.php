@@ -76,10 +76,10 @@ class Items extends Repository {
 	            'type'        => 'string',
 	            'description' => __('The item thumbnail URL')
             ],
-            'featured_image_id' => [
+            'featured_img_id' => [
 	            'map'         => 'thumbnail_id',
 	            'title'       => __('Featured Image ID', 'tainacan'),
-	            'type'        => 'string',
+	            'type'        => 'integer',
 	            'description' => __('The item thumbnail')
             ],
             'attachments'     => [
@@ -166,7 +166,7 @@ class Items extends Repository {
     	
     	// iterate through the native post properties
     	foreach ($map as $prop => $mapped) {
-    		if ($mapped['map'] != 'meta' && $mapped['map'] != 'meta_multi' && $mapped['map'] != 'terms') {
+    		if ($mapped['map'] != 'meta' && $mapped['map'] != 'meta_multi' && $mapped['map'] != 'terms' && $mapped['map'] != 'thumbnail_id') {
     			$item->WP_Post->{$mapped['map']} = $item->get_mapped_property($prop);
     		}
     	}
@@ -192,7 +192,9 @@ class Items extends Repository {
     					add_post_meta($id, $prop, wp_slash( $value ));
     				}
     			}
-    		}
+    		} elseif ($mapped['map'] === 'thumbnail_id'){
+			    set_post_thumbnail($item->WP_Post, $item->get_mapped_property($prop));
+		    }
     	}
     	
     	do_action('tainacan-insert', $item);

@@ -95,7 +95,7 @@ abstract class Repository {
             if ($mapped['map'] == 'meta' || $mapped['map'] == 'meta_multi') {
                 $this->insert_metadata($obj, $prop);
             } elseif ($mapped['map'] === 'thumbnail_id'){
-            	set_post_thumbnail($obj->WP_Post, $obj->get_mapped_property('thumbnail_id'));
+            	set_post_thumbnail($obj->WP_Post, $obj->get_mapped_property($prop));
             }
 		}
 		
@@ -294,6 +294,8 @@ abstract class Repository {
     	} elseif ( isset( $entity->WP_Post )) {
     		if($mapped == 'thumbnail'){
     			$property = isset($entity->WP_Post->ID) ? get_the_post_thumbnail_url($entity->WP_Post->ID, 'full') : null;
+		    } elseif ($mapped == 'thumbnail_id'){
+    			$property = isset($entity->WP_Post->ID) ? get_post_thumbnail_id($entity->WP_Post->ID) : null;
 		    } elseif($mapped == 'attachments'){
     			if(isset($entity->WP_Post->ID)){
     				$attachments_query = [

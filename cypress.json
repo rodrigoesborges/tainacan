@@ -1,4 +1,6 @@
 {
   "projectId": "tubzok",
-  "videoRecording": false
+  "videoRecording": false,
+  "viewportWidth": 1600,
+  "viewportHeight": 900
 }

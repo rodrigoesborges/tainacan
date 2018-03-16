@@ -16,10 +16,10 @@
                             v-for="(filter, index) in activeFilterList" :key="index">
                                 <div class="handle">
                                     <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
-                                    <span class="filter-name">{{ filter.name }}</span>
-                                    <span v-if="filter.id !== undefined" class="label-details">{{ $i18n.get(filter.filter_type_object.component)}}</span><span class="loading-spinner" v-if="filter.id == undefined"></span>
+                                    <span v-if="filter.id !== undefined" class="filter-name">{{ filter.name }}</span>
+                                    <span v-if="filter.id !== undefined" class="label-details"><span class="loading-spinner" v-if="filter.id == undefined"></span>
                                     <span class="controls" v-if="filter.id != undefined">
-                                        <b-switch size="is-small" v-model="filter.disabled" @input="onChangeEnable($event, index)">{{ filter.disabled ? $i18n.get('label_disabled') : $i18n.get('label_enabled') }}</b-switch>
+                                        <b-switch size="is-small" v-model="filter.enabled" @input="onChangeEnable($event, index)">{{ filter.enabled ? $i18n.get('label_enabled') : $i18n.get('label_disabled') }}</b-switch>
                                         <a @click.prevent="removeFilter(filter)">
                                             <b-icon icon="delete"></b-icon>
                                         </a>
@@ -31,10 +31,14 @@
                                         <div class="filter-selection-modal">
                                             <b-field :label="$i18n.get('label_filter_type')">
                                                 <b-select
-                                                        
+                                                        v-model="selectedFilterType"
                                                         :placeholder="$i18n.get('instruction_select_a_filter_type')">
-                                                    <option value="publish" selected>{{ $i18n.get('publish')}}</option>
-                                                    <option value="private">{{ $i18n.get('private')}}</option>
+                                                    <option 
+                                                        v-for="(filterType, index) in allowedFilterTypes" 
+                                                        :key="index"
+                                                        :selected="index == 0"
+                                                        :value="filterType">
+                                                        {{ filterType.name }}</option>  
                                                 </b-select>
                                             </b-field>
                                             <div class="field is-grouped is-grouped-centered">
@@ -42,6 +46,7 @@
                                                     <button 
                                                         class="button is-secondary" 
                                                         type="submit" 
+                                                        :disabled="Object.keys(selectedFilterType).length == 0"
                                                         @click.prevent="confirmSelectedFilterType()">Submit</button>
                                                 </div>
                                                 <div class="control">
@@ -54,14 +59,12 @@
                                         </div>
                                      </b-modal>
                                 </div>
-                                <b-filter v-if="openedFilterId == filter.id">
-                                    <!-- <filter-edition-form 
-                                        :collectionId="collectionId"
-                                        :isRepositoryLevel="isRepositoryLevel"
+                                <b-field v-if="openedFilterId == filter.id">
+                                    <filter-edition-form
                                         @onEditionFinished="onEditionFinished()"
                                         @onEditionCanceled="onEditionCanceled()"
-                                        :filter="editForm"></filter-edition-form> -->
-                                </b-filter>
+                                        :filter="editForm"></filter-edition-form>
+                                </b-field>
                             </div>
                                              
                         <!-- <div class="not-sortable-item" slot="footer">{{ $i18n.get('instruction_dragndrop_filters_collection') }}</div> -->
@@ -71,14 +74,18 @@
             <div class="column">
                 <b-filter :label="$i18n.get('label_available_field_types')">
                     <div class="columns box available-fields-area" >
-                        <draggable class="column" :list="availableFieldList" :options="{ sort: false, group: { name:'filters', pull: 'clone', put: false, revertClone: true }}">
+                        <draggable class="column" :list="availableFieldList" :options="{ sort: false, group: { name:'filters', pull: true, put: false, revertClone: true }}">
                             <div class="available-field-item" v-if="index % 2 == 0" v-for="(field, index) in availableFieldList" :key="index">
-                                {{ field.name }}  <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
+                                <a @click.prevent="addFieldViaButton(field)">
+                                    <b-icon type="is-gray" class="is-pulled-left" icon="arrow-left-bold"></b-icon>
+                                </a>  {{ field.name }}  <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
                             </div>
                         </draggable>
-                        <draggable class="column" :list="availableFieldList" :options="{ sort: false, group: { name:'filters', pull: 'clone', put: false, revertClone: true }}">
+                        <draggable class="column" :list="availableFieldList" :options="{ sort: false, group: { name:'filters', pull: true, put: false, revertClone: true }}">
                             <div class="available-field-item" v-if="index % 2 != 0" v-for="(field, index) in availableFieldList" :key="index">
-                                {{ field.name }}  <b-iiltercon type="is-gray" class="is-pulled-left" icon="drag"></b-iiltercon>
+                                <a @click.prevent="addFieldViaButton(field)">
+                                    <b-icon type="is-gray" class="is-pulled-left" icon="arrow-left-bold"></b-icon>
+                                </a>  {{ field.name }}  <b-icon type="is-gray" class="is-pulled-left" icon="drag"></b-icon>
                             </div>       
                         </draggable> 
                    </div>
@@ -105,11 +112,15 @@ export default {
             isLoadingFilter: false,
             openedFilterId: '',
             isModalOpened: false,
-            editForm: {}
+            editForm: {},
+            allowedFilterTypes: [],
+            selectedFilterType: {},
+            choosenField: {},
+            newIndex: 0
         }
     },
     components: {
-        //FilterEditionForm
+        FilterEditionForm
     },
     methods: {
         ...mapActions('filter', [
@@ -124,10 +135,10 @@ export default {
             'getFilterTypes'
         ]),
         ...mapActions('fields', [
-            'fetchFieldTypes'
+            'fetchFields'
         ]),
         ...mapGetters('fields',[
-            'getFieldTypes'
+            'getFields'
         ]),
         handleChange($event) {     
             if ($event.added) {
@@ -142,48 +153,82 @@ export default {
         updateFiltersOrder() {
             let filtersOrder = [];
             for (let filter of this.activeFilterList) {
-                filtersOrder.push({'id': filter.id, 'enabled': !filter.disabled});
+                filtersOrder.push({'id': filter.id, 'enabled': filter.enabled});
             }
             this.updateCollectionFiltersOrder({ collectionId: this.collectionId, filtersOrder: filtersOrder });
         },
         onChangeEnable($event, index) {
-            this.activeFilterList[index].disabled = $event;
+            this.activeFilterList[index].enabled = $event;
             let filtersOrder = [];
             for (let filter of this.activeFilterList) {
-                filtersOrder.push({'id': filter.id, 'enabled': !filter.disabled});
+                filtersOrder.push({'id': filter.id, 'enabled': filter.enabled});
             }
             this.updateCollectionFiltersOrder({ collectionId: this.collectionId, filtersOrder: filtersOrder });
 
         },
-        addNewFilter(newFilter, newIndex) {
+        addFieldViaButton(field) {
+            let lastIndex = this.activeFilterList.length;
+            this.activeFilterList.push(field);
+            this.addNewFilter(field, lastIndex);
+        },
+        addNewFilter(choosenField, newIndex) {
+            this.choosenField = choosenField;
+            this.newIndex = newIndex;
+            this.allowedFilterTypes = [];
+            this.selectedFilterType = {};
+
+            for (let filter of this.filterTypes) {
+                for (let supportedType of filter['supported_types']) {
+                    if (choosenField.field_type_object.primitive_type == supportedType)
+                        this.allowedFilterTypes.push(filter);
+                }
+            }
             this.isModalOpened = true;
         },
-        createChoosenFilter(field, newFilter, newIndex) {
-            this.sendFilter({collectionId: this.collectionId, fieldId: field.id, name: newFilter.name, filterType: newFilter.className, status: 'auto-draft', isRepositoryLevel: this.isRepositoryLevel})
+        createChoosenFilter() {
+            
+            this.sendFilter({
+                collectionId: this.collectionId, 
+                fieldId: this.choosenField.id, 
+                name: this.choosenField.name, 
+                filterType: this.selectedFilterType.name, 
+                status: 'auto-draft', 
+                isRepositoryLevel: this.isRepositoryLevel,
+                newIndex: this.newIndex
+            })
             .then((filter) => {
-
-                if (newIndex < 0) {
-                    this.activeFilterList.pop();
-                    this.activeFilterList.push(filter);
-                } else {
-                   this.activeFilterList.splice(newIndex, 1, filter);  
-                }
 
                 if (!this.isRepositoryLevel)
                     this.updateFiltersOrder();
 
                 this.editFilter(filter);
+
+                this.newIndex = 0;
+                this.selectedFilterType = {}
+                this.allowedFilterTypes = [];
             })
             .catch((error) => {
                 console.log(error);
+                this.newIndex = 0;
+                this.selectedFilterType = {}
+                this.allowedFilterTypes = [];
             });
         },
         removeFilter(removedFilter) {
-            this.deleteFilter({ collectionId: this.collectionId, filterId: removedFilter.id, isRepositoryLevel: this.isRepositoryLevel})
+            this.deleteFilter(removedFilter.id)
             .then((filter) => {
                 let index = this.activeFilterList.findIndex(deletedFilter => deletedFilter.id === filter.id);
                 if (index >= 0) 
+                    
                     this.activeFilterList.splice(index, 1);
+                    this.isLoadingFieldTypes = true;
+                    this.fetchFields({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel})
+                    .then((res) => {
+                        this.isLoadingFieldTypes = false;
+                    })
+                    .catch((error) => {
+                        this.isLoadingFieldTypes = false;
+                    });
                 
                 if (!this.isRepositoryLevel)
                     this.updateFiltersOrder(); 
@@ -192,23 +237,28 @@ export default {
             });
         },
         confirmSelectedFilterType() {
-           // this.createChoosenFilter();
+            this.isModalOpened = false;
+            this.createChoosenFilter();
         },
         cancelFilterTypeSelection() {
-           // this.createChoosenFilter();
-           this.$modal.close();
+           this.isModalOpened = false;
+           this.choosenField = '';
+           this.allowedFilterTypes = [];
+           this.selectedFilterType = {};
+           this.activeFilterList.splice(this.newIndex, 1);
+           this.newIndex = 0;
         },
         editFilter(filter) {
             if (this.openedFilterId == filter.id) {
-                this.openedFilterId = '';
                 this.editForm = {};
+                this.openedFilterId = '';
             } else {
-                this.openedFilterId = filter.id;
                 this.editForm = JSON.parse(JSON.stringify(filter));
                 this.editForm.status = 'publish';
-            }            
+                this.openedFilterId = filter.id;
+            }     
         },
-        onEditionFinished() {
+         onEditionFinished() {
             this.openedFilterId = '';
             this.fetchFilters({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel});
         },
@@ -219,47 +269,55 @@ export default {
     },
     computed: {
         availableFieldList() {
-            return this.getFieldTypes();
+            let availableFields = this.getFields();  
+            for (let activeFilter of this.activeFilterList) {
+                for (let i = availableFields.length - 1; i >= 0 ; i--) {
+                    if (activeFilter.field != undefined) {
+                        if (activeFilter.field.field_id == availableFields[i].id) 
+                            availableFields.splice(i, 1);
+                    }
+                }
+            }
+            return availableFields;
         },
         activeFilterList() {
             return this.getFilters();
         },
-        filterTypes() {
+        filterTypes() { 
             return this.getFilterTypes();
         }
     },
     created() {
-        this.isLoadingFieldTypes = true;
-        this.isLoadingFilters = true;
-        this.isLoadingFilterTypes = true;
-
-        this.fetchFieldTypes()
-            .then((res) => {
-                this.isLoadingFieldTypes = false;
-            })
-            .catch((error) => {
-                this.isLoadingFieldTypes = false;
-            });
-
-        this.fetchFilterTypes()
-            .then((res) => {
-                console.log(res);
-                this.isLoadingFilterTypes = false;
-            })
-            .catch((error) => {
-                this.isLoadingFilterTypes = false;
-            });
 
         this.isRepositoryLevel = this.$route.name == 'FiltersPage' ? true : false;
         if (this.isRepositoryLevel)
             this.collectionId = 'default';
         else
             this.collectionId = this.$route.params.collectionId;
-        
+
+        this.isLoadingFieldTypes = true;
+        this.isLoadingFilters = true;
+        this.isLoadingFilterTypes = true;
+
+        this.fetchFilterTypes()
+            .then((res) => {
+                this.isLoadingFilterTypes = false;
+            })
+            .catch((error) => {
+                this.isLoadingFilterTypes = false;
+            });        
 
         this.fetchFilters({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel})
             .then((res) => {
                 this.isLoadingFilters = false;
+                // Needs to be done after activeFilterList exists to compare and remove chosen fields.
+                this.fetchFields({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel})
+                    .then((res) => {
+                        this.isLoadingFieldTypes = false;
+                    })
+                    .catch((error) => {
+                        this.isLoadingFieldTypes = false;
+                    });
             })
             .catch((error) => {
                 this.isLoadingFilters = false;

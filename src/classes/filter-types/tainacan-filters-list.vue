@@ -7,6 +7,7 @@
                     :id="filter.filter_type_object.component + '-' + filter.slug"
                     :is="filter.filter_type_object.component"
                     :filter="getFilter"
+                    :query="query"
                     @input="listen( $event )"></component>
         </div>
     </b-field>
@@ -15,6 +16,8 @@
 <script>
     import { eventFilterBus } from '../../js/event-bus-filters'
     import qs from 'qs';
+    import { mapActions, mapGetters } from 'vuex';
+    import router from '../../admin/js/router'
 
     export default {
         name: 'TainacanFiltersList',
@@ -48,9 +51,17 @@
 
         },
         methods: {
+            ...mapActions('search', [
+                'setPage'
+            ]),
+            ...mapGetters('search', [
+                'getPostQuery'
+            ]),
             listen( event ){
-                eventFilterBus.$emit( 'input', ( event.detail ) ? event.detail[0] : event );
-                this.$router.push({ query: this.query })
+                this.setPage(1);
+                eventFilterBus.$emit( 'input', ( event.field_id ) ?  event :  event.detail[0] );
+                router.push({ query: {} });
+                router.push({ query: this.getPostQuery() });
             }
         }
     }

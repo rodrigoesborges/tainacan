@@ -199,28 +199,9 @@ class TAINACAN_REST_Fields_Controller extends TAINACAN_REST_Controller {
 			if($prepared->validate()) {
 				$field = $this->field_repository->insert( $prepared);
 
-				$items = $this->item_repository->fetch([], $collection_id, 'WP_Query');
+				$response = $this->prepare_item_for_response($field, $request);
 
-				$field_added = '';
-				if($items->have_posts()){
-					while ($items->have_posts()){
-						$items->the_post();
-
-						$item = new Entities\Item($items->post);
-						$item_meta = new Entities\Item_Metadata_Entity($item, $field);
-
-						$field_added = $this->item_metadata_repository->insert($item_meta);
-					}
-
-					$response = $this->prepare_item_for_response($field_added->get_field(), $request);
-
-					return new WP_REST_Response($response, 201);
-				}
-				else {
-					$response = $this->prepare_item_for_response($prepared, $request);
-
-					return new WP_REST_Response($response, 201);
-				}
+				return new WP_REST_Response($response, 201);
 			} else {
 				return new WP_REST_Response([
 					'error_message' => __('One or more values are invalid.', 'tainacan'),
@@ -244,8 +225,8 @@ class TAINACAN_REST_Fields_Controller extends TAINACAN_REST_Controller {
 			} else {
 				return new WP_REST_Response([
 					'error_message' => __('One or more values are invalid.', 'tainacan'),
-					'errors'        => $this->field->get_errors(),
-					'field'         => $this->prepare_item_for_response($this->field, $request),
+					'errors'        => $prepared->get_errors(),
+					'field'         => $this->prepare_item_for_response($prepared, $request),
 				], 400);
 			}
 
@@ -289,7 +270,7 @@ class TAINACAN_REST_Fields_Controller extends TAINACAN_REST_Controller {
 				$form = ob_get_clean();
 				$item_arr['edit_form'] = $form;
 				$item_arr['field_type_object'] = $item->get_field_type_object()->__toArray();
-				$item_arr['disabled'] = $item->get_disabled_for_collection();
+				$item_arr['enabled'] = $item->get_enabled_for_collection();
 			}
 
 			return $item_arr;
@@ -391,7 +372,7 @@ class TAINACAN_REST_Fields_Controller extends TAINACAN_REST_Controller {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update_item( $request ) {
-		$collection_id = $request['collection_id'];
+		$collection_id = is_numeric($request['collection_id']) ? $request['collection_id'] : null;
 		$body = json_decode($request->get_body(), true);
 
 		if(!empty($body)){

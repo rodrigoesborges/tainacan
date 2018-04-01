@@ -314,4 +314,56 @@ class Item_Metadata extends Repository {
 	public function suggest($item_metadata) {
 		return Entities\Log::create(false, '', $item_metadata, null, 'pending');
 	}
+	
+	
+	//////////////// BULK EDITION METHODS ///////////////
+	
+	public function bulk_edit_value($items_ids, $field_id, $value) {
+		
+		$field = new Entities\Field($field_id);
+		$field_type = $field->get_field_type_object();
+		
+		if ($field->is_multiple() || $field_type->get_primitive_type() == 'compound') {
+			return false;
+		}
+		
+		// Some items may have a value for this fields, and some may not
+		// therefore, its better if we remove them all
+		
+		// But first, lets trigger the log so we store the previous values
+		// 
+		// new bulk edit ... x items edited field x with value x
+		// 
+		// ... ->bulk_delete() value deleted in a bulk operation
+		
+		// delete
+		if ($field_type->get_core()) {
+
+		} elseif ($field_type->get_primitive_type() == 'term') {
+
+		} else {
+
+		}
+		
+		// insert
+		if ($field_type->get_core()) {
+
+		} elseif ($field_type->get_primitive_type() == 'term') {
+
+		} else {
+
+		}
+		
+		// insert log
+		
+	}
+	
+	public function bulk_add_value_to_multiple_field($items_ids, $field_id, $value) {
+		
+	}
+	
+	public function bulk_delete_value_from_multiple_field($items_ids, $field_id, $value) {
+		
+	}
+	
 }

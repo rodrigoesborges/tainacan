@@ -35,8 +35,10 @@ trait Query_Cache {
 	
 	private function build_query_hash($query_args) {
 		$cur_user = wp_get_current_user();
-		$caps = $cur_user->allcaps;
-		$query_args['caps'] = $caps;
+		if (is_object($cur_user) && isset($cur_user->allcaps)) {
+			$caps = $cur_user->allcaps;
+			$query_args['caps'] = $caps;
+		}
 		return md5(serialize($query_args));
 	}
 	    

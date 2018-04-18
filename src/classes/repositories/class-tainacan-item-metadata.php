@@ -29,7 +29,9 @@ class Item_Metadata extends Repository {
 			throw new \Exception( 'Entities must be validated before you can save them' );
 			// TODO: Throw Warning saying you must validate object before insert()
 		}
-
+		
+		$this->clear_cache('Items');
+		
 	    $is_update = false;
 	    $diffs = [];
 	    if ( $item_metadata->get_id() ) {

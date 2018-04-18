@@ -10,6 +10,7 @@ use \Respect\Validation\Validator as v;
 use Tainacan\Entities\Collection;
 
 class Collections extends Repository {
+	
 	public $entities_type = '\Tainacan\Entities\Collection';
 
 	private static $instance = null;
@@ -300,8 +301,12 @@ class Collections extends Repository {
 			$args['post_type'] = Entities\Collection::get_post_type();
 
 			// TODO: Pegar coleções registradas via código
-
-			$wp_query = new \WP_Query( $args );
+			
+			$wp_query = $this->get_cache($this->get_name(), $args);
+			if (false === $wp_query) {
+				$wp_query = new \WP_Query( $args );
+				$this->add_cache($this->get_name(), $args, $wp_query);
+			}
 
 			return $this->fetch_output( $wp_query, $output );
 		}

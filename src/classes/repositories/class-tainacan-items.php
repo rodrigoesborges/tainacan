@@ -9,6 +9,7 @@ use Tainacan\Entities\Item;
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 class Items extends Repository {
+	
 	public $entities_type = '\Tainacan\Entities\Item';
 
     private static $instance = null;
@@ -204,7 +205,9 @@ class Items extends Repository {
 		// save post and get its ID
 		$item->WP_Post->post_type = $cpt;
 		//$item->WP_Post->post_status = 'publish';
-
+		
+		$this->clear_cache($this->get_name());
+		
 		$id            = wp_insert_post( $item->WP_Post );
 		$item->WP_Post = get_post( $id );
 
@@ -322,7 +325,11 @@ class Items extends Repository {
 
 		$args['post_type'] = $cpt;
 
-		$wp_query = new \WP_Query( $args );
+		$wp_query = $this->get_cache($this->get_name(), $args);
+		if (false === $wp_query) {
+			$wp_query = new \WP_Query( $args );
+			$this->add_cache($this->get_name(), $args, $wp_query);
+		}
 
 		return $this->fetch_output( $wp_query, $output );
 	}

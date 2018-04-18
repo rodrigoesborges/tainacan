@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
  *
  */
 class Logs extends Repository {
+	
 	public $entities_type = '\Tainacan\Entities\Log';
 	private static $instance = null;
 
@@ -196,7 +197,11 @@ class Logs extends Repository {
 
 			$args['post_type'] = Entities\Log::get_post_type();
 
-			$wp_query = new \WP_Query( $args );
+			$wp_query = $this->get_cache($this->get_name(), $args);
+			if (false === $wp_query) {
+				$wp_query = new \WP_Query( $args );
+				$this->add_cache($this->get_name(), $args, $wp_query);
+			}
 
 			return $this->fetch_output( $wp_query, $output );
 		}
@@ -236,7 +241,9 @@ class Logs extends Repository {
 	public function insert_log( $new_value, $diffs, $is_update = null ) {
 		$msn = "";
 		$description = "";
-
+		
+		$this->clear_cache($this->get_name());
+		
 		if ( is_object( $new_value ) ) {
 			// do not log a log
 			if ( (method_exists( $new_value, 'get_post_type' ) && $new_value->get_post_type() === 'tainacan-log') || $new_value->get_status() === 'auto-draft' ) {

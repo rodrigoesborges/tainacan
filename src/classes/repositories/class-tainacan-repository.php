@@ -10,6 +10,9 @@ use \Respect\Validation\Validator as v;
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 abstract class Repository {
+	
+	use \Tainacan\Traits\Query_Cache;
+	
 	public $entities_type = '\Tainacan\Entities\Entity';
 
 	/**
@@ -75,7 +78,9 @@ abstract class Repository {
 			throw new \Exception( 'Entities must be validated before you can save them' );
 			// TODO: Throw Warning saying you must validate object before insert()
 		}
-
+		
+		$this->clear_cache($this->get_name());
+		
 		$is_update = false;
 		$diffs = [];
 		if ( $obj->get_id() ) {

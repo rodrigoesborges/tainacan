@@ -302,8 +302,13 @@ class Fields extends Repository {
 			
             $args['post_type'] = Entities\Field::get_post_type();
 
-            $wp_query = new \WP_Query($args);
-            return $this->fetch_output($wp_query, $output);
+			$wp_query = $this->get_cache($this->get_name(), $args);
+			if (false === $wp_query) {
+				$wp_query = new \WP_Query( $args );
+				$this->add_cache($this->get_name(), $args, $wp_query);
+			}
+            
+			return $this->fetch_output($wp_query, $output);
         }
     }
 

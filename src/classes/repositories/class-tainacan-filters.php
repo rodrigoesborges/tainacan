@@ -7,6 +7,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 use \Respect\Validation\Validator as v;
 class Filters extends Repository {
+	
 	public $entities_type = '\Tainacan\Entities\Filter';
     public $filters_types = [];
 
@@ -228,7 +229,12 @@ class Filters extends Repository {
             
             $args['post_type'] = Entities\Filter::get_post_type();
 
-            $wp_query = new \WP_Query($args);
+			$wp_query = $this->get_cache($this->get_name(), $args);
+			if (false === $wp_query) {
+				$wp_query = new \WP_Query( $args );
+				$this->add_cache($this->get_name(), $args, $wp_query);
+			}
+			
             return $this->fetch_output($wp_query, $output);
         }
     }

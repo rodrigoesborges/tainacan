@@ -16,7 +16,7 @@
 
 <script>
     import { eventBusSearch } from '../../js/event-bus-search'
-    import { mapActions, mapGetters } from 'vuex';
+    // import { mapActions, mapGetters } from 'vuex';
 
     export default {
         name: 'TainacanFilterItem',

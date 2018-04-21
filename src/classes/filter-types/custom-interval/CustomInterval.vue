@@ -47,7 +47,7 @@
 
 <script>
     import { tainacan as axios } from '../../../js/axios/axios';
-    import _ from 'lodash';
+    //import _ from 'lodash';
 
     export default {
         created(){

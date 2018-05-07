@@ -265,6 +265,8 @@
                                     display: display
                                 }
                             );
+                            this.$eventBusSearch.addFetchOnlyMeta(field.id);
+                            
                         }
                     }
 

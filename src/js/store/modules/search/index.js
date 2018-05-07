@@ -9,6 +9,9 @@ const state = {
         paged: 1,
         perpage: 12,
         search: '',
+        fetchonly: [
+            {'meta': [] }
+        ],
         post_type: [],
         metaquery: [],
         taxquery: []

@@ -35,5 +35,9 @@ export const getSearchQuery = state => {
 }
 
 export const getFecthOnly = state => {
-    return state.postquery.fetchonly;
+    return state.postquery.fetch_only;
+}
+
+export const getFecthOnlyMeta = state => {
+    return ( ! state.postquery.fetch_only['meta'] ) ? [] : state.postquery.fetch_only['meta'];
 }

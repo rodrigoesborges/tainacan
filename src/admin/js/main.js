@@ -15,6 +15,7 @@ import Date from '../../classes/field-types/date/Date.vue';
 import Relationship from '../../classes/field-types/relationship/Relationship.vue';
 import Category from '../../classes/field-types/category/Category.vue';
 
+import FormCompound from '../../classes/field-types/compound/FormCompound.vue';
 import FormRelationship from '../../classes/field-types/relationship/FormRelationship.vue';
 import FormCategory from '../../classes/field-types/category/FormCategory.vue';
 import FormSelectbox from '../../classes/field-types/selectbox/FormSelectbox.vue';
@@ -59,6 +60,7 @@ Vue.component('tainacan-relationship', Relationship);
 Vue.component('tainacan-category', Category);
 
 Vue.component('tainacan-form-relationship', FormRelationship);
+Vue.component('tainacan-form-compound', FormCompound);
 Vue.component('tainacan-form-category', FormCategory);
 Vue.component('tainacan-form-selectbox', FormSelectbox);
 Vue.component('tainacan-form-item', TainacanFormItem);

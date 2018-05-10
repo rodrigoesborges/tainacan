@@ -47,7 +47,7 @@
             emitValues(){
                 this.$emit('input',{
                     children: this.selected,
-                    father: this.field.id,
+                    parent: this.field.id,
                     before_children: ( this.field.field_type_options
                         && this.field.field_type_options.children ) ? this.field.field_type_options.children : []
                 });
@@ -59,7 +59,6 @@
                     if ( metadata.field_type === 'Tainacan\\Field_Types\\Compound' ) {
                         continue;
                     }
-
                     allMetadata.push( metadata );
                 }
 

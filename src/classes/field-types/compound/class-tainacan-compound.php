@@ -21,6 +21,57 @@ class Compound extends Field_Type {
     }
 
     /**
+     * save options and remove old children
+     * @param $options
+     */
+    public function set_options( $options ){
+        $Tainacan_Fields = \Tainacan\Repositories\Fields::get_instance();
+
+        parent::set_options( $options );
+
+        if( !isset( $options['parent'] ) )
+            return;
+
+        if( isset( $options['before_children'] ) && is_array( $options['before_children'] ) ){
+            foreach ( $options['children'] as $child) {
+
+                if( isset( $options['children'] ) && is_array( $options['children'] ) && in_array( $child,  $options['children']))
+                    continue;
+
+                $field = new \Field( $child );
+                $field->set_parent(0);
+
+                if( $field->validate() )
+                    $Tainacan_Fields->update( $field );
+            }
+        }
+
+        if( isset( $options['children'] ) && is_array( $options['children'] ) ){
+            foreach ( $options['children'] as $child) {
+                $field = new \Field( $child );
+                $field->set_parent( $options['parent'] );
+
+                if( $field->validate() )
+                    $Tainacan_Fields->update( $field );
+            }
+        }
+    }
+
+    /**
+     * validate the children of the compound
+     * @param \Tainacan\Entities\Field $field
+     * @return array|bool
+     */
+    public function validate_options( \Tainacan\Entities\Field $field ){
+        if ( !in_array($field->get_status(), apply_filters('tainacan-status-require-validation', ['publish','future','private'])) )
+            return true;
+
+        //TODO validate parent and their children
+
+        return true;
+    }
+
+    /**
      * @param $itemMetadata \Tainacan\Entities\Item_Metadata_Entity The instace of the entity itemMetadata
      * @return string
      */

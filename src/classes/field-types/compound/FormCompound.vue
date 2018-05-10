@@ -8,17 +8,17 @@
                         :title="$i18n.getHelperTitle('tainacan-compound', 'children')"
                         :message="$i18n.getHelperMessage('tainacan-compound', 'children')"/>
             </label>
-            <b-select
-                    name="field_type_compound"
-                    placeholder="Select the collection to fetch items"
-                    v-model="selected">
-                <option
-                        v-for="option in getFields()"
-                        :value="option.id"
-                        :key="option.id">
-                    {{ option.name }}
-                </option>
-            </b-select>
+            <div
+                v-for="option in listAvailableMetadata()"
+                :key="option.id">
+                <b-checkbox
+                        v-model="selected"
+                        @input="emitValues()"
+                        :native-value="option.id">
+                    {{ option.name }}<br>
+                </b-checkbox>
+            </div>
+
         </b-field>
     </section>
 </template>
@@ -45,7 +45,25 @@
                 'getFields'
             ]),
             emitValues(){
-                this.$emit('input',{});
+                this.$emit('input',{
+                    children: this.selected,
+                    father: this.field.id,
+                    before_children: ( this.field.field_type_options
+                        && this.field.field_type_options.children ) ? this.field.field_type_options.children : []
+                });
+            },
+            listAvailableMetadata(){
+                const allMetadata = [];
+
+                for( let metadata of this.getFields() ){
+                    if ( metadata.field_type === 'Tainacan\\Field_Types\\Compound' ) {
+                        continue;
+                    }
+
+                    allMetadata.push( metadata );
+                }
+
+                return allMetadata;
             }
         }
     }

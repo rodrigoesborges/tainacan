@@ -2,6 +2,7 @@
 
 namespace Tainacan\Field_Types;
 
+use Tainacan\Entities;
 use Tainacan\Entities\Field;
 use Tainacan\Entities\Item_Metadata_Entity;
 
@@ -38,7 +39,7 @@ class Compound extends Field_Type {
                 if( isset( $options['children'] ) && is_array( $options['children'] ) && in_array( $child,  $options['children']))
                     continue;
 
-                $field = new \Field( $child );
+                $field = new Tainacan\Entities\Field( $child );
                 $field->set_parent(0);
 
                 if( $field->validate() )
@@ -48,7 +49,7 @@ class Compound extends Field_Type {
 
         if( isset( $options['children'] ) && is_array( $options['children'] ) ){
             foreach ( $options['children'] as $child) {
-                $field = new \Field( $child );
+                $field = new Field( $child );
                 $field->set_parent( $options['parent'] );
 
                 if( $field->validate() )

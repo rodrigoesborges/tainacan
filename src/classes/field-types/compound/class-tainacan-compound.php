@@ -19,43 +19,49 @@ class Compound extends Field_Type {
         $this->set_primitive_type('compound');
         $this->set_component('tainacan-compound');
         $this->set_form_component('tainacan-form-compound');
+
+        add_action( 'tainacan-insert-tainacan-field', array( &$this, 'save_children' ), 10, 1 );
     }
 
     /**
      * save options and remove old children
      * @param $options
      */
-    public function set_options( $options ){
-        $Tainacan_Fields = \Tainacan\Repositories\Fields::get_instance();
+    public function save_children( $field ){
+        $field_type_object = $field->get_field_type_object();
 
-        parent::set_options( $options );
+        if( $field_type_object instanceof self ){
+           $options = $field_type_object->get_options();
+           $Tainacan_Fields = \Tainacan\Repositories\Fields::get_instance();
 
-        if( !isset( $options['parent'] ) )
-            return;
+           if( !isset( $options['parent'] ) )
+               return;
 
-        if( isset( $options['before_children'] ) && is_array( $options['before_children'] ) ){
-            foreach ( $options['children'] as $child) {
+           if( isset( $options['before_children'] ) && is_array( $options['before_children'] ) ){
+               foreach ( $options['children'] as $child) {
 
-                if( isset( $options['children'] ) && is_array( $options['children'] ) && in_array( $child,  $options['children']))
-                    continue;
+                   if( isset( $options['children'] ) && is_array( $options['children'] ) && in_array( $child,  $options['children']))
+                       continue;
 
-                $field = new Tainacan\Entities\Field( $child );
-                $field->set_parent(0);
+                   $field = new Tainacan\Entities\Field( $child );
+                   $field->set_parent(0);
 
-                if( $field->validate() )
-                    $Tainacan_Fields->update( $field );
-            }
+                   if( $field->validate() )
+                       $Tainacan_Fields->update( $field );
+               }
+           }
+
+           if( isset( $options['children'] ) && is_array( $options['children'] ) ){
+               foreach ( $options['children'] as $child) {
+                   $field = new Field( $child );
+                   $field->set_parent( $options['parent'] );
+
+                   if( $field->validate() )
+                       $Tainacan_Fields->update( $field );
+               }
+           }
         }
 
-        if( isset( $options['children'] ) && is_array( $options['children'] ) ){
-            foreach ( $options['children'] as $child) {
-                $field = new Field( $child );
-                $field->set_parent( $options['parent'] );
-
-                if( $field->validate() )
-                    $Tainacan_Fields->update( $field );
-            }
-        }
     }
 
     /**

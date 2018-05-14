@@ -9,7 +9,7 @@
 				<router-link
                         class="card-footer-item"
                         :to="{ path: $routerHelper.getItemEditPath(collectionId, itemId)}">
-                    {{ $i18n.get('edit') + ' ' + $i18n.get('item') }}
+                    {{ $i18n.getFrom('item','edit') }}
                 </router-link>
 
 				<div

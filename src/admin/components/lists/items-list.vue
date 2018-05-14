@@ -23,22 +23,29 @@
                 backend-sorting>
             <template slot-scope="props">
                 <b-table-column 
-                        v-for="(column, index) in tableFields"
                         :key="index"
-                        :custom-key="column.slug"
+                        :label="$i18n.get('label_thumbnail')">
+                    <template>
+                        <router-link 
+                                tag="img" 
+                                class="table-thumb clickable-row" 
+                                :to="{ path: $routerHelper.getItemPath(collectionId, props.row.id) }" 
+                                :src="props.row.thumbnail"/>
+                    </template>
+                </b-table-column>
+                
+                <b-table-column 
+                        v-for="(column, index) in props.row.metadata"
+                        :key="index"
                         :label="column.name"
-                        :visible="column.display"
-                        :class="column.field == 'row_creation' ? 'row-creation' : ''"
-                        :width="column.field == 'row_actions' ? 78 : column.field == 'row_thumbnail' ? 55 : undefined ">
-                        
+                        :visible="column.display">
                     <template>
                         <span
                                 class="clickable-row" 
                                 @click.prevent="goToItemPage(props.row.id)"
-                                v-if="column.field != 'row_thumbnail' && column.field != 'row_actions' && column.field != 'row_creation'"
-                                v-html="renderMetadata( props.row.metadata[column.slug] )" />   
+                                v-html="renderMetadata( column )" />   
                     </template>
-                    
+<!--                     
                     <template v-if="column.field == 'row_thumbnail'">
                         <router-link 
                                 tag="img" 
@@ -56,23 +63,28 @@
                                 tag="span" 
                                 :to="{path: $routerHelper.getItemPath(collectionId, props.row.id)}"/>
                     </template>
-                         
-                    <template v-if="column.field == 'row_actions'">
-                        <!-- <a id="button-view" @click.prevent.stop="goToItemPage(props.row.id)"><b-icon icon="eye"></a> -->
-                        <a 
-                                id="button-edit" 
-                                :aria-label="$i18n.getFrom('items','edit_item')" 
-                                @click="goToItemEditPage(props.row.id)">
-                            <b-icon 
-                                    type="is-gray" 
-                                    icon="pencil"/></a>
-                        <a 
-                                id="button-delete" 
-                                :aria-label="$i18n.get('label_button_delete')" 
-                                @click="deleteOneItem(props.row.id)">
-                            <b-icon 
-                                    type="is-gray" 
-                                    icon="delete"/></a>
+                          -->
+                    <!--  -->
+                </b-table-column>
+                <b-table-column 
+                        :key="index"
+                        :label="$i18n.get('label_actions')"
+                        width="85">
+                    <template>
+                    <a 
+                            id="button-edit" 
+                            :aria-label="$i18n.getFrom('items','edit_item')" 
+                            @click="goToItemEditPage(props.row.id)">
+                        <b-icon 
+                                type="is-gray" 
+                                icon="pencil"/></a>
+                    <a 
+                            id="button-delete" 
+                            :aria-label="$i18n.get('label_button_delete')" 
+                            @click="deleteOneItem(props.row.id)">
+                        <b-icon 
+                                type="is-gray" 
+                                icon="delete"/></a>
                     </template>
                 </b-table-column>
             </template>
@@ -93,7 +105,7 @@ export default {
     },
     props: {
         collectionId: Number,
-        tableFields: Array,
+        //tableFields: Array,
         items: Array,
         isLoading: false
     },

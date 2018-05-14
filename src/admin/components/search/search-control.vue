@@ -6,7 +6,7 @@
                 <button
                         class="button is-secondary"
                         slot="trigger">
-                    <span>{{ `${$i18n.get('add')} ${$i18n.get('item')}` }}</span>
+                    <span>{{ $i18n.getFrom('item','add_new') }}</span>
                     <b-icon icon="menu-down"/>
                 </button>
 
@@ -38,7 +38,8 @@
                         class="control"
                         custom>
                     <b-checkbox
-                            @input="onChangeDisplayedField($event, column)"
+                            @input="onChangeDisplayedField($event, index)"
+                            :value="column.display"
                             :native-value="column.display">
                         {{ column.name }}
                     </b-checkbox>
@@ -101,8 +102,7 @@
         methods: {
             ...mapGetters('search', [
                 'getOrderBy',
-                'getOrder',
-                'getFetchOnlyMeta'
+                'getOrder'
             ]),
             onChangeOrderBy(field) {
                 this.$eventBusSearch.setOrderBy(field);
@@ -110,12 +110,14 @@
             onChangeOrder() {
                 this.order == 'DESC' ? this.$eventBusSearch.setOrder('ASC') : this.$eventBusSearch.setOrder('DESC');
             },
-            onChangeDisplayedField(event, fieldId) {
-                column.display = event;
-                if (event)
-                    this.$eventBusSearch.addFetchOnlyMeta(field.id);
-                else 
-                    this.$eventBusSearch.removeFetchOnlyMeta(field.id);
+            onChangeDisplayedField(event, index) {
+                if (this.tableFields[index] != undefined) {
+                    this.tableFields[index].display = event;
+                    if (event)
+                        this.$eventBusSearch.addFetchOnlyMeta(this.tableFields[index].id);
+                    else 
+                        this.$eventBusSearch.removeFetchOnlyMeta(this.tableFields[index].id);
+                }
             }
         }
     }

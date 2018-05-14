@@ -47,23 +47,27 @@ export const addTaxQuery = ( state, filter ) => {
 };
 
 export const addFetchOnly = ( state, field ) => {
-    state.postquery.fetch_only = ( ! state.postquery.fetch_only ) ? [{'meta': []}] : state.postquery.fetch_only;
-    let index = state.postquery.fetch_only.findIndex( item => item === field);
-    if ( index >= 0 ){
-        Vue.set( state.postquery.fetch_only, index, field);
-    } else {
-        state.postquery.fetch_only.push(field);
+
+    state.postquery.fetch_only = ( ! state.postquery.fetch_only ) ? {} : state.postquery.fetch_only;
+
+    for (let key in field) {
+        state.postquery.fetch_only[key] = field[key];
     }
+    
 };
 export const addFetchOnlyMeta = ( state, field ) => { 
-    state.postquery.fetch_only = ( ! state.postquery.fetch_only ) ? [] : state.postquery.fetch_only;
+
+    state.postquery.fetch_only = ( ! state.postquery.fetch_only ) ? {} : state.postquery.fetch_only;
+    console.log(state.postquery.fetch_only['meta']);
     state.postquery.fetch_only['meta'] = ( ! state.postquery.fetch_only['meta'] ) ? [] : state.postquery.fetch_only['meta'];
-    let index = state.postquery.fetch_only['meta'].findIndex( item => item === field);
+    let index = state.postquery.fetch_only['meta'].findIndex( item => item == field);
     if ( index >= 0 ){    
-        Vue.set( state.postquery.fetch_only['meta'], index, field);
+        state.postquery.fetch_only['meta'][index] = field;
     } else {
         state.postquery.fetch_only['meta'].push(field);
     }
+    console.log(state.postquery.fetch_only['meta']);
+    console.log("----------------------------");
 };
 
 export const removeMetaQuery = ( state, filter ) => {
@@ -81,15 +85,14 @@ export const removeTaxQuery = ( state, filter ) => {
 };
 
 export const removeFetchOnly = ( state, field ) => {
-    let index = state.postquery.fetch_only.findIndex( item => item === field);
-    if (index >= 0) {
-        state.postquery.fetch_only.splice(index, 1);
+    for (let key in field) {
+        delete state.postquery.fetch_only[key];
     }
 };
 
 export const removeFetchOnlyMeta = ( state, field ) => {
     if(state.postquery.fetch_only['meta'] != undefined) {
-        let index = state.postquery.fetch_only['meta'].findIndex( item => item === field);
+        let index = state.postquery.fetch_only['meta'].findIndex( item => item == field);
         if (index >= 0) {
             state.postquery.fetch_only['meta'].splice(index, 1);
         }

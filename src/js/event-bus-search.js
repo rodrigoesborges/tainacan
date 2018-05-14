@@ -39,7 +39,7 @@ export default {
                             this.$route.query.order = 'DESC';
                         if (this.$route.query.orderby == undefined)
                             this.$route.query.orderby = 'date';
-
+                        console.log(this.$route.query);
                         this.$store.dispatch('search/set_postquery', this.$route.query); 
                         this.loadItems();
                     }
@@ -56,12 +56,17 @@ export default {
                         this.$store.dispatch('search/add_taxquery', data );
                     }
                 },
-                addFetchOnlyMeta( field ){
-                    this.$store.dispatch('search/add_fetchonly_meta', field );
+                addFetchOnlyMeta( fieldId ){
+                    this.$store.dispatch('search/add_fetchonly_meta', fieldId );
                     this.updateURLQueries();             
                 },
-                removeFetchOnlyMeta( field ){
-                    this.$store.dispatch('search/remove_fetchonly_meta', field );
+                addFetchOnly( field ){
+
+                    this.$store.dispatch('search/add_fetchonly', field );
+                    this.updateURLQueries();             
+                },
+                removeFetchOnlyMeta( fieldId ){
+                    this.$store.dispatch('search/remove_fetchonly_meta', fieldId );
                     this.updateURLQueries();             
                 },
                 getErrors( filter_id ){

@@ -18,7 +18,7 @@ export const fetchItems = ({ rootGetters, dispatch, commit }, collectionId) => {
 
         if (collectionId == undefined)
             endpoint = '/items?'
-        console.log(qs.stringify(postQueries));
+            
         axios.tainacan.get(endpoint + qs.stringify(postQueries) )
         .then(res => {
             let items = res.data;

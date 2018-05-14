@@ -78,15 +78,15 @@
                         :is-full-page="false"
                         :active.sync="isLoadingFields"/>
                 <search-control
-                        v-if="fields.length > 0 && (items.length > 0 || isLoadingItems)"
+                        v-if="fields.length > 0 && (items.length > 0 || isLoadingItems) && !isLoadingFields"
                         :is-repository-level="isRepositoryLevel"
                         :collection-id="collectionId"
                         :table-fields="tableFields"
                         :pref-table-fields="prefTableFields"/>
             </div>
-            <div 
+            <!-- <div 
                     :items="items"
-                    id="theme-items-list" />
+                    id="theme-items-list" /> -->
             <!-- LISTING RESULTS ------------------------- -->
             <div class="table-container above-subheader">
                 <b-loading
@@ -244,6 +244,7 @@
                         display: true
                     });
 
+                    let fetchOnlyFieldIds = []
                     for (let field of this.fields) {
                         if (field.display !== 'never') {
                             // Will be pushed on array
@@ -265,11 +266,10 @@
                                     display: display
                                 }
                             );    
-                            this.$eventBusSearch.addFetchOnlyMeta(field.id);                       
+                            fetchOnlyFieldIds.push(field.id);                       
                         }
                     }
-                    this.$eventBusSearch.loadItems();
-
+                    
                     this.tableFields.push({
                         name: this.$i18n.get('label_creation'),
                         field: 'row_creation',
@@ -297,6 +297,12 @@
                     //         this.$userPrefs.set('table_columns_' + this.collectionId, this.prefTableFields, null);
                     //     });
 
+                    this.$eventBusSearch.addFetchOnly({
+                        '0': 'thumbnail',
+                        'meta': fetchOnlyFieldIds,
+                        '1': 'creation_date',
+                        '2': 'author_name'
+                    });
                     this.isLoadingFields = false;
 
                 })
@@ -306,8 +312,8 @@
         },
         mounted() {
             this.$eventBusSearch.setCollectionId(this.collectionId);
-            this.$eventBusSearch.updateStoreFromURL();
-            this.$eventBusSearch.loadItems();
+            //this.$eventBusSearch.updateStoreFromURL();
+            //this.$eventBusSearch.loadItems();
         } 
     }
 </script>

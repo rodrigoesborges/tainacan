@@ -38,12 +38,12 @@ class Compound extends Field_Type {
                return;
 
            if( isset( $options['before_children'] ) && is_array( $options['before_children'] ) ){
-               foreach ( $options['children'] as $child) {
+               foreach ( $options['before_children'] as $child) {
 
                    if( isset( $options['children'] ) && is_array( $options['children'] ) && in_array( $child,  $options['children']))
                        continue;
 
-                   $field = new Tainacan\Entities\Field( $child );
+                   $field = new Field( $child );
                    $field->set_parent(0);
 
                    if( $field->validate() )

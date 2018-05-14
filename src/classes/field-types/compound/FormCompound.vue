@@ -24,7 +24,7 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
+    import { tainacan as axios } from '../../../js/axios/axios';
 
     export default {
         props: {
@@ -37,25 +37,44 @@
         },
         data(){
             return {
-              selected: []
+              selected: [],
+              options: [],
+              before_children: []
             }
         },
+        created(){
+              this.selected = [];
+
+              // retorna todos os metadados nao importa o parent
+              axios.get('/collection/' + this.field.collection_id + '/fields?nopaging=1&parent=all')
+                  .then( res => {
+                      for (let field of res.data) {
+                          if( this.field.field_type_options
+                              && this.field.field_type_options.children && this.field.field_type_options.children.indexOf( field.id ) >= 0 ){
+                                this.selected.push( field.id );
+                                this.before_children.push( field.id );
+                          }
+
+                          this.options.push(field);
+                      }
+                  })
+                  .catch(error => {
+                      this.$console.log(error);
+                  });
+        },
         methods:{
-            ...mapGetters('fields',[
-                'getFields'
-            ]),
             emitValues(){
+                this.$console.log(this.before_children);
                 this.$emit('input',{
                     children: this.selected,
                     parent: this.field.id,
-                    before_children: ( this.field.field_type_options
-                        && this.field.field_type_options.children ) ? this.field.field_type_options.children : []
+                    before_children: this.before_children
                 });
             },
             listAvailableMetadata(){
                 const allMetadata = [];
 
-                for( let metadata of this.getFields() ){
+                for( let metadata of this.options ){
                     if ( metadata.field_type === 'Tainacan\\Field_Types\\Compound' ) {
                         continue;
                     }
@@ -63,6 +82,12 @@
                 }
 
                 return allMetadata;
+            },
+            clearSelected( id ){
+              let index = this.previous_children.findIndex(field => field.id == id);
+              if (index >= 0) {
+                  this.previous_children.splice(index, 1);
+              }
             }
         }
     }

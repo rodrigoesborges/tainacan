@@ -94,6 +94,7 @@ class REST_Controller extends \WP_REST_Controller {
 			'perpage'      => 'posts_per_page',
 			'paged'        => 'paged',
 			'postin'       => 'post__in',
+			'parent'       => 'parent',
 			'relation'     => 'relation',
 			'nopaging'     => 'nopaging',
 			'meta_key'     => 'meta_key',
@@ -282,7 +283,7 @@ class REST_Controller extends \WP_REST_Controller {
 						$args[ $mapped_v ][ $index1 ][ $meta_v ] = $request[ $mapped ][ $index1 ][ $meta_v ];
 					}
 				}
-				
+
 			}
 
 		} else {

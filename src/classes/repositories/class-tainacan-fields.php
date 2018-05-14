@@ -38,7 +38,7 @@ class Fields extends Repository {
         add_filter('pre_trash_post', array( &$this, 'disable_delete_core_fields' ), 10, 2 );
         add_filter('pre_delete_post', array( &$this, 'force_delete_core_fields' ), 10, 3 );
     }
-	
+
     public function get_map() {
     	return apply_filters('tainacan-get-map-'.$this->get_name(), [
 		    'name'               => [
@@ -184,7 +184,7 @@ class Fields extends Repository {
 		    ]
 	    ] );
     }
-	
+
 	/**
 	 * Get the labels for the custom post type of this repository
 	 * @return array Labels in the format expected by register_post_type()
@@ -250,9 +250,9 @@ class Fields extends Repository {
      * @param $class_name string | object The class name or the instance
      */
     public function register_field_type( $class_name ){
-        
+
 		// TODO: we shoud not allow registration of field types of retricted core field types (e.g. compound, term) by plugins
-		
+
 		if( is_object( $class_name ) ){
             $class_name = get_class( $class_name );
         }
@@ -307,9 +307,9 @@ class Fields extends Repository {
             $args = array_merge([
                 'posts_per_page' => -1,
             ], $args);
-			
+
 			$args = $this->parse_fetch_args($args);
-			
+
             $args['post_type'] = Entities\Field::get_post_type();
 
             $wp_query = new \WP_Query($args);
@@ -344,10 +344,14 @@ class Fields extends Repository {
             'value'   => $parents,
             'compare' => 'IN',
         );
-		
-		$args = array_merge([
-			'parent' => 0
-		], $args);
+
+		if( !isset( $args['parent']) )
+				$args = array_merge([
+					'parent' => 0
+				], $args);
+
+		if( $args['parent'] === 'all ')
+				unset( $args['parent'] );
 
         if( isset( $args['meta_query'] ) ){
             $args['meta_query'][] = $meta_query;
@@ -432,7 +436,7 @@ class Fields extends Repository {
         }
         return $result;
     }
-	
+
 	/**
      * @param \Tainacan\Entities\Field $field
      * @return \Tainacan\Entities\Field
@@ -701,7 +705,7 @@ class Fields extends Repository {
 
 			foreach ($post_statuses as $post_status) {
 				$sql_string = $wpdb->prepare(
-					"SELECT item_id, field_id, mvalue 
+					"SELECT item_id, field_id, mvalue
 				  		FROM (
 			  				SELECT ID as item_id
 		  					FROM $wpdb->posts
@@ -729,7 +733,7 @@ class Fields extends Repository {
 
 			foreach ($post_statuses as $post_status) {
 				$sql_string = $wpdb->prepare(
-					"SELECT item_id, field_id, mvalue 
+					"SELECT item_id, field_id, mvalue
 		  	        	FROM (
 	  	  		        	SELECT ID as item_id
   	  			        	FROM $wpdb->posts
@@ -753,7 +757,7 @@ class Fields extends Repository {
 
 		return $results;
 	}
-	
+
 	/**
 	 * Stores the value of the taxonomy_id option to use on update_category_field method.
 	 *
@@ -762,7 +766,7 @@ class Fields extends Repository {
 		$field_type = $field->get_field_type_object();
 		$current_tax = '';
 		if ($field_type->get_primitive_type() == 'term') {
-			
+
 			$options = $this->get_mapped_property($field, 'field_type_options');
 			$field_type->set_options($options);
 			$current_tax = $field_type->get_option('taxonomy_id');
@@ -783,11 +787,11 @@ class Fields extends Repository {
 	private function update_category_field($field) {
 		$field_type = $field->get_field_type_object();
 		$new_tax = '';
-		
+
 		if ($field_type->get_primitive_type() == 'term') {
 			$new_tax = $field_type->get_option('taxonomy_id');
 		}
-		
+
 		if ($new_tax != $this->current_taxonomy) {
 			$collection = $field->get_collection();
 
@@ -801,7 +805,7 @@ class Fields extends Repository {
 
 		}
 	}
-	
+
 	private function delete_category_field($field_id) {
 		$field = $this->fetch($field_id);
 		$field_type = $field->get_field_type_object();

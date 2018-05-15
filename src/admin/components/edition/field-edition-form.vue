@@ -252,7 +252,8 @@
         },
         methods: {
             ...mapActions('fields', [
-                'updateField'
+                'updateField',
+                'fetchFields'
             ]),
             saveEdition(field) {
 
@@ -271,6 +272,10 @@
                             this.formErrorMessage = '';
                             this.closedByForm = true;
                             this.$emit('onEditionFinished');
+
+                            if( field.field_type_object.primitive_type === 'compound' ){
+                                this.fetchFields({collectionId: this.collectionId, isRepositoryLevel: this.isRepositoryLevel, isContextEdit: true});
+                            }
                         })
                         .catch((errors) => {
                             for (let error of errors.errors) {
@@ -341,5 +346,3 @@
     }
 
 </style>
-
-

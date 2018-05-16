@@ -1,6 +1,9 @@
 <template>
     <section>
         <b-field
+                :listen="getErrors"
+                :type="type"
+                :message="message"
                 :addons="false">
             <label class="label">
                 {{ $i18n.get('label_compound_select_metadata_children') }}<span :class="collectionType" >&nbsp;*&nbsp;</span>
@@ -39,7 +42,9 @@
             return {
               selected: [],
               options: [],
-              before_children: []
+              before_children: [],
+              type: '',
+              message: ''
             }
         },
         created(){
@@ -62,9 +67,28 @@
                       this.$console.log(error);
                   });
         },
+        computed: {
+            getErrors(){
+              this.setErrors();
+              return true;
+            }
+        },
         methods:{
+            setErrors(){
+              if( this.errors && this.errors.children && this.selected.length === 0 ){
+                  this.message = this.errors.children;
+                  this.type = 'is-danger';
+              } else if( this.errors && this.errors.length > 0 && !this.errors.children){
+                  let errors = Object.values(this.errors[0]);
+                  this.message = errors[0];
+                  this.type = 'is-danger';
+              }else {
+                  this.message = '';
+                  this.type = '';
+              }
+            },
             emitValues(){
-                this.$console.log(this.before_children);
+                this.setErrors();
                 this.$emit('input',{
                     children: this.selected,
                     parent: this.field.id,

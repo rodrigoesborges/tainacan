@@ -73,7 +73,29 @@ class Compound extends Field_Type {
         if ( !in_array($field->get_status(), apply_filters('tainacan-status-require-validation', ['publish','future','private'])) )
             return true;
 
-        //TODO validate parent and their children
+        $field_type_object = $field->get_field_type_object();
+
+        if( $field_type_object instanceof self  ){
+           $options = $field_type_object->get_options();
+
+           // if parent is not set, it comes from tests
+           if( !isset( $options['parent'] ) )
+              return true;
+
+           if( !isset( $options['children'] ) || empty( $options['children'] ) ){
+             return [
+                 'children' => __('Children is required','tainacan')
+             ];
+           }
+
+           foreach ($options['children'] as $child) {
+              $field = new Field( $child );
+              $field->set_parent( $options['parent'] );
+              if( !$field->validate() ){
+                  return [ $field->get_errors()[0] ];
+              }
+           }
+        }
 
         return true;
     }

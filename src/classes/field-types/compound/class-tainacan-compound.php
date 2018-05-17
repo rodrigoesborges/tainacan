@@ -101,6 +101,36 @@ class Compound extends Field_Type {
     }
 
     /**
+     * Overrides and bring back all data for the children
+     * that were not set yet.
+     * @return array Field type options
+     */
+    public function get_options() {
+        $Tainacan_Fields = \Tainacan\Repositories\Fields::get_instance();
+        $options = parent::get_options();
+        $options['children_objects'] = [];
+
+        if( isset( $options['children'] ) && !empty( $options['children'] ) ){
+
+          foreach ($options['children'] as $child) {
+             $item = new Field( $child );
+             $item_arr = $item->__toArray();
+       			 $item_arr['field_type_object'] = $item->get_field_type_object()->__toArray();
+       			 $item_arr['current_user_can_edit'] = $item->can_edit();
+       			 ob_start();
+       			 $item->get_field_type_object()->form();
+       			 $form = ob_get_clean();
+       			 $item_arr['edit_form'] = $form;
+
+
+             $options['children_objects'][] = $item_arr;
+          }
+
+        }
+        return $options;
+    }
+
+    /**
      * @param $itemMetadata \Tainacan\Entities\Item_Metadata_Entity The instace of the entity itemMetadata
      * @return string
      */

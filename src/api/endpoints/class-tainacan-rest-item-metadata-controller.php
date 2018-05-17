@@ -126,7 +126,7 @@ class REST_Item_Metadata_Controller extends REST_Controller {
 
 		return new \WP_REST_Response(apply_filters('tainacan-rest-response', $prepared_item, $request), 200);
 	}
-	
+
 	/**
 	 * @param \WP_REST_Request $request
 	 *
@@ -135,13 +135,13 @@ class REST_Item_Metadata_Controller extends REST_Controller {
 	public function get_item_field_value( $request ) {
 		$item_id = $request['item_id'];
 		$field_id = $request['metadata_id'];
-		
+
 		$item = $this->item_repository->fetch($item_id);
-		
+
 		$items_metadata = $item->get_fields();
-		
+
 		$prepared_item = '';
-		
+
 		foreach ($items_metadata as $item_metadata){
 			$field = $item_metadata->get_field();
 			if($field->get_id() == $field_id) {
@@ -149,7 +149,7 @@ class REST_Item_Metadata_Controller extends REST_Controller {
 				$prepared_item['field']['field_type_object'] = $this->prepare_item_for_response( $field->get_field_type_object(), $request);
 			}
 		}
-		
+
 		return new \WP_REST_Response(apply_filters('tainacan-rest-response', $prepared_item, $request), 200);
 	}
 
@@ -206,10 +206,11 @@ class REST_Item_Metadata_Controller extends REST_Controller {
 
 					$prepared_item =  $this->prepare_item_for_response($field_updated, $request);
 					$prepared_item['field']['field_type_object'] = $this->prepare_item_for_response($field_updated->get_field()->get_field_type_object(), $request);
+					$prepared_item['parent_meta_id'] = $field_updated->get_parent_meta_id();
 				}
 				elseif($field->get_accept_suggestion()) {
 					$log = $this->item_metadata_repository->suggest( $item_metadata );
-					$prepared_item = $log->__toArray();  
+					$prepared_item = $log->__toArray();
 				}
 				else {
 					return new \WP_REST_Response( [

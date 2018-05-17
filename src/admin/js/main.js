@@ -14,6 +14,7 @@ import Numeric from '../../classes/field-types/numeric/Numeric.vue';
 import Date from '../../classes/field-types/date/Date.vue';
 import Relationship from '../../classes/field-types/relationship/Relationship.vue';
 import Category from '../../classes/field-types/category/Category.vue';
+import Compound from '../../classes/field-types/compound/Compound.vue';
 
 import FormCompound from '../../classes/field-types/compound/FormCompound.vue';
 import FormRelationship from '../../classes/field-types/relationship/FormRelationship.vue';
@@ -58,6 +59,7 @@ Vue.component('tainacan-numeric', Numeric);
 Vue.component('tainacan-date', Date);
 Vue.component('tainacan-relationship', Relationship);
 Vue.component('tainacan-category', Category);
+Vue.component('tainacan-compound', Compound);
 
 Vue.component('tainacan-form-relationship', FormRelationship);
 Vue.component('tainacan-form-compound', FormCompound);

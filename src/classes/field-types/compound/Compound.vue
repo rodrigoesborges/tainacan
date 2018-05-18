@@ -38,6 +38,11 @@
         created(){
             this.$console.log( this.field );
         },
+        data(){
+            return {
+                uniqId: new Date().getTime()
+            }
+        },
         computed: {
             getChildren(){
                 const children = [];
@@ -63,7 +68,12 @@
         },
         methods: {
             save( $event, id ) {
-                eventBus.$emit('input', { item_id: this.field.item.id, field_id: id, values: [$event] } );
+                eventBus.$emit('input', {
+                  parent_meta_id: eventBus.getCompoundMetaId( this.uniqId ),
+                  compoundIndex: this.uniqId,
+                  item_id: this.field.item.id,
+                  field_id: id,
+                  values: [$event] } );
             }
         }
     }

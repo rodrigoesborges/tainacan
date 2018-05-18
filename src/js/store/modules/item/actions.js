@@ -17,10 +17,11 @@ export const sendField = ( { commit }, { item_id, field_id, values }) => {
 };
 
 
-export const updateMetadata = ({ commit }, { item_id, field_id, values }) => {
+export const updateMetadata = ({ commit }, { item_id, field_id, values, parent_meta_id }) => {
     return new Promise((resolve, reject) => {
         axios.tainacan.patch(`/item/${item_id}/metadata/${field_id}`, {
             values: values,
+            parent_meta_id
         })
             .then( res => {
                 let field = res.data;
@@ -70,7 +71,7 @@ export const fetchItem = ({ commit }, item_id) => {
 
 export const fetchItemTitle = ({ commit }, id) => {
     commit('cleanItemTitle');
-    return new Promise((resolve, reject) =>{ 
+    return new Promise((resolve, reject) =>{
         axios.tainacan.get('/items/' + id + '?fetch_only=title')
         .then(res => {
             let itemTitle = res.data;
@@ -97,20 +98,20 @@ export const sendItem = ( { commit }, { collection_id, status }) => {
             });
     });
 };
- 
+
 export const updateItem = ({ commit }, { item_id, status }) => {
 
     return new Promise((resolve, reject) => {
         axios.tainacan.patch('/items/' + item_id, {
-            status: status 
+            status: status
         }).then( res => {
             commit('setItem', res.data);
             resolve( res.data );
-        }).catch( error => { 
+        }).catch( error => {
             reject({ error_message: error['response']['data'].error_message, errors: error['response']['data'].errors });
         });
 
-    }); 
+    });
 };
 
 export const updateItemDocument = ({ commit }, { item_id, document, document_type }) => {
@@ -123,11 +124,11 @@ export const updateItemDocument = ({ commit }, { item_id, document, document_typ
 
             commit('setItem', item);
             resolve( res.data );
-        }).catch( error => { 
+        }).catch( error => {
             reject({ error_message: error['response']['data'].error_message, errors: error['response']['data'].errors });
         });
 
-    }); 
+    });
 };
 
 // Attachments =======================================
@@ -163,7 +164,7 @@ export const fetchAttachments = ({ commit }, item_id) => {
     });
 };
 
- 
+
 export const updateThumbnail = ({ commit }, { itemId, thumbnailId }) => {
     return new Promise((resolve, reject) => {
         axios.tainacan.patch('/items/' + itemId, {
@@ -172,9 +173,9 @@ export const updateThumbnail = ({ commit }, { itemId, thumbnailId }) => {
             let item = res.data
             commit('setItem', item);
             resolve( item );
-        }).catch( error => { 
+        }).catch( error => {
             reject({ error_message: error['response']['data'].error_message, errors: error['response']['data'].errors });
         });
 
-    }); 
+    });
 };

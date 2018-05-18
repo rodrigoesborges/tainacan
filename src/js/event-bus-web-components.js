@@ -5,7 +5,8 @@ export const eventBus = new Vue({
     store,
     data: {
         componentsTag: [],
-        errors : []
+        errors : [],
+        compoundsMap: []
     },
     created(){
         if( tainacan_plugin.components ){
@@ -37,13 +38,20 @@ export const eventBus = new Vue({
         updateValue(data){
             if ( data.item_id ){
                 let values = ( Array.isArray( data.values[0] ) ) ? data.values[0] : data.values ;
-                const promisse = this.$store.dispatch('item/updateMetadata',
-                    { item_id: data.item_id, field_id: data.field_id, values: values });
+                let parent_meta_id = ( data.parent_meta_id ) ? data.parent_meta_id : 0;
+                const compoundIndex = ( data.compoundIndex ) ? data.compoundIndex : 0;
 
-                    promisse.then( () => {
+                const promisse = this.$store.dispatch('item/updateMetadata',
+                    { item_id: data.item_id, field_id: data.field_id, values: values, parent_meta_id });
+
+                    promisse.then( ( result ) => {
                     let index = this.errors.findIndex( errorItem => errorItem.field_id == data.field_id );
                     if ( index >= 0){
                         this.errors.splice( index, 1);
+                    }
+
+                    if( result && result.parent_meta_id ){
+                        this.setCompoundMetaId( compoundIndex, result.parent_meta_id )
                     }
                 })
                 .catch((error) => {
@@ -107,7 +115,14 @@ export const eventBus = new Vue({
                     }
                 }
             }
+        },
+        setCompoundMetaId( index, value ){
+          this.compoundsMap[index] = value;
+        },
+        getCompoundMetaId( index ){
+           return ( this.compoundsMap[index] ) ? this.compoundsMap[index] : 0;
         }
+
     }
 
 });

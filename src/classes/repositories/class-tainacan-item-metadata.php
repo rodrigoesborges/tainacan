@@ -148,6 +148,27 @@ class Item_Metadata extends Repository {
                 }
             }
 		}
+
+    // I need a parent Id to compound
+    /**if( $item_metadata->get_field()->get_parent() > 0 ){
+        if (is_int($item_metadata->get_meta_id())) {
+            update_metadata_by_mid( 'post', $item_metadata->get_meta_id(), wp_slash( $item_metadata->get_value() ) );
+        } else {
+
+            /**
+             * When we are adding a field that is child of another, this means it is inside a compound field
+             *
+             * In that case, if the Item_Metadata object is not set with a meta_id, it means we want to create a new one
+             * and not update an existing. This is the case of a multiple compound field.
+             *
+            if (  && is_null($item_metadata->get_meta_id()) ) {
+              $added_meta_id = add_post_meta($item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id(), wp_slash( $item_metadata->get_value() ) );
+              $added_compound = $this->add_compound_value($item_metadata, $added_meta_id);
+            } else {
+              update_post_meta($item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id(), wp_slash( $item_metadata->get_value() ) );
+            }
+        }
+    } **/
 	}
 
 	/**

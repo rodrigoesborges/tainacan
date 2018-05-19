@@ -24,7 +24,7 @@
                       :id="child.field_type_object.component + '-' + field.slug"
                       :is="child.field_type_object.component"
                       :field="{ field: child, item: field.item }"
-                      :value="valueChild"
+                      :value="valueChild[child.id]"
                       @input="save($event, child.id)"/>
           </div>
     </b-field>
@@ -42,7 +42,7 @@
         data(){
             return {
                 uniqId: new Date().getTime(),
-                valueChild: null
+                valueChild: []
             }
         },
         computed: {
@@ -71,16 +71,12 @@
         },
         methods: {
             setValue( fieldId ){
-                if( this.field.value && this.field.value.length > 0){
-                    for( const val of this.field.value ){
-
-                        if(val && val.length > 0){
-                           const realValue = val[0];
-                           if(realValue.field.id === fieldId){
-                             this.setParent( realValue.parent_meta_id );
-                             this.valueChild = realValue.value;
-                           }
-                        }
+                if( this.value && this.value.length > 0){
+                    for( const realValue of this.value ){
+                         if( realValue.field && realValue.field.id === fieldId){
+                           this.setParent( realValue.parent_meta_id );
+                           this.valueChild[fieldId] = realValue.value;
+                         }
                     }
                 }
             },

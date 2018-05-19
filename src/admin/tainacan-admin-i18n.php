@@ -5,7 +5,7 @@ return [
 	'repository'                               => __( 'Repository', 'tainacan' ),
 	'collections'                              => __( 'Collections', 'tainacan' ),
 	'items'                                    => __( 'Items', 'tainacan' ),
-	'fields'                                   => __( 'Fields', 'tainacan' ),
+	'fields'                                   => __( 'Metadata', 'tainacan' ),
 	'filters'                                  => __( 'Filters', 'tainacan' ),
 	'categories'                               => __( 'Categories', 'tainacan' ),
 	'events'                                   => __( 'Events', 'tainacan' ),
@@ -29,7 +29,7 @@ return [
 	'save'                                     => __( 'Save', 'tainacan' ),
 	'next'                                     => __( 'Next', 'tainacan' ),
 	'back'         	                           => __( 'Back', 'tainacan' ),
-	'see'                                      => __( 'See', 'tainacan' ),
+	'see'                                      => __( 'View', 'tainacan' ),
 	'search'                                   => __( 'Search', 'tainacan' ),
 	'advanced_search'                          => __( 'Advanced Search', 'tainacan' ),
 	'continue'                                 => __( 'Continue', 'tainacan' ),
@@ -169,6 +169,10 @@ return [
 	'label_expand_all'	 					   => __( 'Expand all', 'tainacan' ),
 	'label_collapse_all'		 			   => __( 'Collapse all', 'tainacan' ),
 	'label_compound_select_metadata_children'     => __( 'Select children metadata ', 'tainacan' ),
+	'label_view_term'			 			   => __( 'View Term', 'tainacan' ),
+	'label_all_items'			 			   => __( 'All items', 'tainacan' ),
+	'label_draft_items'			 			   => __( 'Draft', 'tainacan' ),
+	'label_trash_items'			 			   => __( 'Trash', 'tainacan' ),
 
 	// Instructions. More complex sentences to guide user and placeholders
 	'instruction_delete_selected_collections'    => __( 'Delete selected collections', 'tainacan' ),

@@ -40,7 +40,7 @@ class Collections extends Repository {
 				'map'         => 'post_title',
 				'title'       => __( 'Name', 'tainacan' ),
 				'type'        => 'string',
-				'description' => __( 'Name of the collection', 'tainacan' ),
+				'description' => __( 'The title of the collection', 'tainacan' ),
 				'validation'  => v::stringType()->notEmpty(),
 			],
 			'status'                   => [
@@ -48,7 +48,7 @@ class Collections extends Repository {
 				'title'       => __( 'Status', 'tainacan' ),
 				'type'        => 'string',
 				'default'     => '',
-				'description' => __( 'The posts status', 'tainacan' )
+				'description' => __( 'The current situation of the post', 'tainacan' )
 			],
 			'author_id'                => [
 				'map'         => 'post_author',
@@ -68,31 +68,25 @@ class Collections extends Repository {
 				'type'        => 'string',
 				'description' => __( 'The collection modification date', 'tainacan' )
 			],
-			'url'                      => [
-				'map'         => 'guid',
-				'title'       => __( 'Collection URL', 'tainacan' ),
-				'type'        => 'string',
-				'description' => __( 'The collection URL', 'tainacan' )
-			],
 			'order'                    => [
 				'map'         => 'menu_order',
 				'title'       => __( 'Order', 'tainacan' ),
 				'type'        => 'string',
-				'description' => __( 'Collection order. Field used if collections are manually ordered', 'tainacan' ),
+				'description' => __( 'Collection order. Field used if collections are manually ordered.', 'tainacan' ),
 				//'validation' => v::stringType(),
 			],
 			'parent'                   => [
 				'map'         => 'post_parent',
 				'title'       => __( 'Parent Collection', 'tainacan' ),
 				'type'        => 'integer',
-				'description' => __( 'Parent collection ID', 'tainacan' ),
+				'description' => __( 'Original collection from which features are inherited', 'tainacan' ),
 				//'validation' => v::stringType(),
 			],
 			'description'              => [
 				'map'         => 'post_content',
 				'title'       => __( 'Description', 'tainacan' ),
 				'type'        => 'string',
-				'description' => __( 'Collection description', 'tainacan' ),
+				'description' => __( 'An introductory text describing the collection', 'tainacan' ),
 				'default'     => '',
 				//'validation' => v::stringType(),
 			],
@@ -100,7 +94,7 @@ class Collections extends Repository {
 				'map'         => 'post_name',
 				'title'       => __( 'Slug', 'tainacan' ),
 				'type'        => 'string',
-				'description' => __( 'A unique and santized string representation of the collection, used to build the collection URL', 'tainacan' ),
+				'description' => __( 'An unique and sanitized string representation of the collection, used to build the collection URL. It must not contain any special characters or spaces.', 'tainacan' ),
 				//'validation' => v::stringType(),
 			],
 			'default_orderby'          => [
@@ -155,7 +149,7 @@ class Collections extends Repository {
 				'map'         => 'meta',
 				'title'       => __( 'Enable Cover Page', 'tainacan' ),
 				'type'        => 'string',
-				'description' => __( 'Use page as the home page of this collection', 'tainacan' ),
+				'description' => __( 'To use this page as the home page of this collection', 'tainacan' ),
 				'on_error'    => __( 'Value should be yes or no', 'tainacan' ),
 				'validation'  => v::stringType()->in( [ 'yes', 'no' ] ), // yes or no
 				'default'     => 'no'
@@ -183,13 +177,13 @@ class Collections extends Repository {
 				'title'       => __( 'Moderators', 'tainacan' ),
 				'type'        => 'array/object/string',
 				'items'       => [ 'type' => 'array/string/integer/object' ],
-				'description' => __( 'The IDs of users assigned as moderators of this collection', 'tainacan' ),
+				'description' => __( 'To assign users as Moderators of this collection', 'tainacan' ),
 				'validation'  => ''
 			],
 			'_thumbnail_id'          => [
 				'map'         => 'meta',
-				'title'       => __( 'Featured image ID', 'tainacan' ),
-				'description' => __( 'Featured image ID', 'tainacan' )
+				'title'       => __( 'Thumbnail', 'tainacan' ),
+				'description' => __( 'Squared reduced-size version of a picture that helps recognizing and organizing files', 'tainacan' )
 			]
 
 		] );

@@ -1,14 +1,13 @@
 <template>
     <span>
-        <div class="header-item">
-
-            <b-dropdown 
-                    v-if="!isOnTheme"
-                    id="item-creation-options-dropdown">
+        <div 
+                class="header-item"
+                v-if="!isOnTheme">
+            <b-dropdown id="item-creation-options-dropdown">
                 <button
                         class="button is-secondary"
                         slot="trigger">
-                    <span>{{ `${$i18n.get('add')} ${$i18n.get('item')}` }}</span>
+                    <span>{{ $i18n.getFrom('items','add_new') }}</span>
                     <b-icon icon="menu-down"/>
                 </button>
 
@@ -126,7 +125,7 @@
     #item-creation-options-dropdown {
         margin-right: 80px;
     }
-    .dropdown-menu {
+    .header-item .dropdown-menu {
         display: block;
     }
 </style>

@@ -215,7 +215,7 @@
                             <template slot="empty">{{ $i18n.get('info_no_user_found') }}</template>
                         </b-autocomplete>
                         <ul
-                                class="moderators-list"
+                                class="selected-list-box"
                                 v-if="moderators != undefined && moderators.length > 0">
                             <li
                                     :key="index"
@@ -648,6 +648,9 @@ export default {
 
     .tainacan-form>.columns>.column {
         overflow: auto;
+        .field {
+            position: relative;
+        }
     }
     .thumbnail-field {  
         max-height: 128px;
@@ -713,14 +716,6 @@ export default {
             float: right;
         }
 
-    }
-    .moderators-list {
-        padding: 10px;
-        display: flex;
-
-        .tags {
-            margin-right: 5px;
-        }
     }
     .moderators-empty-list { 
         color: gray;

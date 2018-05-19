@@ -51,7 +51,7 @@ export const eventBus = new Vue({
                     }
 
                     if( result && result.parent_meta_id ){
-                        this.setCompoundMetaId( compoundIndex, result.parent_meta_id )
+                        this.setCompoundMetaId( compoundIndex, result.parent_meta_id );
                     }
                 })
                 .catch((error) => {

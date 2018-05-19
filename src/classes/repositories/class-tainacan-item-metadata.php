@@ -44,7 +44,7 @@ class Item_Metadata extends Repository {
 
 		    $diffs = $this->diff($old, $item_metadata);
 	    }
-		
+
 		$unique = !$item_metadata->is_multiple();
 
 		$field_type = $item_metadata->get_field()->get_field_type_object();
@@ -57,15 +57,15 @@ class Item_Metadata extends Repository {
 			return $item_metadata;
 		} else {
 			if ($unique) {
-				
+
 				if (is_int($item_metadata->get_meta_id())) {
 					update_metadata_by_mid( 'post', $item_metadata->get_meta_id(), wp_slash( $item_metadata->get_value() ) );
 				} else {
-					
+
 					/**
-					 * When we are adding a field that is child of another, this means it is inside a compound field 
+					 * When we are adding a field that is child of another, this means it is inside a compound field
 					 *
-					 * In that case, if the Item_Metadata object is not set with a meta_id, it means we want to create a new one 
+					 * In that case, if the Item_Metadata object is not set with a meta_id, it means we want to create a new one
 					 * and not update an existing. This is the case of a multiple compound field.
 					 */
 					if ( $item_metadata->get_field()->get_parent() > 0 && is_null($item_metadata->get_meta_id()) ) {
@@ -74,12 +74,12 @@ class Item_Metadata extends Repository {
 					} else {
 						update_post_meta($item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id(), wp_slash( $item_metadata->get_value() ) );
 					}
-					
+
 				}
-				
+
 	        } else {
 	            delete_post_meta($item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id());
-	            
+
 	            if (is_array($item_metadata->get_value())){
 	            	$values = $item_metadata->get_value();
 
@@ -94,17 +94,17 @@ class Item_Metadata extends Repository {
 		}
 
         $new_entity = new Entities\Item_Metadata_Entity($item_metadata->get_item(), $item_metadata->get_field());
-		
+
 		if (isset($added_compound) && is_int($added_compound)) {
 			$new_entity->set_parent_meta_id($added_compound);
 		}
-		
+
 		if (isset($added_meta_id) && is_int($added_meta_id)) {
 			$new_entity->set_meta_id($added_meta_id);
 		}
-		
-		return $new_entity;	
-		
+
+		return $new_entity;
+
     }
 
 	/**
@@ -129,7 +129,7 @@ class Item_Metadata extends Repository {
             }
         }
     }
-	
+
 	public function save_terms_field_value($item_metadata) {
 		$field_type = $item_metadata->get_field()->get_field_type_object();
 		if ($field_type->get_primitive_type() == 'term') {
@@ -149,32 +149,32 @@ class Item_Metadata extends Repository {
             }
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return null|ind the meta id of the created compound metadata
 	 */
 	public function add_compound_value(Entities\Item_Metadata_Entity $item_metadata, $meta_id) {
-		
+
 		$current_value = get_metadata_by_mid( 'post', $item_metadata->get_parent_meta_id() );
-		
+
 		if (is_object($current_value))
 		 	$current_value = $current_value->meta_value;
-			
+
 		if ( !is_array($current_value) )
 			$current_value = [];
-		
+
 		if ( !in_array( $meta_id, $current_value ) ) {
 			$current_value[] = $meta_id;
 		}
-		
+
 		if ( $item_metadata->get_parent_meta_id() > 0 ) {
 			update_metadata_by_mid( 'post', $item_metadata->get_parent_meta_id(), $current_value );
 		} elseif ( $item_metadata->get_field()->get_parent() > 0 ) {
 			return add_post_meta( $item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_parent(), $current_value );
 		}
-		
-		
+
+
 	}
 
 	/**
@@ -188,23 +188,23 @@ class Item_Metadata extends Repository {
     public function fetch($object, $output = null, $args = [] ){
         if($object instanceof Entities\Item){
             $Tainacan_Fields = \Tainacan\Repositories\Fields::get_instance();
-            
+
             $collection = $object->get_collection();
-            
+
             if (!$collection instanceof Entities\Collection){
                 return [];
             }
-            
+
             $meta_list = $Tainacan_Fields->fetch_by_collection($collection, $args, 'OBJECT' );
-            
+
             $return = [];
-            
+
             if (is_array($meta_list)) {
                 foreach ($meta_list as $meta) {
                     $return[] = new Entities\Item_Metadata_Entity($object, $meta);
                 }
             }
-            
+
             return $return;
         }else{
             return [];
@@ -221,14 +221,14 @@ class Item_Metadata extends Repository {
 	 */
     public function get_value(Entities\Item_Metadata_Entity $item_metadata) {
         $unique = ! $item_metadata->is_multiple();
-        
+
         $field_type = $item_metadata->get_field()->get_field_type_object();
         if ($field_type->get_core()) {
             $item = $item_metadata->get_item();
-            
+
             $get_method = 'get_' . $field_type->get_related_mapped_prop();
             return $item->$get_method();
-        
+
 		} elseif ($field_type->get_primitive_type() == 'term') {
 
             if( is_numeric( $field_type->get_option('taxonomy_id') ) ){
@@ -243,10 +243,10 @@ class Item_Metadata extends Repository {
             }
 
 			$terms = wp_get_object_terms($item_metadata->get_item()->get_id(), $taxonomy_slug );
-			
+
 			if ($unique) {
 				$terms = reset($terms);
-				
+
 				if (false !== $terms)
 					$terms = new Entities\Term($terms);
 			}
@@ -259,20 +259,20 @@ class Item_Metadata extends Repository {
 
 				return $terms_array;
 			}
-			
+
 			return $terms;
-		
+
 		} elseif ($field_type->get_primitive_type() == 'compound') {
-			
+
 			global $wpdb;
-			$rows = $wpdb->get_results( 
-				$wpdb->prepare("SELECT * FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s", $item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id()), 
+			$rows = $wpdb->get_results(
+				$wpdb->prepare("SELECT * FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s", $item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id()),
 				ARRAY_A );
-			
+
 			$return_value = [];
-			
+
 			if (is_array($rows)) {
-				
+
 				foreach ($rows as $row) {
 					$value = $this->extract_compound_value(maybe_unserialize($row['meta_value']), $item_metadata->get_item(), $row['meta_id']);
 					if ( $unique ) {
@@ -282,11 +282,11 @@ class Item_Metadata extends Repository {
 						$return_value[] = $value;
 					}
 				}
-				
+
 			}
-			
-			return $return_value; 
-			
+
+			return $return_value;
+
         } else {
             if (is_int($item_metadata->get_meta_id())) {
 				$value = get_metadata_by_mid( 'post', $item_metadata->get_meta_id() );
@@ -296,9 +296,9 @@ class Item_Metadata extends Repository {
 			} else {
 				return get_post_meta($item_metadata->get_item()->get_id(), $item_metadata->get_field()->get_id(), $unique);
 			}
-			
+
         }
-        
+
     }
 
 	/**
@@ -313,26 +313,26 @@ class Item_Metadata extends Repository {
 	 * @throws \Exception
 	 */
 	private function extract_compound_value(array $ids, Entities\Item $item, $compund_meta_id) {
-		
+
 		$return_value = [];
-		
-		if (is_array($ids)) { 
+
+		if (is_array($ids)) {
 			foreach ($ids as $id) {
 				$post_meta_object = get_metadata_by_mid( 'post', $id );
 				if ( is_object($post_meta_object) ) {
 					$field = new Entities\Field($post_meta_object->meta_key);
-					$return_value[$field->get_id()] = new Entities\Item_Metadata_Entity( $item, $field, $id, $compund_meta_id );
+					$return_value[$field->get_id()] = new Entities\Item_Metadata_Entity( $item, $field, $id, intval($compund_meta_id) );
 				}
-				
+
 			}
 		}
-		
+
 		return $return_value;
-		
+
 	}
 
     public function register_post_type() { }
-    
+
     public function get_map() { return []; }
     public function get_default_properties($map) { return []; }
 
@@ -346,10 +346,10 @@ class Item_Metadata extends Repository {
 	}
 
     /**
-     * Suggest a value to be inserted as a item Field value, return a pending log  
+     * Suggest a value to be inserted as a item Field value, return a pending log
      * @param Entities\Item_Metadata_Entity $item_metadata
      * @return Entities\Log
-     */        
+     */
 	public function suggest($item_metadata) {
 		return Entities\Log::create(false, '', $item_metadata, null, 'pending');
 	}

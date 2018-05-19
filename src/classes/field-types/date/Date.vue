@@ -11,8 +11,14 @@
 <script>
     export default {
         created(){
-            if( this.value ){
-                this.inputValue = this.value
+            if( this.value && (typeof this.value === 'string' || this.value instanceof String) ){
+                try {
+                  let dateStr= this.value; //returned from mysql timestamp/datetime field
+                  let separetedDate = dateStr.split("-");
+                  this.dateValue = new Date(separetedDate[0],(separetedDate[1]-1),separetedDate[2] );
+                } catch (e) {
+                    // move on
+                }
             }
         },
         data() {

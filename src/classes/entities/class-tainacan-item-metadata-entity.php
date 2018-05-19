@@ -129,9 +129,9 @@ class Item_Metadata_Entity extends Entity {
 
 			$return = '';
 
-			if( is_array($v) ){
+			if( is_array($value) ){
 				$compounds = [];
-				foreach ($v as $itemMetadata) {
+				foreach ($value as $itemMetadata) {
 						if ( $itemMetadata instanceof self ) {
 							$compounds[] = $itemMetadata->__toArray();
 						}

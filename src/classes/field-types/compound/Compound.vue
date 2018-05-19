@@ -24,6 +24,7 @@
                       :id="child.field_type_object.component + '-' + field.slug"
                       :is="child.field_type_object.component"
                       :field="{ field: child, item: field.item }"
+                      :value="valueChild"
                       @input="save($event, child.id)"/>
           </div>
     </b-field>
@@ -40,7 +41,8 @@
         },
         data(){
             return {
-                uniqId: new Date().getTime()
+                uniqId: new Date().getTime(),
+                valueChild: null
             }
         },
         computed: {
@@ -52,6 +54,7 @@
                   this.field.field.field_type_object.options.children_objects.length > 0  ){
 
                     for( let field of this.field.field.field_type_object.options.children_objects ){
+                        this.setValue( field.id )
                         children.push( field );
                     }
 
@@ -67,6 +70,23 @@
             value: [String, Number, Array],
         },
         methods: {
+            setValue( fieldId ){
+                if( this.field.value && this.field.value.length > 0){
+                    for( const val of this.field.value ){
+
+                        if(val && val.length > 0){
+                           const realValue = val[0];
+                           if(realValue.field.id === fieldId){
+                             this.setParent( realValue.parent_meta_id );
+                             this.valueChild = realValue.value;
+                           }
+                        }
+                    }
+                }
+            },
+            setParent( id ){
+                eventBus.setCompoundMetaId( this.uniqId, id );
+            },
             save( $event, id ) {
                 eventBus.$emit('input', {
                   parent_meta_id: eventBus.getCompoundMetaId( this.uniqId ),

@@ -2,7 +2,7 @@
 <template>
   <div>
     <b-field
-            v-for="( child , index) in getChildren"
+            v-for="( child , index) in children"
             :key="index"
             :addons="false"
             :message="getErrorMessage"
@@ -36,27 +36,23 @@
     import { eventBus } from '../../../js/event-bus-web-components'
 
     export default {
+        created(){
+            if( this.field.field.field_type_object &&
+              this.field.field.field_type_object.options &&
+                this.field.field.field_type_object.options.children_objects.length > 0  ){
+
+                for( let field of this.field.field.field_type_object.options.children_objects ){
+                    this.setValue( field.id )
+                    this.children.push( field );
+                }
+
+            }
+        },
         data(){
             return {
                 uniqId: new Date().getTime(),
-                valueChild: []
-            }
-        },
-        computed: {
-            getChildren(){
-                const children = [];
-
-                if( this.field.field.field_type_object &&
-                this.field.field.field_type_object.options &&
-                  this.field.field.field_type_object.options.children_objects.length > 0  ){
-
-                    for( let field of this.field.field.field_type_object.options.children_objects ){
-                        this.setValue( field.id )
-                        children.push( field );
-                    }
-
-                }
-                return children;
+                valueChild: [],
+                children: []
             }
         },
         props: {

@@ -268,7 +268,7 @@
                             v-for="(field, index) of fieldList"
                             :key="index"
                             :field="field"
-                            :is-collapsed="fieldCollapses[index]" 
+                            :is-collapsed="fieldCollapses[index]"
                             @changeCollapse="onChangeCollapse($event, index)"/>
 
                 </div>
@@ -622,10 +622,10 @@ export default {
                     cancelText: this.$i18n.get('cancel'),
                     confirmText: this.$i18n.get('continue'),
                     type: 'is-secondary'
-                });  
+                });
         } else {
             next()
-        }  
+        }
     }
 }
 </script>

@@ -187,7 +187,33 @@ class Compound extends Field_Type {
 
 		} else {
 
-			foreach ( $value as $meta ) {
+      $compounds = [];
+      $options = $item_metadata->get_field()->get_field_type_object()->get_options();
+      //dealing with categories
+      if( isset( $options['children_objects'] )){
+        foreach ($options['children_objects'] as $child) {
+            $field = new Field($child['id']);
+            $itemMetadata = new Item_Metadata_Entity( $item_metadata->get_item(), $field );
+            $child_primitive_type = $field->get_field_type_object()->get_primitive_type();
+           if ( $itemMetadata instanceof Item_Metadata_Entity && $child_primitive_type === 'term' ) {
+             $compounds[$child['id']] = $itemMetadata;
+           }
+        }
+      }
+
+
+      if( is_array($value) ){
+        foreach ($value as $itemMetadata) {
+            $child_primitive_type = $itemMetadata->get_field()->get_field_type_object()->get_primitive_type();
+
+            if ( $itemMetadata instanceof Item_Metadata_Entity && $child_primitive_type !== 'term' ) {
+              $compounds[$itemMetadata->get_field()->get_id()] = $itemMetadata;
+            }
+        }
+      }
+
+
+			foreach ( $compounds as $meta ) {
 
 				$return .= '<div class="tainacan-compund-field">';
 

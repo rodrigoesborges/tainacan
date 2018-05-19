@@ -104,6 +104,7 @@ class Item_Metadata_Entity extends Entity {
 	 */
 	public function get_value_as_array() {
 		$value = $this->get_value();
+		$primitive_type = $this->get_field()->get_field_type_object()->get_primitive_type();
 
 		if ( $this->is_multiple() ) {
 
@@ -128,15 +129,33 @@ class Item_Metadata_Entity extends Entity {
 		} else {
 
 			$return = '';
-
-			if( is_array($value) ){
+			if( $primitive_type === 'compound' ){
 				$compounds = [];
-				foreach ($value as $itemMetadata) {
-						if ( $itemMetadata instanceof self ) {
-							$compounds[] = $itemMetadata->__toArray();
-						}
+				$options = $this->get_field()->get_field_type_object()->get_options();
+
+				//dealing with categories
+				if( isset( $options['children_objects'] )){
+					foreach ($options['children_objects'] as $child) {
+							$field = new Field($child['id']);
+              $itemMetadata = new self( $this->get_item(), $field );
+							$child_primitive_type = $field->get_field_type_object()->get_primitive_type();
+						 if ( $itemMetadata instanceof self && $child_primitive_type === 'term' ) {
+							 $compounds[$child['id']] = $itemMetadata->__toArray();
+						 }
+				  }
 				}
-				$return[] = $compounds;
+
+				if( is_array($value) ){
+					foreach ($value as $itemMetadata) {
+							$child_primitive_type = $itemMetadata->get_field()->get_field_type_object()->get_primitive_type();
+
+							if ( $itemMetadata instanceof self && $child_primitive_type !== 'term' ) {
+								$compounds[$itemMetadata->get_field()->get_id()] = $itemMetadata->__toArray();
+							}
+					}
+				}
+
+				$return = $compounds;
 			} else if ( $value instanceof Term || $value instanceof ItemMetadataEntity ) {
 				$return = $value->__toArray();
 			} else {

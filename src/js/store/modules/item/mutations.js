@@ -52,6 +52,10 @@ export const setSingleField = ( state, field) => {
         //state.field[index] = field;
         Vue.set( state.fields, index, field );
     } else {
+        if( field.field && field.field.parent && field.field.parent > 0  ){
+            return false;
+        }
+
         state.fields.push( field );
     }
 }

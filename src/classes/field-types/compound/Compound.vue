@@ -36,9 +36,6 @@
     import { eventBus } from '../../../js/event-bus-web-components'
 
     export default {
-        created(){
-            this.$console.log( this.field );
-        },
         data(){
             return {
                 uniqId: new Date().getTime(),
@@ -71,17 +68,20 @@
         },
         methods: {
             setValue( fieldId ){
-                if( this.value && this.value.length > 0){
-                    for( const realValue of this.value ){
-                         if( realValue.field && realValue.field.id === fieldId){
-                           this.setParent( realValue.parent_meta_id );
-                           this.valueChild[fieldId] = realValue.value;
-                         }
-                    }
+               if( this.value ){
+                  for( const index in this.value ){
+                       const realValue = this.value[index];
+
+                       if( realValue.field && realValue.field.id === fieldId){
+                         this.setParent( realValue.parent_meta_id );
+                         this.valueChild[fieldId] = realValue.value;
+                       }
+                  }
                 }
             },
             setParent( id ){
-                eventBus.setCompoundMetaId( this.uniqId, id );
+                if( id > 0 )
+                  eventBus.setCompoundMetaId( this.uniqId, id );
             },
             save( $event, id ) {
                 eventBus.$emit('input', {

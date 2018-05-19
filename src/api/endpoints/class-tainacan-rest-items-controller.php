@@ -106,6 +106,9 @@ class REST_Items_Controller extends REST_Controller {
 			$item_array['metadata'][ $slug ]['value']           = $item_metadata_array['value'];
 			$item_array['metadata'][ $slug ]['value_as_html']   = $item_metadata_array['value_as_html'];
 			$item_array['metadata'][ $slug ]['value_as_string'] = $item_metadata_array['value_as_string'];
+			if($field->get_field_type_object()->get_primitive_type() === 'date') {
+				$item_array['metadata'][ $slug ]['date_i18n'] = $item_metadata_array['date_i18n'];
+			}
 			$item_array['metadata'][ $slug ]['multiple']        = $field->get_multiple();
 		}
 
@@ -401,7 +404,7 @@ class REST_Items_Controller extends REST_Controller {
 			}
 
 			return new \WP_REST_Response([
-				'error_message' => __('Item with that ID not found', 'tainacan' ),
+				'error_message' => __('An item with this ID was not found', 'tainacan' ),
 				'item_id'       => $item_id
 			], 400);
 		}
@@ -477,7 +480,7 @@ class REST_Items_Controller extends REST_Controller {
 		array_merge($query_params, parent::get_collection_params('item'));
 
 		$query_params['title'] = array(
-			'description' => __('Limit result set to items with specific title.'),
+			'description' => __('Limits the result set to items with a specific title'),
 			'type'        => 'string',
 		);
 

@@ -365,7 +365,7 @@ class REST_Collections_Controller extends REST_Controller {
 		    }
 
 		    return new \WP_REST_Response([
-		    	'error_message' => __('Collection with that ID not found', 'tainacan' ),
+		    	'error_message' => __('Collection with this ID was not found', 'tainacan' ),
 			    'collection_id' => $collection_id
 		    ], 400);
 	    }
@@ -445,7 +445,7 @@ class REST_Collections_Controller extends REST_Controller {
 	    $query_params = array_merge($query_params, parent::get_collection_params('collection'));
 
 	    $query_params['name'] = array(
-	    	'description' => __('Limit result set to collection with specific name.'),
+	    	'description' => __('Limits the result set to collections with a specific name'),
 		    'type'        => 'string',
 	    );
 

@@ -28,6 +28,7 @@
                     :class="{'has-content': value_init !== undefined && value_init !== ''}"
                     size="is-small"
                     type="number"
+                    step="any"
                     @input="validate_values()"
                     class="column"
                     v-model="value_init"/>
@@ -35,30 +36,31 @@
                     :class="{'has-content': value_end !== undefined && value_end !== ''}"
                     size="is-small"
                     type="number"
+                    step="any"
                     @input="validate_values()"
                     @focus="isTouched = true"
                     class="column"
                     v-model="value_end"/>
         </div>
-        <ul
+        <div
                 class="selected-list-box"
                 v-if="isValid && !clear">
-            <li>
                 <b-tag
                         attached
                         closable
                         @close="clearSearch()">
                     {{ showSearch() }}
                 </b-tag>
-            </li>
-        </ul>
+        </div>
     </div>
 </template>
 
 <script>
     import { tainacan as axios } from '../../../js/axios/axios';
+    import { wpAjax } from "../../../admin/js/mixins";
 
     export default {
+        mixins: [ wpAjax ],
         created(){
             const vm = this;
             this.collection = ( this.collection_id ) ? this.collection_id : this.filter.collection_id;
@@ -134,8 +136,9 @@
 
                 } else {
                     if ( parseFloat( this.value_init ) > parseFloat( this.value_end )) {
-                        this.value_end = parseFloat( this.value_init ) + 1;
+                        //this.value_end = parseFloat( this.value_init ) + 1;
                         //this.error_message();
+                        return;
                     }
                 }
                 this.emit( this );
@@ -182,13 +185,15 @@
                     }
 
                     return this.date_init.toLocaleString().split(' ')[0] + ' - ' + this.date_end.toLocaleString().split(' ')[0];
-                } else {
-                    return this.value_init + ' - ' +this.value_end;
                 }
+                // else {
+                //     return this.value_init + ' - ' +this.value_end;
+                // }
             },
             clearSearch(){
 
                 this.clear = true;
+
                 this.$emit('input', {
                     filter: 'range',
                     compare: 'BETWEEN',
@@ -201,15 +206,15 @@
                     this.date_init =  null;
                     this.date_end = null;
                     this.isTouched = false;
-                 } else {
-                    this.value_end = null;
-                    this.value_init = null;
+                } else {
+                    // this.value_end = null;
+                    // this.value_init = null;
                     this.isTouched = false;
-                 }
+                }
             },
 
             // emit the operation for listeners
-            emit:( vm ) => {
+            emit: ( vm ) => {
                 let values = [];
                 let type = '';
 
@@ -237,14 +242,27 @@
                       || vm.value_init === '' || vm.value_end === ''){
                         values = [];
                         type = 'DECIMAL';
-                        vm.isValid = false;
-                        vm.clear = true;
+                        //vm.isValid = false;
+                        //vm.clear = true;
+
+                        vm.clearSearch();
+
                         return;
                     } else {
                         values =  [ vm.value_init, vm.value_end ];
-                        type = 'DECIMAL';
-                        vm.isValid = true;
-                        vm.clear = false;
+
+                        if(vm.value_init !== vm.value_end &&
+                            vm.value_init % 1 !== 0 ||
+                            vm.value_end % 1 !== 0) {
+
+                            type = 'NUMERIC';
+                        } else if(vm.value_init !== vm.value_end){
+                            type = 'DECIMAL';
+                        } else {
+                            type = '';
+                        }
+                        //vm.isValid = true;
+                        //vm.clear = false;
                     }
                 }
 

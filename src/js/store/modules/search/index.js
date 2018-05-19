@@ -12,7 +12,10 @@ const state = {
         search: '',
         post_type: [],
         metaquery: [],
-        taxquery: []
+        taxquery: [],
+        fetch_only: [
+            {'meta': [] }
+        ],
     },
     totalItems: 0
 };

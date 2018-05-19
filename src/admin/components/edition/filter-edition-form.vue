@@ -7,7 +7,7 @@
                 :addons="false"
                 :type="formErrors['name'] != undefined ? 'is-danger' : ''" 
                 :message="formErrors['name'] != undefined ? formErrors['name'] : ''">
-            <label class="label">
+            <label class="label is-inline">
                 {{ $i18n.get('label_name') }} 
                 <span 
                         class="required-field-asterisk" 
@@ -27,7 +27,7 @@
                 :addons="false" 
                 :type="formErrors['description'] != undefined ? 'is-danger' : ''" 
                 :message="formErrors['description'] != undefined ? formErrors['description'] : ''">
-            <label class="label">
+            <label class="label is-inline">
                 {{ $i18n.get('label_description') }} 
                 <help-button 
                         :title="$i18n.getHelperTitle('filters', 'description')" 
@@ -45,7 +45,7 @@
                 :addons="false"
                 :type="formErrors['status'] != undefined ? 'is-danger' : ''" 
                 :message="formErrors['status'] != undefined ? formErrors['status'] : ''">
-            <label class="label">
+            <label class="label is-inline">
                 {{ $i18n.get('label_status') }} 
                 <help-button 
                         :title="$i18n.getHelperTitle('filters', 'status')" 

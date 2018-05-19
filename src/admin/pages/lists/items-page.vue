@@ -15,13 +15,28 @@
                     :active.sync="isLoadingFilters"/>
 
             <b-field class="margin-1">
-                <b-input
+                <div class="control is-small is-clearfix">
+                    <input
+                        class="input is-small"
                         :placeholder=" $i18n.get('instruction_search_collection') "
                         type="search"
-                        size="is-small"
-                        icon="magnify" 
-                        @input="updateSearch($event)"
-                        :value="searchQuery"/>
+                        autocomplete="on"
+                        :value="searchQuery"
+                        @input="futureSearchQuery = $event.target.value"
+                        @keyup.enter="updateSearch()">
+                </div>
+
+                <p class="control">
+                    <button                             
+                            id="collection-search-button"
+                            type="submit"
+                            class="button"
+                            @click="updateSearch()">
+                        <b-icon 
+                                icon="magnify" 
+                                size="is-small"/>
+                    </button>
+                </p>
             </b-field>
             <!-- <a class="is-size-7 is-secondary is-pulled-right">Busca avançada</a> -->
 
@@ -85,7 +100,9 @@
                         :pref-table-fields="prefTableFields"
                         :is-on-theme="isOnTheme"/>
             </div>
-            <div class="tabs">
+            <div 
+                    v-if="!isOnTheme"
+                    class="tabs">
                 <ul>
                     <li 
                             @click="onChangeTab('')"
@@ -99,11 +116,11 @@
                 </ul>
             </div>
             
-            <div 
+            <!-- <div 
                     :items="items"
-                    id="theme-items-list" />
+                    id="theme-items-list" /> -->
             <!-- LISTING RESULTS ------------------------- -->
-            <div class="table-container above-subheader">
+            <div class="above-subheader">
                 <b-loading
                         :is-full-page="false"
                         :active.sync="isLoadingItems"/>
@@ -164,6 +181,7 @@
                 isFiltersMenuCompressed: false,
                 collapseAll: false,
                 isOnTheme: false,
+                futureSearchQuery: ''
             }
         },
         props: {
@@ -195,9 +213,9 @@
                 'getSearchQuery',
                 'getStatus'
             ]),
-            updateSearch(searchQuery) {
-                this.$eventBusSearch.setSearchQuery(searchQuery)
-            },
+            updateSearch() {
+                this.$eventBusSearch.setSearchQuery(this.futureSearchQuery);
+            },  
             onChangeTab(status) {
                 this.$eventBusSearch.setStatus(status);
             }
@@ -290,9 +308,11 @@
                                     id: field.id,
                                     display: display
                                 }
-                            );
+                            );    
+                            //this.$eventBusSearch.addFetchOnlyMeta(field.id);                       
                         }
                     }
+                    this.$eventBusSearch.loadItems();
 
                     this.tableFields.push({
                         name: this.$i18n.get('label_creation'),
@@ -300,15 +320,6 @@
                         field_type: undefined,
                         slug: 'creation',
                         id: 'date',
-                        display: true
-                    });
-
-                    this.tableFields.push({
-                        name: this.$i18n.get('label_actions'),
-                        field: 'row_actions',
-                        field_type: undefined,
-                        slug: 'actions',
-                        id: undefined,
                         display: true
                     });
 
@@ -353,8 +364,8 @@
         min-height: $subheader-height;
         height: $subheader-height;
         padding-top: $page-small-top-padding;
-        padding-left: $page-small-side-padding;
-        padding-right: $page-small-side-padding;
+        padding-left: $page-side-padding;
+        padding-right: $page-side-padding;
         border-bottom: 0.5px solid #ddd;
         position: relative;
 
@@ -370,26 +381,42 @@
 
     .tabs {
         padding-top: $page-small-top-padding;
-        padding-left: $page-small-side-padding;
-        padding-right: $page-small-side-padding;
+        padding-left: $page-side-padding;
+        padding-right: $page-side-padding;
     }
     .above-subheader {
         margin-bottom: 0;
         margin-top: 0;
-        min-height: 100%;
-        height: auto;
+        height: calc(100% - 184px);
+    }
+    .pagination-area {
+        margin-left: $page-side-padding;
+        margin-right: $page-side-padding;
+    }
+
+    .table-container {
+        padding-left: 8.333333%;
+        padding-right: 8.333333%;
+        height: calc(100% - 82px);
+    }
+
+    #collection-search-button {
+        border-radius: 0px !important;
+        padding: 0px 8px !important;
+        &:focus, &:active {
+            border-color: none !important;
+        }
     }
 
     .filters-menu {
-        position: relative;
+        position: absolute;
         width: $filter-menu-width;
         max-width: $filter-menu-width;
-        min-height: 100%;
+        min-height: calc(100% - 82px);
+        height: calc(100% - 82px);
         background-color: $tainacan-input-background;
         padding: $page-small-side-padding;
         float: left;
-        height: 100%;
-        max-height: 100%;
         overflow-y: auto;
         visibility: visible;
         display: block;
@@ -408,23 +435,11 @@
 
     .items-list-area {
         margin-left: 0;
-        transition: margin-left ease 0.5s ;
+        transition: margin-left ease 0.5s;
+        height: 100%;
     }
     .spaced-to-right {
         margin-left: $filter-menu-width;
-    }
-
-    .table-container {
-        padding: 3em 55px;
-        position: relative;
-    }
-
-    @media screen and (max-width: 769px) {
-
-        .table-container {
-            margin-right: 0;
-            padding: 16px;
-        }
     }
 
     #filter-menu-compress-button {

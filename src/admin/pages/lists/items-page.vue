@@ -1,9 +1,11 @@
 <template>
-    <div :class="{'primary-page': isRepositoryLevel, 'page-container': isRepositoryLevel, 'page-container-small' :!isRepositoryLevel }">
+    <div 
+            :class="{'primary-page': isRepositoryLevel}">
 
         <!-- SEARCH AND FILTERS --------------------- -->
         <button 
                 id="filter-menu-compress-button"
+                :style="{ top: isHeaderShrinked ? '125px' : '152px'}"
                 @click="isFiltersMenuCompressed = !isFiltersMenuCompressed">
             <b-icon :icon="isFiltersMenuCompressed ? 'menu-right' : 'menu-left'" />
         </button>
@@ -14,7 +16,7 @@
                     :is-full-page="false"
                     :active.sync="isLoadingFilters"/>
 
-            <b-field class="margin-1">
+            <b-field class="margin-1"> 
                 <div class="control is-small is-clearfix">
                     <input
                         class="input is-small"
@@ -85,6 +87,7 @@
         </aside>
         
         <div 
+                id="items-list-area"
                 class="items-list-area"
                 :class="{ 'spaced-to-right': !isFiltersMenuCompressed }">
             <!-- SEARCH CONTROL ------------------------- -->
@@ -181,7 +184,8 @@
                 isFiltersMenuCompressed: false,
                 collapseAll: false,
                 isOnTheme: false,
-                futureSearchQuery: ''
+                futureSearchQuery: '',
+                isHeaderShrinked: false
             }
         },
         props: {
@@ -343,7 +347,14 @@
             this.$eventBusSearch.setCollectionId(this.collectionId);
             this.$eventBusSearch.updateStoreFromURL();
             this.$eventBusSearch.loadItems();
-        } 
+
+            if (!this.isRepositoryLevel && !this.isOnTheme) {
+                document.getElementById('items-list-area').addEventListener('scroll', ($event) => {
+                    this.isHeaderShrinked = ($event.originalTarget.scrollTop > 53);
+                    this.$emit('onShrinkHeader', this.isHeaderShrinked); 
+                });
+            }
+        }
     }
 </script>
 
@@ -355,7 +366,7 @@
         margin-bottom: 0.1rem;
     }
 
-    .page-container, .page-container-small {
+    .page-container {
         padding: 0px;
         
     }
@@ -380,7 +391,8 @@
     }
 
     .tabs {
-        padding-top: $page-small-top-padding;
+        padding-top: 20px;
+        margin-bottom: 20px;
         padding-left: $page-side-padding;
         padding-right: $page-side-padding;
     }
@@ -397,23 +409,24 @@
     .table-container {
         padding-left: 8.333333%;
         padding-right: 8.333333%;
-        height: calc(100% - 82px);
+        //height: calc(100% - 82px);
     }
 
     #collection-search-button {
         border-radius: 0px !important;
         padding: 0px 8px !important;
+        border-color: $tainacan-input-background;
         &:focus, &:active {
             border-color: none !important;
         }
     }
 
     .filters-menu {
-        position: absolute;
+        position: relative;
         width: $filter-menu-width;
         max-width: $filter-menu-width;
-        min-height: calc(100% - 82px);
-        height: calc(100% - 82px);
+        min-height: 100%;
+        height: 100%;
         background-color: $tainacan-input-background;
         padding: $page-small-side-padding;
         float: left;
@@ -437,6 +450,7 @@
         margin-left: 0;
         transition: margin-left ease 0.5s;
         height: 100%;
+        overflow: auto;
     }
     .spaced-to-right {
         margin-left: $filter-menu-width;
@@ -457,6 +471,7 @@
         border-top-right-radius: 2px;
         border-bottom-right-radius: 2px;
         cursor: pointer;
+        transition: top 0.3s;
 
         .icon {
             margin-top: -1px;

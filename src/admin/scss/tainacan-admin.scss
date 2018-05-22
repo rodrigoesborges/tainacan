@@ -68,9 +68,13 @@ a:hover {
         padding: $page-mobile-top-padding $page-mobile-side-padding;
     }
 }
-.page-container-small{
+.page-container-small {
     height: calc(100% - 82px);
     overflow-y: auto;
+    transition: height 0.6s;
+}
+.page-container-shrinked {
+    height: calc(100% - 53px) !important;
 }
 .page-container-narrow{
     padding: $page-small-top-padding $page-small-side-padding;
@@ -99,12 +103,20 @@ a:hover {
         height: 1px;
         background-color: $secondary;
     }
-    margin-bottom: 60px;
+    margin-bottom: 40px;
 }
 
 .tainacan-modal-content {
     background-color: white;
     padding: 52px 80px;
+
+    figure {
+        margin: 0;
+        text-align: center;
+    }
+    .attachment {
+        width: 100%;
+    }
 
     .form-submit {
         padding: 80px 0em 0.4em 0em !important;
@@ -529,6 +541,7 @@ a:hover {
 .table-container {
     padding: 0 $table-side-padding;
     position: relative;
+    margin-bottom: 40px;
 
     .table-wrapper {
         width: 100%;
@@ -536,7 +549,12 @@ a:hover {
         overflow: auto;
         .table {
             tbody {
-                td { border-bottom: 0px solid $gray-light !important; }
+                td { 
+                    border-bottom: 0px solid $gray-light !important; 
+                }
+                .b-checkbox.checkbox .control-label {
+                    display: none;
+                }
             }
             .th-wrap {
                 font-size: 12px !important;
@@ -553,7 +571,10 @@ a:hover {
     font-size: 0.85em !important;
     font-weight: normal !important;
     border-top: 1px solid $gray;
-    padding: 0em 1.0em;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: $page-side-padding;
+    padding-right: $page-side-padding;
     color: $gray-light;
 
     .shown-items { 
@@ -561,7 +582,7 @@ a:hover {
     }
 
     .items-per-page { 
-        flex-grow: 3;
+        flex-grow: 5;
         margin-top: 0.35em;
         .field-label {
             flex-grow: 5;

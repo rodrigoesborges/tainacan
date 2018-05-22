@@ -16,11 +16,11 @@
                         position="is-bottom-left"
                         v-if="items.length > 0 && items[0].current_user_can_edit"
                         :disabled="!isSelectingItems"
-                        id="mass-actions-dropdown">
+                        id="bulk-actions-dropdown">
                     <button
                             class="button is-white"
                             slot="trigger">
-                        <span>{{ $i18n.get('label_mass_actions') }}</span>
+                        <span>{{ $i18n.get('label_bulk_actions') }}</span>
                         <b-icon icon="menu-down"/>
                     </button> 
 
@@ -93,17 +93,16 @@
                                         'table-creation': column.field == 'row_creation'}"
                                 @click="goToItemPage(item)">
 
-                            <p
+                            <data-and-tooltip
                                     v-if="column.field !== 'row_thumbnail' &&
-                                     column.field !== 'row_actions' &&
-                                      column.field !== 'row_creation'"
-
-                                    v-html="renderMetadata( item.metadata[column.slug] )"/>
+                                            column.field !== 'row_actions' &&
+                                            column.field !== 'row_creation'"
+                                    :data="renderMetadata( item.metadata[column.slug] )"/>
 
                             <span v-if="column.field == 'row_thumbnail'">
                                 <img 
                                         class="table-thumb" 
-                                        :src="item[column.slug]">
+                                        :src="item[column.slug].thumb">
                             </span> 
                             <p 
                                     v-if="column.field == 'row_creation'"
@@ -113,13 +112,14 @@
                         <!-- Actions -->
                         <td 
                                 v-if="item.current_user_can_edit && !isOnTheme"
-                                class="column-default-width actions-cell">
+                                class="column-default-width actions-cell"
+                                :label="$i18n.get('label_actions')">
                             <div class="actions-container">
                                 <a 
                                         id="button-edit"   
                                         :aria-label="$i18n.getFrom('items','edit_item')" 
                                         @click.prevent.stop="goToItemEditPage(item.id)">
-                                    <b-icon 
+                                    <b-icon
                                             type="is-secondary" 
                                             icon="pencil"/>
                                 </a>
@@ -144,6 +144,7 @@
 
 <script>
 import { mapActions } from 'vuex';
+import DataAndTooltip from '../other/data-and-tooltip.vue'
 
 export default {
     name: 'ItemsList',
@@ -160,6 +161,9 @@ export default {
         items: Array,
         isLoading: false,
         isOnTheme: false
+    },
+    components: {
+        DataAndTooltip
     },
     mounted() {
         this.selectedItems = [];
@@ -290,8 +294,7 @@ export default {
 
     .selection-control {
         
-        padding: 6px 14px 0px 14px;
-        position: relative;
+        padding: 6px 0px 0px 13px;
         background: white;
         height: 40px;
 
@@ -315,34 +318,33 @@ export default {
             border-bottom: 1px solid $tainacan-input-background;
             top: 0px;
             z-index: 9;
+            padding: 10px;
+            vertical-align: bottom;
 
             &.actions-header {
                 min-width: 8.333333333%;
             }
         }
 
-        // &.selectable-table th:nth-child(2), &.selectable-table td:nth-child(2) {
-        //     padding-left: 54px;
-        // }
-        
         .checkbox-cell {
-            min-width: 44px;
-            width: 44px;
+            min-width: 40px;
+            width: 40px;
             padding: 0;
             position: sticky !important;
             position: -webkit-sticky !important;
             left: 0;
             top: auto;
-            visibility: hidden;
+            display: table-cell;
 
             &::before {
-                box-shadow: inset 54px 0 10px -12px #222;
+                box-shadow: inset 50px 0 10px -12px #222;
                 content: " ";
-                width: 54px;
+                width: 50px;
                 height: 100%;
                 position: absolute;
                 left: 0;
                 top: 0;
+                visibility: hidden;
             }
 
             label.checkbox {  
@@ -353,10 +355,14 @@ export default {
                 height: 100%; 
                 display: flex;
                 justify-content: center;
-
+                visibility: hidden;
+            }
+            label.control-label {
+                display: none;
             }
             &.is-selecting {
-                visibility: visible; 
+                .checkbox { visibility: visible; } 
+                &::before { visibility: visible !important; }
             }
         }
         // Only to be used in case we can implement Column resizing
@@ -365,7 +371,7 @@ export default {
         // }
 
         .thumbnail-cell {
-            width: 58px;
+            width: 60px;
         }
   
         tbody {
@@ -374,14 +380,14 @@ export default {
                 background-color: transparent;
 
                 &.selected-row { 
-                    background-color: $primary-lighter !important; 
+                    background-color: $primary-lighter; 
                     .checkbox-cell .checkbox, .actions-cell .actions-container {
-                        background-color: $primary-lighter !important;
+                        background-color: $primary-lighter;
                     }
                 }
                 td {
-                    height: 58px;
-                    max-height: 58px;
+                    height: 60px;
+                    max-height: 60px;
                     padding: 10px;
                     vertical-align: middle;
                     line-height: 12px;
@@ -392,7 +398,7 @@ export default {
                     }
                     
                 }
-                td.column-default-width{
+                td.column-default-width {
                     max-width: 300px;
                     p {
                         text-overflow: ellipsis;
@@ -401,7 +407,7 @@ export default {
                     }
                 }
                 img.table-thumb {
-                    max-height: 38px !important;
+                    max-height: 37px !important;
                     border-radius: 3px;
                 }
 
@@ -413,12 +419,11 @@ export default {
 
                 td.actions-cell {
                     padding: 0px;
-                    
                     position: sticky !important;
                     position: -webkit-sticky !important;
                     right: 0px;
                     top: auto;
-                    width: 8.333333333%;
+                    width: 80px;
 
                     .actions-container {
                         visibility: hidden;
@@ -426,36 +431,40 @@ export default {
                         position: relative;
                         padding: 0;
                         height: 100%;
-                        min-width: 120px;
+                        width: 80px;
                         z-index: 9;
                         background-color: transparent; 
+                        float: right;
                     }
 
                     a {
                         margin: auto;
-                        .mdi {font-size: 18px !important; }  
+                        font-size: 18px !important;
                     }
 
                 }
 
                 &:hover {
-                    background-color: $tainacan-input-background;
+                    background-color: $tainacan-input-background !important;
                     cursor: pointer;
 
                     .checkbox-cell {
-                        visibility: visible; 
-                        .checkbox { background-color: $tainacan-input-background; }
+                        &::before { visibility: visible; }
+                        .checkbox { 
+                            visibility: visible; 
+                            background-color: $tainacan-input-background !important; 
+                        }
                     }
                     .actions-cell {
                         .actions-container {
                             visibility: visible;
-                            background: $tainacan-input-background;
+                            background: $tainacan-input-background !important;
                         }
 
                         &::after {
-                            box-shadow: inset -134px 0 17px -21px #222;
+                            box-shadow: inset -97px 0 17px -21px #222;
                             content: " ";
-                            width: 140px;
+                            width: 100px;
                             height: 100%;
                             position: absolute;
                             right: 0px;

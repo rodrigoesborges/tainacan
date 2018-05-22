@@ -49,8 +49,8 @@ class Item extends Entity {
 		return 'Hello, my name is ' . $this->get_title();
 	}
 
-	public function __toArray() {
-		$array_item = parent::__toArray();
+	public function _toArray() {
+		$array_item = parent::_toArray();
 
 		$array_item['thumbnail']         = $this->get_thumbnail();
 		$array_item['_thumbnail_id']     = $this->get__thumbnail_id();
@@ -126,10 +126,16 @@ class Item extends Entity {
 	}
 
 	/**
-	 * @return false|string
+	 * @return array
 	 */
 	function get_thumbnail() {
-		return get_the_post_thumbnail_url( $this->get_id(), 'full' );
+		return array(
+			'thumb'        => get_the_post_thumbnail_url( $this->get_id(), 'thumbnail' ),
+			'full'         => get_the_post_thumbnail_url( $this->get_id(), 'full' ),
+			'medium'       => get_the_post_thumbnail_url( $this->get_id(), 'medium' ),
+			'medium_large' => get_the_post_thumbnail_url( $this->get_id(), 'medium_large' ),
+			'large'        => get_the_post_thumbnail_url( $this->get_id(), 'large' ),
+		);
 	}
 
 	/**
@@ -417,7 +423,7 @@ class Item extends Entity {
 	}
 	
 	
-	public function __toHtml() {
+	public function _toHtml() {
 		
 		$return = '';
 		$id = $this->get_id();

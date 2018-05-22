@@ -115,12 +115,12 @@ class Item_Metadata_Entity extends Entity {
 					$compounds = [];
 					foreach ($v as $itemMetadata) {
 							if ( $itemMetadata instanceof self ) {
-								$compounds[] = $itemMetadata->__toArray();
+								$compounds[] = $itemMetadata->_toArray();
 							}
 					}
 					$return[] = $compounds;
 				} else if ( $v instanceof Term || $v instanceof self ) {
-					$return[] = $v->__toArray();
+					$return[] = $v->_toArray();
 				} else {
 					$return[] = $v;
 				}
@@ -140,7 +140,7 @@ class Item_Metadata_Entity extends Entity {
               $itemMetadata = new self( $this->get_item(), $field );
 							$child_primitive_type = $field->get_field_type_object()->get_primitive_type();
 						 if ( $itemMetadata instanceof self && $child_primitive_type === 'term' ) {
-							 $compounds[$child['id']] = $itemMetadata->__toArray();
+							 $compounds[$child['id']] = $itemMetadata->_toArray();
 						 }
 				  }
 				}
@@ -150,14 +150,14 @@ class Item_Metadata_Entity extends Entity {
 							$child_primitive_type = $itemMetadata->get_field()->get_field_type_object()->get_primitive_type();
 
 							if ( $itemMetadata instanceof self && $child_primitive_type !== 'term' ) {
-								$compounds[$itemMetadata->get_field()->get_id()] = $itemMetadata->__toArray();
+								$compounds[$itemMetadata->get_field()->get_id()] = $itemMetadata->_toArray();
 							}
 					}
 				}
 
 				$return = $compounds;
 			} else if ( $value instanceof Term || $value instanceof ItemMetadataEntity ) {
-				$return = $value->__toArray();
+				$return = $value->_toArray();
 			} else {
 				$return = $value;
 			}
@@ -171,7 +171,7 @@ class Item_Metadata_Entity extends Entity {
 	 * Convert the object to an Array
 	 * @return array the representation of this object as an array
 	 */
-    public function  __toArray(){
+    public function  _toArray(){
 		$as_array = [];
 
 		$as_array['value'] = $this->get_value_as_array();
@@ -182,9 +182,9 @@ class Item_Metadata_Entity extends Entity {
 			$as_array['date_i18n'] = $this->get_date_i18n($this->get_value_as_string());
 		}
 
-	    $as_array['item']  = $this->get_item()->__toArray();
-	    $as_array['field'] = $this->get_field()->__toArray();
-     $as_array['parent_meta_id'] = $this->get_parent_meta_id();
+	    $as_array['item']  = $this->get_item()->_toArray();
+	    $as_array['field'] = $this->get_field()->_toArray();
+      $as_array['parent_meta_id'] = $this->get_parent_meta_id();
 	    return $as_array;
     }
 

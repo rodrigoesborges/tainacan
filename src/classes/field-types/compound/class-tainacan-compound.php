@@ -114,8 +114,8 @@ class Compound extends Field_Type {
 
           foreach ($options['children'] as $child) {
              $item = new Field( $child );
-             $item_arr = $item->__toArray();
-       			 $item_arr['field_type_object'] = $item->get_field_type_object()->__toArray();
+             $item_arr = $item->_toArray();
+       			 $item_arr['field_type_object'] = $item->get_field_type_object()->_toArray();
        			 $item_arr['current_user_can_edit'] = $item->can_edit();
        			 ob_start();
        			 $item->get_field_type_object()->form();

@@ -78,7 +78,7 @@
                             )"
                             :value="field"
                             :key="field.id">
-                        {{ field.name }}
+                        <p>{{ field.name }}</p>
                     </option>
                 </b-select>
                 <button

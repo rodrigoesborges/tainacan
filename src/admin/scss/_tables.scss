@@ -180,11 +180,14 @@
                             z-index: 9;
                             background-color: transparent; 
                             float: right;
-                        }
-    
-                        a {
-                            margin: auto;
-                            font-size: 18px !important;
+
+                            i::before { font-size: 20px !important }
+                            a:first-child { margin-left: 12px; }
+                            a:last-child { margin-right: 12px; }
+                            a {
+                                margin: auto;
+                                font-size: 18px !important;
+                            }
                         }
     
                     }

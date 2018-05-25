@@ -371,14 +371,12 @@
 
         },
         mounted() {
-            //this.$eventBusSearch.updateStoreFromURL();
-            //this.$eventBusSearch.loadItems();
 
             this.prepareFieldsAndFilters();
 
             if (!this.isRepositoryLevel && !this.isOnTheme) {
                 document.getElementById('items-list-area').addEventListener('scroll', ($event) => {
-                    this.isHeaderShrinked = ($event.originalTarget.scrollTop > 53);
+                    this.isHeaderShrinked = ($event.target.scrollTop > 53);
                     this.$emit('onShrinkHeader', this.isHeaderShrinked); 
                 });
             }
@@ -499,7 +497,6 @@
         border-top-right-radius: 2px;
         border-bottom-right-radius: 2px;
         cursor: pointer;
-        transition: top 0.3s;
 
         .icon {
             margin-top: -1px;

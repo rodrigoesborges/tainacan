@@ -669,7 +669,7 @@ export default {
     },
     mounted() {
         document.getElementById('collection-page-container').addEventListener('scroll', ($event) => {
-            this.$emit('onShrinkHeader', ($event.originalTarget.scrollTop > 53)); 
+            this.$emit('onShrinkHeader', ($event.target.scrollTop > 53)); 
         });
     },
     beforeRouteLeave ( to, from, next ) {

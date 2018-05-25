@@ -641,7 +641,7 @@ export default {
     mounted() {
         if (this.$route.fullPath.split("/").pop() != "new") {
             document.getElementById('collection-page-container').addEventListener('scroll', ($event) => {
-                this.$emit('onShrinkHeader', ($event.originalTarget.scrollTop > 53)); 
+                this.$emit('onShrinkHeader', ($event.target.scrollTop > 53)); 
             });
         }
     }

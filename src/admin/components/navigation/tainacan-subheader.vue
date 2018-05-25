@@ -251,8 +251,6 @@ export default {
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;  
-            -webkit-transition: margin-bottom 0.2s linear; /* Safari */
-            transition: margin-bottom 0.2s linear; 
         }
 
         .breadcrumbs {

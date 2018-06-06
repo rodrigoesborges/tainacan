@@ -32,8 +32,8 @@ install:
 - composer install
 - sudo mkdir /tmp/wordpress/wordpress-test/wp-content/uploads
 - sudo wget https://phar.phpunit.de/phpunit-6.5.7.phar -P /tmp
-- sudo chmod +x /tmp/phpunit-6.5.phar
-- sudo mv /tmp/phpunit-6.5.phar /usr/local/bin/phpunit
+- sudo chmod +x /tmp/phpunit-6.5.7.phar
+- sudo mv /tmp/phpunit-6.5.7.phar /usr/local/bin/phpunit
 - phpunit --version
 script: phpunit 
 before_deploy:

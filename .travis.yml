@@ -31,7 +31,11 @@ install:
   true
 - composer install
 - sudo mkdir /tmp/wordpress/wordpress-test/wp-content/uploads
-script: phpunit --version
+- sudo wget https://phar.phpunit.de/phpunit-6.5.7.phar 
+- sudo chmod +x phpunit-6.5.phar
+- sudo sudo mv phpunit-6.5.phar /usr/local/bin/phpunit
+- phpunit --version
+script: phpunit 
 before_deploy:
 - echo "Seção executada antes do deploy!"
 - openssl aes-256-cbc -K $encrypted_cb93ef43fcd2_key -iv $encrypted_cb93ef43fcd2_iv

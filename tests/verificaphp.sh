@@ -1,9 +1,7 @@
-#!/bin/bash
+#! /bin/bash
 
 var=$(php --version)
-
 versaophp=${var:4:1}
-
 if [ "$versaophp" = "7" ]
  then
    echo "Versão 7!\n Instalando a versão do PHPUnit compatível!"

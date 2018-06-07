@@ -27,6 +27,9 @@ before_install:
 install:
 - echo -e "Install"
 - sudo mv  ./tests/bootstrap-config-sample.php ./tests/bootstrap-config.php
+- sudo ls /home/travis/.phpenv/versions/
+- sudo ls /usr/local/bin
+- sudo ls /usr/bin/
 - sudo ./tests/bin/install-wp-tests.sh test travis "" /tmp/wordpress localhost latest
   true
 - composer install

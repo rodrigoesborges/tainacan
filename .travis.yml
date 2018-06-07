@@ -34,10 +34,10 @@ install:
 #- sudo wget https://phar.phpunit.de/phpunit-6.5.7.phar -P /tmp
 #- sudo chmod +x /tmp/phpunit-6.5.7.phar
 #- sudo mv /tmp/phpunit-6.5.7.phar /usr/local/bin/phpunit
-- sudo chmod +x ./tests/verificaphp.sh
-- sudo ./tests/verificaphp.sh
+#- sudo chmod +x ./tests/verificaphp.sh
+#- sudo ./tests/verificaphp.sh
 #- /usr/local/bin/phpunit --version
-script: echo "Script aqui!" #/usr/local/bin/phpunit 
+script: phpunit 
 before_deploy:
 - echo "Seção executada antes do deploy!"
 - openssl aes-256-cbc -K $encrypted_cb93ef43fcd2_key -iv $encrypted_cb93ef43fcd2_iv

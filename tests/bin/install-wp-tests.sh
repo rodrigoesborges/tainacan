@@ -122,7 +122,7 @@ install_db() {
 }
 
 verifica_php(){
- var="$(php -v)"
+ var=`php -v`
  versaophp=${var:4:1}
  if [ "$versaophp" = "7" ]; then
    echo "Versão 7!\n Instalando a versão do PHPUnit compatível!"

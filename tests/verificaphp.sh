@@ -1,6 +1,6 @@
 #! /bin/bash
 
-var=$(php --version)
+var=`php --version`
 versaophp=${var:4:1}
 if [ "$versaophp" = "7" ]
  then

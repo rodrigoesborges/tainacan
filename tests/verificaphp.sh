@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 var=`php --version`
 versaophp=${var:4:1}

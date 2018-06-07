@@ -9,5 +9,5 @@ if [ "$versaophp" = "7" ]
    sudo chmod +x /tmp/phpunit-6.5.7.phar
    sudo mv /tmp/phpunit-6.5.7.phar /usr/local/bin/phpunit
  else 
-   echo "Outra versão! Mantendo a instalação padrão!" 
+   echo "Outra versão! Mantendo a instalação padrão!"  
 fi

@@ -35,7 +35,7 @@ install:
 #- sudo chmod +x /tmp/phpunit-6.5.7.phar
 #- sudo mv /tmp/phpunit-6.5.7.phar /usr/local/bin/phpunit
 - sudo chmod +x ./tests/verificaphp.sh
-- sudo ./tests/verificaphp.sh
+- sudo sh ./tests/verificaphp.sh
 - /usr/local/bin/phpunit --version
 script: /usr/local/bin/phpunit 
 before_deploy:

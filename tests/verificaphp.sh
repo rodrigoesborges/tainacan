@@ -1,6 +1,6 @@
 #!/bin/bash
 
-var=$(php -v)
+var=$(php --version)
 
 versaophp=${var:4:1}
 

@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
+set -ex
+php -v
 var="$(php -v)"
 versaophp=${var:4:1}
 if [ "$versaophp" = "7" ]; then

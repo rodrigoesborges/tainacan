@@ -9,7 +9,7 @@ matrix:
   fast_finish: true
 addons:
 - ssh_know_hosts:
-  - "$ssh_host"
+  - "$ssh_host" 
 apt:
   sources:
   - mysql-5.7-trusty

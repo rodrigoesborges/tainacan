@@ -8,6 +8,6 @@ if [ "$versaophp" = "7" ]
    sudo wget https://phar.phpunit.de/phpunit-6.5.7.phar -P /tmp
    sudo chmod +x /tmp/phpunit-6.5.7.phar
    sudo mv /tmp/phpunit-6.5.7.phar /usr/local/bin/phpunit
- else
+ else 
    echo "Outra versão! Mantendo a instalação padrão!"
 fi

@@ -54,10 +54,10 @@ before_deploy:
 - ssh-add -l
 deploy:
 - provider: script
-  script:   sshpass -p '$ssh_password' ssh $ssh_user@$ssh_host ls  #ssh   $ssh_user@$ssh_host $script_deploy_tainacan
+  script:   sshpass -p '$ssh_password' ssh $ssh_user@$ssh_host $script_deploy_tainacan  #ssh   $ssh_user@$ssh_host $script_deploy_tainacan
   skip_cleanup: true
   on:
-    branch: continuousintegration
+    branch: continuousintegration 
 cache:
   directories:
   - vendor

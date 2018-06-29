@@ -106,6 +106,7 @@ UserPrefsPlugin.install = function (Vue, options = {}) {
             'collections_per_page': 12,
             'taxonomies_per_page': 12,
             'events_per_page': 12,
+            'terms_per_page': 12,
             'order': 'DESC',
             'order_by': { 
                 slug: 'creation_date',

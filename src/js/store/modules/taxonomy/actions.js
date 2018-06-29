@@ -170,7 +170,7 @@ export const updateTerm = ({ commit }, { taxonomyId, termId, name, description, 
     });
 };
 
-export const fetchTerms = ({ commit }, {taxonomyId, fetchOnly, search, all, order}) => {
+export const fetchTerms = ({ commit }, {taxonomyId, fetchOnly, search, all, order, page, perpage}) => {
     
     let query = '';
     if (order == undefined) {
@@ -185,12 +185,18 @@ export const fetchTerms = ({ commit }, {taxonomyId, fetchOnly, search, all, orde
         query =`?hideempty=0&order=${order}`;
     }
 
+    if (page != undefined && perpage != undefined)
+        query += '&number=' + perpage + '&offset=' + ((page - 1)*perpage + 1);
+    
     return new Promise((resolve, reject) => {
         axios.tainacan.get(`/taxonomy/${taxonomyId}/terms${query}`)
             .then(res => {
                 let terms = res.data;
                 commit('setTerms', terms);
-                resolve( terms );
+                if (page != undefined && perpage != undefined)
+                    resolve({ 'terms': terms, 'total': res.headers['x-wp-total'] });
+                else
+                    resolve( terms );
             })
             .catch(error => {
                 reject( error );

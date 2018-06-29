@@ -268,9 +268,7 @@
                                 <span>
                                     <b-icon
                                             class="gray-icon view-mode-icon" 
-                                            :icon="(adminViewMode == 'table' || adminViewMode == undefined) ?
-                                                        'table' : (adminViewMode == 'cards' ?
-                                                        'view-list' : 'view-grid')"/>
+                                            :icon="getAdminViewModeIcon()"/>
                                 </span>
                                 &nbsp;&nbsp;&nbsp;{{ $i18n.get('label_visualization') }}
                                 <b-icon icon="menu-down" />
@@ -599,6 +597,21 @@
                 'getTotalItems',
                 'getAdminViewMode'
             ]),
+            getAdminViewModeIcon() {
+
+                switch(this.adminViewMode) {
+                    case 'table':
+                        return 'table';
+                    case 'cards':
+                        return 'view-list';
+                    case 'grid':
+                        return 'view-grid';
+                    case 'records':
+                        return 'view-module'
+                    default:
+                        return 'table';
+                }
+            },
             updateSearch() {
                 this.$eventBusSearch.setSearchQuery(this.futureSearchQuery);
             },  

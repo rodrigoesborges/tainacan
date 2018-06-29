@@ -35,7 +35,7 @@
                             class="button is-rounded is-secondary"
                             id="button-delete-header"
                             :aria-label="$i18n.get('label_button_delete_thumb')"
-                            @click="deleteThumbnail()">
+                            @click="deleteHeaderImage()">
                         <b-icon 
                             size="is-small"
                             icon="delete" />

@@ -9,7 +9,7 @@
             </button>
             <b-field class="order-area">
                 <button
-                        :disabled="orderedTermsList.length <= 0 || isLoadingTerms || isEditingTerm"
+                        :disabled="totalTerms <= 0 || isLoadingTerms || isEditingTerm"
                         class="button is-white is-small"
                         @click="onChangeOrder()">
                     <b-icon 
@@ -17,7 +17,6 @@
                             :icon="order === 'ASC' ? 'sort-ascending' : 'sort-descending'"/>
                 </button>
             </b-field>
-
             <br>
             <br>
             <div    
@@ -86,9 +85,45 @@
                     @onEditionCanceled="onTermEditionCanceled(term)"
                     @onErrorFound="formWithErrors = term.id"
                     :edit-form="term"/>
-
-
         </div>
+        <!-- Footer -->
+        <div
+                class="pagination-area"
+                v-if="totalTerms > 0">
+            <div class="shown-items"> 
+                {{ 
+                    $i18n.get('info_showing_terms') + 
+                    (termsPerPage*(page - 1) + 1) + 
+                    $i18n.get('info_to') + 
+                    getLastTermNumber() + 
+                    $i18n.get('info_of') + totalTerms + '.'
+                }} 
+            </div> 
+            <div class="items-per-page">
+                <b-field 
+                        horizontal 
+                        :label="$i18n.get('label_terms_per_page')"> 
+                    <b-select 
+                            :value="termsPerPage"
+                            @input="onChangeTermsPerPage" 
+                            :disabled="orderedTermsList.length <= 0">
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                        <option value="48">48</option>
+                        <option value="96">96</option>
+                    </b-select>
+                </b-field>
+            </div>
+            <div class="pagination"> 
+                <b-pagination
+                        @change="onPageChange"
+                        :total="totalTerms"
+                        :current.sync="page"
+                        order="is-centered"
+                        size="is-small"
+                        :per-page="termsPerPage"/> 
+            </div>
+        </div> 
         <b-loading 
                 :active.sync="isLoadingTerms" 
                 :can-cancel="false"/>
@@ -108,7 +143,10 @@ export default {
             isEditingTerm: false,
             formWithErrors: '',
             orderedTermsList: [],
-            order: 'asc'
+            order: 'asc',
+            totalTerms: 0,
+            page: 1,
+            termsPerPage: 12,
         }
     },
     props: {
@@ -332,15 +370,42 @@ export default {
         },
         loadTerms() {
             this.isLoadingTerms = true;
-            this.fetchTerms({ taxonomyId: this.taxonomyId, fetchOnly: '', search: '', all: '', order: this.order})
-                .then(() => {
+            this.fetchTerms({ 
+                    taxonomyId: this.taxonomyId, 
+                    fetchOnly: '', 
+                    search: '', 
+                    all: '', 
+                    order: this.order,
+                    page: this.page,
+                    perpage: this.termsPerPage})
+                .then((res) => {
                     // Fill this.form data with current data.
                     this.isLoadingTerms = false;
                     this.generateOrderedTerms();
+                    this.totalTerms = res.total;
                 })
                 .catch((error) => {
                     this.$console.log(error);
                 });
+        },
+        onPageChange(page) {
+            this.page = page;
+            this.loadTerms();
+        },
+        onChangeTermsPerPage() {
+            this.termsPerPage = value;
+            this.$userPrefs.set('terms_per_page', value)
+            .then((newValue) => {
+                this.termsPerPage = newValue;
+            })
+            .catch(() => {
+                this.$console.log("Error settings user prefs for terms per page")
+            });
+            this.loadTerms();
+        },
+        getLastTermNumber() {
+            let last = (Number(this.termsPerPage*(this.page - 1)) + Number(this.termsPerPage));
+            return last > this.totalTerms ? this.totalTerms : last;
         }
     },
     created() {

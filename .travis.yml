@@ -67,7 +67,7 @@ notifications:
     on_sucess: always
     on_failure: always
   email:
-    on_success: never
+    on_success: never 
     on_failure: always
 env:
   global:

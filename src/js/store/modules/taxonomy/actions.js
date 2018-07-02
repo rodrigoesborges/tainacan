@@ -186,7 +186,7 @@ export const fetchTerms = ({ commit }, {taxonomyId, fetchOnly, search, all, orde
     }
 
     if (page != undefined && perpage != undefined)
-        query += '&number=' + perpage + '&offset=' + ((page - 1)*perpage + 1);
+        query += '&number=' + perpage + '&offset=' + ((page - 1)*perpage);
     
     return new Promise((resolve, reject) => {
         axios.tainacan.get(`/taxonomy/${taxonomyId}/terms${query}`)

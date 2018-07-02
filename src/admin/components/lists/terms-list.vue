@@ -19,60 +19,100 @@
             </b-field>
             <br>
             <br>
-            <div    
-                    class="term-item"
-                    :class="{
-                        'not-sortable-item': term.opened || !term.saved, 
-                        'not-focusable-item': term.opened
-                    }" 
-                    :style="{'margin-left': (term.depth * 40) + 'px'}"
-                    v-for="(term, index) in orderedTermsList"
-                    :key="term.id"> 
-                <a
-                        class="is-medium"
-                        type="button"
-                        @click="addNewChildTerm(term, index)">
-                    <b-icon icon="plus-circle"/>
-                </a>
-                <span 
-                        class="term-name" 
-                        :class="{'is-danger': formWithErrors == term.id }">
-                    {{ term.saved && !term.opened ? term.name : getUnsavedTermName(term) }}
-                </span>
-                <span   
-                        v-if="term.id != undefined"
-                        class="label-details">
-                    <span 
-                            class="not-saved" 
-                            v-if="!term.saved"> 
-                        {{ $i18n.get('info_not_saved') }}
-                    </span>
-                </span>
-            
-                <span class="controls" >
-                <!--
-                    <button
-                            class="button is-success is-small"
+            <div>
+                <div    
+                        class="term-item"
+                        :class="{
+                            'not-sortable-item': term.opened || !term.saved, 
+                            'not-focusable-item': term.opened
+                        }" 
+                        :style="{'margin-left': (term.depth * 40) + 'px'}"
+                        v-for="(term, index) in orderedTermsList"
+                        :key="term.id"> 
+                    <a
+                            class="is-medium"
                             type="button"
-                            :href="taxonomyPath + '/' + term.slug">
-                        {{ $i18n.get('label_view_term') }}
-                    </button>
-                -->
-
-                    <a @click.prevent="editTerm(term, index)">
-                        <b-icon 
-                                type="is-secondary" 
-                                icon="pencil"/>
+                            @click="addNewChildTerm(term, index)">
+                        <b-icon icon="plus-circle"/>
                     </a>
-                    <a 
-                        @click.prevent="tryToRemoveTerm(term)">
-                        <b-icon 
-                                type="is-secondary" 
-                                icon="delete"/>
-                    </a>
-                </span>
+                    <span 
+                            class="term-name" 
+                            :class="{'is-danger': formWithErrors == term.id }">
+                        {{ term.saved && !term.opened ? term.name : getUnsavedTermName(term) }}
+                    </span>
+                    <span   
+                            v-if="term.id != undefined"
+                            class="label-details">
+                        <span 
+                                class="not-saved" 
+                                v-if="!term.saved"> 
+                            {{ $i18n.get('info_not_saved') }}
+                        </span>
+                    </span>
                 
+                    <span class="controls" >
+                    <!--
+                        <button
+                                class="button is-success is-small"
+                                type="button"
+                                :href="taxonomyPath + '/' + term.slug">
+                            {{ $i18n.get('label_view_term') }}
+                        </button>
+                    -->
+
+                        <a @click.prevent="editTerm(term, index)">
+                            <b-icon 
+                                    type="is-secondary" 
+                                    icon="pencil"/>
+                        </a>
+                        <a 
+                            @click.prevent="tryToRemoveTerm(term)">
+                            <b-icon 
+                                    type="is-secondary" 
+                                    icon="delete"/>
+                        </a>
+                    </span>
+                    
+                </div>
             </div>
+            <!-- Footer -->
+            <div
+                    class="pagination-area"
+                    v-if="totalTerms > 0">
+                <div class="shown-items"> 
+                    {{ 
+                        $i18n.get('info_showing_terms') + 
+                        (termsPerPage*(page - 1) + 1) + 
+                        $i18n.get('info_to') + 
+                        getLastTermNumber() + 
+                        $i18n.get('info_of') + totalTerms + '.'
+                    }} 
+                </div> 
+                <div class="items-per-page">
+                    <b-field 
+                            horizontal 
+                            :label="$i18n.get('label_terms_per_page')"> 
+                        <b-select 
+                                :value="termsPerPage"
+                                @input="onChangeTermsPerPage" 
+                                :disabled="orderedTermsList.length <= 0">
+                            <option value="12">12</option>
+                            <option value="24">24</option>
+                            <option value="48">48</option>
+                            <option value="96">96</option>
+                        </b-select>
+                    </b-field>
+                </div>
+                <div class="pagination"> 
+                    <b-pagination
+                            @change="onPageChange"
+                            :total="totalTerms"
+                            :current.sync="page"
+                            order="is-centered"
+                            size="is-small"
+                            :per-page="termsPerPage"/> 
+                </div>
+            </div> 
         </div>
         <div 
                 class="column" 
@@ -86,44 +126,6 @@
                     @onErrorFound="formWithErrors = term.id"
                     :edit-form="term"/>
         </div>
-        <!-- Footer -->
-        <div
-                class="pagination-area"
-                v-if="totalTerms > 0">
-            <div class="shown-items"> 
-                {{ 
-                    $i18n.get('info_showing_terms') + 
-                    (termsPerPage*(page - 1) + 1) + 
-                    $i18n.get('info_to') + 
-                    getLastTermNumber() + 
-                    $i18n.get('info_of') + totalTerms + '.'
-                }} 
-            </div> 
-            <div class="items-per-page">
-                <b-field 
-                        horizontal 
-                        :label="$i18n.get('label_terms_per_page')"> 
-                    <b-select 
-                            :value="termsPerPage"
-                            @input="onChangeTermsPerPage" 
-                            :disabled="orderedTermsList.length <= 0">
-                        <option value="12">12</option>
-                        <option value="24">24</option>
-                        <option value="48">48</option>
-                        <option value="96">96</option>
-                    </b-select>
-                </b-field>
-            </div>
-            <div class="pagination"> 
-                <b-pagination
-                        @change="onPageChange"
-                        :total="totalTerms"
-                        :current.sync="page"
-                        order="is-centered"
-                        size="is-small"
-                        :per-page="termsPerPage"/> 
-            </div>
-        </div> 
         <b-loading 
                 :active.sync="isLoadingTerms" 
                 :can-cancel="false"/>

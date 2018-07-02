@@ -87,11 +87,8 @@
     .filter-item-forms {
 
         .datepicker {
-
-            .dropdown-item {
-                background-color: white !important;
-            }
-
+            font-size: 0.75rem;
+     
             @media screen and (min-width: 1024px) {
 
                 .datepicker-header {
@@ -128,14 +125,19 @@
                 }
 
                 .dropdown-item {
+                    background-color: white !important;
+                    font-size: 0.75rem;
                     padding: 0.8em;
+                }
+
+                .pagination {
+                    font-size: 0.75rem;
                 }
 
                 .dropdown-menu {
                     min-width: 100% !important;
                     max-width: 165px !important;
                 }
-
 
                 .datepicker-table {
                     margin-bottom: 0px;

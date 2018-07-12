@@ -33,6 +33,7 @@ install:
   true
 - composer install
 - sudo mkdir /tmp/wordpress/wordpress-test/wp-content/uploads
+- sudo chmod -R 777 /tmp/wordpress/wordpress-test/wp-content/uploads
 - sudo wget https://phar.phpunit.de/phpunit-6.5.7.phar -P /tmp 
 - sudo chmod +x /tmp/phpunit-6.5.7.phar
 - sudo mv /tmp/phpunit-6.5.7.phar /usr/local/bin/phpunit-6
@@ -54,11 +55,10 @@ before_deploy:
 - ssh-add -l
 deploy:
 - provider: script
-  script:   sshpass -p '$ssh_password' ssh $ssh_user@$ssh_host sh /home/l3p/atualiza_git/atualiza_todos.sh
-  #ssh   $ssh_user@$ssh_host $script_deploy_tainacan
+  script:  sshpass -p '$ssh_password' ssh $ssh_user@$ssh_host sh /home/l3p/atualiza_git/atualiza_todos.sh      #ssh   $ssh_user@$ssh_host $script_deploy_tainacan
   skip_cleanup: true
   on:
-    branch: continuousintegration 
+    branch: continuousintegration
 cache:
   directories:
   - vendor

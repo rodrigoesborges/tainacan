@@ -46,6 +46,34 @@
             </div>
         </div>
     </div>
+    <div class="selection-control">
+        <div class="field select-all is-pulled-left">
+            <span>
+                <b-checkbox 
+                        @click.native="selectAllParentTerms()" 
+                        :value="allParentTermsSelected">{{ $i18n.get('label_select_all_parent_terms') }}</b-checkbox>
+            </span>
+        </div>
+        <div class="field is-pulled-right">
+            <b-dropdown
+                    position="is-bottom-left"
+                    :disabled="!isSelectingTerms"
+                    id="bulk-actions-dropdown">
+                <button
+                        class="button is-white"
+                        slot="trigger">
+                    <span>{{ $i18n.get('label_bulk_actions') }}</span>
+                    <b-icon icon="menu-down"/>
+                </button> 
+
+                <b-dropdown-item
+                        id="item-delete-selected-items"
+                        @click="deleteSelectedTerms()">
+                    {{ $i18n.get('label_delete_selected_terms') + ' (Not ready)' }}
+                </b-dropdown-item>
+            </b-dropdown>
+        </div>
+    </div>
     <div class="columns">
         <b-loading 
                 :is-full-page="false"
@@ -85,7 +113,8 @@
                         :term="term"
                         :index="index"
                         :taxonomy-id="taxonomyId"
-                        :order="order"/>
+                        :order="order"
+                        :selected-terms="selectedTerms"/>
             </div>
             <a 
                     class="view-more-terms-level-0"
@@ -150,7 +179,9 @@ export default {
             editTerm: null,
             maxTerms: 100,
             offset: 0,
-            totalTerms: 0
+            totalTerms: 0,
+            allParentTermsSelected: false,
+            isSelectingTerms: true
         }
     },
     props: {
@@ -175,6 +206,19 @@ export default {
         },
         taxonomyId() {
             this.loadTerms(0);
+        },
+        selectedTerms() {
+            let allSelected = true;
+            let isSelecting = false;
+            for (let i = 0; i < this.selectedTerms.length; i++) {
+                if (this.selectedTerms[i] == false) {
+                    allSelected = false;
+                } else {
+                    isSelecting = true;
+                }
+            }
+            this.allParentTermsSelected = allSelected;
+            this.isSelectingTerms = isSelecting;
         }
     },
     components: {
@@ -193,6 +237,10 @@ export default {
         ...mapGetters('taxonomy',[
             'getTerms'
         ]),
+        selectAllParentTerms() {
+            for (let i = 0; i < this.selectedTerms.length; i++) 
+                this.selectedTerms.splice(i, 1, !this.allParentTermsSelected);
+        },
         onChangeOrder(newOrder) {
             this.offset = 0;
             this.order = newOrder;
@@ -350,6 +398,9 @@ export default {
                 .catch((error) => {
                     this.$console.log(error);
                 });
+        },
+        deleteSelectedTerms() {
+            console.log(this.selectedTerms);
         }
     },
     created() {
@@ -382,6 +433,24 @@ export default {
 <style lang="scss">
 
     @import "../../scss/_variables.scss";
+
+    .selection-control {
+        
+        padding: 6px 0px 0px 12px;
+        background: white;
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+
+        .select-all {
+            color: $gray4;
+            font-size: 14px;
+            &:hover {
+                color: $gray4;
+            }
+        }
+    }
 
     .columns {
         position: relative;

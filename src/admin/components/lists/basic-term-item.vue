@@ -6,6 +6,11 @@
             :class="{
                 'opened-term': term.opened
             }">
+        <span class="checkbox-area">
+            <b-checkbox 
+                size="is-small"
+                v-model="node.checked"/> 
+        </span>
         <span 
                 class="term-name" 
                 :class="{'is-danger': formWithErrors == term.id }">
@@ -49,6 +54,7 @@ export default {
         return {
             isLoadingTerms: false,
             isEditingTerm: false,
+            selectedTerms: []
         }
     },
     props: {

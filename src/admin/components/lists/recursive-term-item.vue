@@ -1,13 +1,13 @@
 <template>
-<div 
-        style="width: 100%;">
+<div style="width: 100%;">
     <div
             class="term-item"
             :style="{
                 'border-left-color': term.parent > 0 ? '#f2f2f2' : 'transparent'
             }"
             :class="{
-                'opened-term': term.opened
+                'opened-term': term.opened,
+                'selected-term': selectedTerms[index]
             }">
         <span 
                 v-if="term.parent != 0 && index == 0"
@@ -24,6 +24,11 @@
                     v-if="term.total_children > 0"
                     @click.prevent="toggleShowChildren()"/>
         </span>
+        <span class="checkbox-area">
+            <b-checkbox 
+                size="is-small"
+                v-model="selectedTerms[index]"/> 
+        </span>
         <span 
                 class="term-name" 
                 :class="{'is-danger': formWithErrors == term.id }">
@@ -38,8 +43,10 @@
         </span>
         <span 
                 class="children-counter"
-                v-if="term.total_children > 0">
-            <span>{{ term.total_children + ' ' + $i18n.get('label_children_terms') }}</span>
+                v-if="term.total_children > 0"> 
+            <b-checkbox 
+                    @click.native="selectAllChildTerms()" 
+                    :value="allChildTermsSelected">{{ term.total_children + ' ' + $i18n.get('label_children_terms') }}</b-checkbox>   
         </span>
         <span 
                 class="controls" 
@@ -78,7 +85,8 @@
                 :term="childTerm"
                 :index="childIndex"
                 :taxonomy-id="taxonomyId"
-                :order="order"/>
+                :order="order"
+                :selected-terms="selectedChildTerms"/>
         
     </div>
     <a 
@@ -106,7 +114,10 @@ export default {
             showChildren: false,
             maxTerms: 100,
             offset: 0,
-            totalTerms: 0
+            totalTerms: 0,
+            selectedChildTerms: [],
+            allChildTermsSelected: false,
+            isSelectingTerms: false
         }
     },
     props: {
@@ -114,6 +125,7 @@ export default {
         index: Number,
         taxonomyId: Number,
         order: String,
+        selectedTerms: Array
     },
     components: {
         RecursiveTermItem,
@@ -261,7 +273,6 @@ export default {
         display: flex; 
         position: relative;
         align-items: center;
-        justify-content: space-between;
         border-left: 1px solid transparent;
         visibility: visible;
         opacity: 1;
@@ -324,6 +335,7 @@ export default {
         }
         .controls { 
             visibility: hidden;
+            margin-left: auto;
             opacity: 0.0;
             display: flex;
             justify-content: space-between;
@@ -369,6 +381,10 @@ export default {
             &:hover:before {
                 border-color: transparent transparent transparent $gray1;
             }
+        }
+        &.selected-term {
+            cursor: default;
+            background-color: $blue1;
         }
 
         &.collapsed-term {

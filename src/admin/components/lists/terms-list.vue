@@ -1,7 +1,7 @@
 <template>
 <div>
     <div 
-            v-if="termsList.length > 0 && !isLoadingTerms"
+            v-if="term.length > 0 && !isLoadingTerms"
             class="terms-list-header">
         <button
                 class="button is-secondary"
@@ -12,7 +12,7 @@
         </button>
         <b-field class="order-area">
             <button
-                    :disabled="localTerms.length <= 0 || isLoadingTerms || isEditingTerm || order == 'asc'"
+                    :disabled="termsTree.length <= 0 || isLoadingTerms || isEditingTerm || order == 'asc'"
                     class="button is-white is-small"
                     @click="onChangeOrder('asc')">
                 <b-icon 
@@ -20,7 +20,7 @@
                         icon="sort-ascending"/>
             </button>
             <button
-                    :disabled="localTerms.length <= 0 || isLoadingTerms || isEditingTerm || order == 'desc'"
+                    :disabled="termsTree.length <= 0 || isLoadingTerms || isEditingTerm || order == 'desc'"
                     class="button is-white is-small"
                     @click="onChangeOrder('desc')">
                 <b-icon 
@@ -87,7 +87,7 @@
             <!-- Basic list, without hierarchy, used during search -->
             <div 
                     v-if="searchQuery != undefined && searchQuery != ''"
-                    v-for="(term, index) in localTerms"
+                    v-for="(term, index) in termsTree"
                     :key="term.id">
                 <basic-term-item 
                         :term="term"
@@ -99,14 +99,14 @@
                     class="view-more-terms-level-0"
                     :class="{'is-disabled': isEditingTerm}"
                     @click="offset = offset + maxTerms; searchTerms(offset)"
-                    v-if="(searchQuery != undefined && searchQuery != '') && totalTerms > localTerms.length">
-                {{ $i18n.get('label_view_more') + ' (' + Number(totalTerms - localTerms.length) + ' ' + $i18n.get('terms') + ')' }}
+                    v-if="(searchQuery != undefined && searchQuery != '') && totalTerms > termsTree.length">
+                {{ $i18n.get('label_view_more') + ' (' + Number(totalTerms - termsTree.length) + ' ' + $i18n.get('terms') + ')' }}
             </a>
 
             <!-- Recursive list for hierarchy -->
             <div    
                     v-if="searchQuery == undefined || searchQuery == ''"
-                    v-for="(term, index) in localTerms"
+                    v-for="(term, index) in termsTree"
                     :key="term.id">
                 
                 <recursive-term-item 
@@ -120,8 +120,8 @@
                     class="view-more-terms-level-0"
                     :class="{'is-disabled': isEditingTerm}"
                     @click="offset = offset + maxTerms; loadTerms(0)"
-                    v-if="(searchQuery == undefined || searchQuery == '') && totalTerms > localTerms.length">
-                {{ $i18n.get('label_view_more') + ' (' + Number(totalTerms - localTerms.length) + ' ' + $i18n.get('terms') + ')' }}
+                    v-if="(searchQuery == undefined || searchQuery == '') && totalTerms > termsTree.length">
+                {{ $i18n.get('label_view_more') + ' (' + Number(totalTerms - termsTree.length) + ' ' + $i18n.get('terms') + ')' }}
             </a>
         </div>
         <div 
@@ -137,7 +137,7 @@
         </div>
     </div>
     <!-- Empty state image -->
-    <div v-if="termsList.length <= 0 && !isLoadingTerms && !isEditingTerm">
+    <div v-if="term.length <= 0 && !isLoadingTerms && !isEditingTerm">
         <section class="section">
             <div class="content has-text-grey has-text-centered">
                 <p>
@@ -175,7 +175,7 @@ export default {
             order: 'asc',
             termEditionFormTop: 0,
             searchQuery: '',
-            localTerms: [],
+            termsTree: [],
             editTerm: null,
             maxTerms: 100,
             offset: 0,
@@ -188,15 +188,16 @@ export default {
         taxonomyId: String,
     },
     computed: {
-        termsList() {
+        terms() {
             return this.getTerms();
         }
     },
     watch: {
-        termsList: {
+        terms: {
             handler() { 
-                this.localTerms = JSON.parse(JSON.stringify(this.termsList));
-                for (let aTerm of this.localTerms) {
+                this.buildTree();
+                this.termsTree = JSON.parse(JSON.stringify(this.term));
+                for (let aTerm of this.termsTree) {
                     t.dfs(aTerm, [], (node) => { 
                         node.opened = false; 
                     });
@@ -259,9 +260,9 @@ export default {
                 opened: true
             }
             if (parent == 0) {
-                this.localTerms.unshift(newTerm);
+                this.termsTree.unshift(newTerm);
             } else {
-                for (let term of this.localTerms) {
+                for (let term of this.termsTree) {
                     let parentTerm = t.find(term, [], (node) => { return node.id == parent; });
                     if (parentTerm != undefined) {
                         if (parentTerm['children'] == undefined) {
@@ -282,12 +283,12 @@ export default {
             let term = $event;
 
             if (term.id == 'new') { 
-                for (let i = 0; i < this.localTerms.length; i++) {
-                    if (this.localTerms[i].id == term.id) {
-                        this.localTerms.splice(i, 1);
+                for (let i = 0; i < this.termsTree.length; i++) {
+                    if (this.termsTree[i].id == term.id) {
+                        this.termsTree.splice(i, 1);
                         break;
                     } else { 
-                        let canceledParent = t.find(this.localTerms[i], [], (node) => { return node.id == term.parent }); 
+                        let canceledParent = t.find(this.termsTree[i], [], (node) => { return node.id == term.parent }); 
                         if (canceledParent != undefined) {
                             for (let j = 0; j < canceledParent['children'].length; j++){
                                 if (canceledParent['children'][j].id == term.id) {
@@ -313,12 +314,12 @@ export default {
                 }
 
                 if (originalTerm != undefined) {
-                    for (let i = 0; i < this.localTerms.length; i++) {
-                        if (this.localTerms[i].id == term.id) {
-                            this.$set(this.localTerms, i, JSON.parse(JSON.stringify(originalTerm)));
+                    for (let i = 0; i < this.termsTree.length; i++) {
+                        if (this.termsTree[i].id == term.id) {
+                            this.$set(this.termsTree, i, JSON.parse(JSON.stringify(originalTerm)));
                             break;
                         } else { 
-                            let canceledParent = t.find(this.localTerms[i], [], (node) => { return node.id == originalTerm.parent }); 
+                            let canceledParent = t.find(this.termsTree[i], [], (node) => { return node.id == originalTerm.parent }); 
                             if (canceledParent != undefined) {
                                 for (let j = 0; j < canceledParent['children'].length; j++){
                                     if (canceledParent['children'][j].id == originalTerm.id) {
@@ -401,6 +402,9 @@ export default {
         },
         deleteSelectedTerms() {
             console.log(this.selectedTerms);
+        },
+        buildTree() {
+            
         }
     },
     created() {

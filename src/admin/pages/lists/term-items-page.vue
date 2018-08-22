@@ -9,11 +9,23 @@
                 v-if="!openAdvancedSearch"
                 class="is-hidden-mobile"
                 id="filter-menu-compress-button"
-                :class="{'filter-menu-compress-button-top-repo': isRepositoryLevel}"
-                :style="{ top: !isOnTheme ? '120px' : (searchControlHeight - 15) + 'px' }"
+                :class="{'filter-menu-compress-button-top-repo': isRepositoryLevel && !isOnTheme }"
+                :style="{ top: !isOnTheme ? '120px' : '76px' }"
                 @click="isFiltersMenuCompressed = !isFiltersMenuCompressed">
             <b-icon :icon="isFiltersMenuCompressed ? 'menu-right' : 'menu-left'" />
         </button>
+        <!-- Filters mobile modal button -->
+        <button 
+                v-if="!openAdvancedSearch"
+                class="is-hidden-tablet"
+                id="filter-menu-compress-button"
+                :class="{'filter-menu-compress-button-top-repo': isRepositoryLevel && !isOnTheme }"
+                :style="{ top: !isOnTheme ? (searchControlHeight + 70) + 'px' : (searchControlHeight - 25) + 'px' }"
+                @click="isFilterModalActive = !isFilterModalActive">
+            <b-icon :icon="isFiltersMenuCompressed ? 'menu-right' : 'menu-left'" />
+            <span class="text">{{ $i18n.get('filters') }}</span>
+        </button>
+
         <!-- Side bar with search and filters -->
         <aside
                 :style="{ top: searchControlHeight + 'px' }"
@@ -116,7 +128,7 @@
                         class="search-control-item"
                         v-if="!isOnTheme">
                     <b-dropdown 
-                            :mobile-modal="false"
+                            :mobile-modal="true"
                             id="item-creation-options-dropdown">
                         <button
                                 class="button is-secondary"
@@ -158,7 +170,7 @@
                         class="search-control-item">
                     <b-dropdown
                             ref="displayedMetadataDropdown"
-                            :mobile-modal="false"
+                            :mobile-modal="true"
                             :disabled="totalItems <= 0 || adminViewMode == 'grid'|| adminViewMode == 'cards'"
                             class="show">
                         <button
@@ -256,13 +268,13 @@
                 </div>
 
                 <!-- View Modes Dropdown -->
-                <div 
+                <!-- <div 
                         v-if="isOnTheme"
                         class="search-control-item">
                     <b-field>
                         <b-dropdown
                                 @change="onChangeViewMode($event)"
-                                :mobile-modal="false"
+                                :mobile-modal="true"
                                 position="is-bottom-left"
                                 :aria-label="$i18n.get('label_view_mode')">
                             <button 
@@ -295,7 +307,7 @@
                     <b-field>
                         <b-dropdown
                                 @change="onChangeAdminViewMode($event)"
-                                :mobile-modal="false"
+                                :mobile-modal="true"
                                 position="is-bottom-left"
                                 :aria-label="$i18n.get('label_view_mode')">
                             <button
@@ -357,14 +369,7 @@
                             </b-dropdown-item>
                         </b-dropdown>
                     </b-field>
-                </div>
-
-                <!-- Filters mobile modal button -->
-                <div class="search-control-item is-hidden-tablet">
-                    <button 
-                            @click="isFilterModalActive = !isFilterModalActive"
-                            class="button is-secondary">{{ $i18n.get('filters') }}</button>
-                </div>
+                </div> -->
 
                 <!-- Text simple search (used on mobile, instead of the one from filter list)-->
                 <div class="is-hidden-tablet search-control-item">
@@ -1087,6 +1092,7 @@
             });
 
             this.$eventBusSearch.$on('hasFiltered', hasFiltered => {
+                this.adjustSearchControlHeight();
                 this.hasFiltered = hasFiltered;
             });
 
@@ -1136,11 +1142,12 @@
             }
 
             // Watches window resize to adjust filter's top position and compression on mobile 
-            window.addEventListener('resize', this.adjustSearchControlHeight());
+            this.adjustSearchControlHeight();
+            window.addEventListener('resize', this.adjustSearchControlHeight);
         },
         beforeDestroy() {
             this.$off();
-            window.removeEventListener('resize', this.adjustSearchControlHeight());
+            window.removeEventListener('resize', this.adjustSearchControlHeight);
         }
     }
 </script>
@@ -1291,6 +1298,22 @@
 
         .icon {
             margin-top: -1px;
+        }
+
+        @media screen and (max-width: 768px) {
+            max-width: 100%;
+            width: auto;
+            padding: 3px 6px 3px 0px;
+            height: 24px;
+
+            .icon {
+                position: relative;
+                top: -3px;
+            }
+            .text {
+                position: relative;
+                top: -6px;
+            }
         }
     }
 

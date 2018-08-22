@@ -87,7 +87,12 @@ export const filter_type_mixin = {
 
                     if (this.filter.max_options && this.options.length >= this.filter.max_options) {
                         let seeMoreLink = `<a style="font-size: 12px;"> ${ this.$i18n.get('label_view_all') } </a>`;
-                        this.options[this.filter.max_options - 1].seeMoreLink = seeMoreLink;
+
+                        if(this.options.length === this.filter.max_options){
+                            this.options[this.filter.max_options-1].seeMoreLink = seeMoreLink;
+                        } else {
+                            this.options[this.options.length-1].seeMoreLink = seeMoreLink;
+                        }
                     }
 
                 })
@@ -162,7 +167,12 @@ export const filter_type_mixin = {
 
                     if (this.filter.max_options && this.options.length >= this.filter.max_options) {
                         let seeMoreLink = `<a style="font-size: 12px;"> ${ this.$i18n.get('label_view_all') } </a>`;
-                        this.options[this.filter.max_options - 1].seeMoreLink = seeMoreLink;
+
+                        if(this.options.length === this.filter.max_options){
+                            this.options[this.filter.max_options-1].seeMoreLink = seeMoreLink;
+                        } else {
+                            this.options[this.options.length-1].seeMoreLink = seeMoreLink;
+                        }
                     }
 
                 })

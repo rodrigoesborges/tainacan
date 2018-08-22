@@ -26,9 +26,14 @@
         max-height: 218px;
         cursor: pointer;
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 450px) {
             max-width: 100%;
             min-width: 100%;
+
+            img {
+                width: 33.333333% !important;
+                height: 33.333333% !important;
+            }
         }
 
         &:hover {
@@ -68,10 +73,7 @@
         img {
             width: 172px;
             height: 172px;
-            border-radius: 2px;
-        }
-        &:hover img {
-            border-radius: 0;
+            border-radius: 0px;
         }
         .metadata-title {
             flex-shrink: 0;

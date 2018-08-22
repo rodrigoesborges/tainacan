@@ -11,7 +11,7 @@
             </div>
             <div class="field is-pulled-right">
                 <b-dropdown
-                        :mobile-modal="false"
+                        :mobile-modal="true"
                         position="is-bottom-left"
                         v-if="items.length > 0 && items[0].current_user_can_edit"
                         :disabled="!isSelectingItems"
@@ -72,7 +72,7 @@
                     <a
                             v-if="item.thumbnail != undefined"
                             @click="goToItemPage(item)">
-                        <img :src="item['thumbnail'].medium ? item['thumbnail'].medium : thumbPlaceholderPath">
+                        <img :src="item['thumbnail'].tainacan_medium ? item['thumbnail'].tainacan_medium : (item['thumbnail'].medium ? item['thumbnail'].medium : thumbPlaceholderPath)">
                     </a>
 
                     <!-- Actions -->
@@ -136,10 +136,13 @@
                     </div>
 
                     <!-- Thumbnail -->  
-                    <img 
+                    <div 
                             @click="goToItemPage(item)"
                             v-if="item.thumbnail != undefined"
-                            :src="item['thumbnail'].medium_large ? item['thumbnail'].medium_large : thumbPlaceholderPath">  
+                            class="thumbnail"
+                            :style="{ backgroundImage: 'url(' + (item['thumbnail'].tainacan_medium_full ? item['thumbnail'].tainacan_medium_full : (item['thumbnail'].medium_large ? item['thumbnail'].medium_large : thumbPlaceholderPath)) + ')' }">  
+                        <img :src="item['thumbnail'].tainacan_medium_full ? item['thumbnail'].tainacan_medium_full : (item['thumbnail'].medium_large ? item['thumbnail'].medium_large : thumbPlaceholderPath)">  
+                    </div>
                     
                     <!-- Actions -->
                     <div 
@@ -228,7 +231,7 @@
                       
                         <img 
                                 v-if="item.thumbnail != undefined"
-                                :src="item['thumbnail'].medium ? item['thumbnail'].medium : thumbPlaceholderPath">  
+                                :src="item['thumbnail'].tainacan_medium ? item['thumbnail'].tainacan_medium : (item['thumbnail'].medium ? item['thumbnail'].medium : thumbPlaceholderPath)">
                     
                         <div class="list-metadata media-body">
                             <!-- Description -->
@@ -271,7 +274,9 @@
             </div>
 
             <!-- RECORDS VIEW MODE -->
-            <div
+            <masonry 
+                    :cols="{default: 4, 1919: 3, 1407: 2, 1215: 2, 1023: 1, 767: 1, 343: 1}"
+                    :gutter="42"
                     class="tainacan-records-container"
                     v-if="viewMode == 'records'">
                 <div 
@@ -284,9 +289,15 @@
                     <div 
                             :class="{ 'is-selecting': isSelectingItems }"
                             class="record-checkbox">
-                        <b-checkbox 
-                                size="is-small"
-                                v-model="selectedItems[index]"/> 
+                        <label 
+                                tabindex="0" 
+                                class="b-checkbox checkbox is-small">
+                            <input 
+                                    type="checkbox"
+                                    v-model="selectedItems[index]"> 
+                                <span class="check" /> 
+                                <span class="control-label" />
+                        </label>
                     </div>
                     
                     <!-- Title -->
@@ -343,31 +354,18 @@
                     <div    
                             class="media"
                             @click="goToItemPage(item)">
-                    
-                        <img 
-                                v-if="item.thumbnail != undefined"
-                                :src="item['thumbnail'].medium_large ? item['thumbnail'].medium_large : thumbPlaceholderPath">  
-                        
                         <div class="list-metadata media-body">
+                            <div class="thumbnail">
+                                <img 
+                                        v-if="item.thumbnail != undefined"
+                                        :src="item['thumbnail'].tainacan_medium_full ? item['thumbnail'].tainacan_medium_full : (item['thumbnail'].medium_large ? item['thumbnail'].medium_large : thumbPlaceholderPath)"> 
+                            </div>
                             <span 
                                     v-for="(column, index) in tableMetadata"
                                     :key="index"
                                     v-if="collectionId == undefined && column.display && column.metadata_type_object != undefined && (column.metadata_type_object.related_mapped_prop == 'description')">
-                                <h3 
-                                        v-tooltip="{
-                                            content: $i18n.get('label_description'),
-                                            html: false,
-                                            autoHide: false,
-                                            placement: 'auto-start'
-                                        }"
-                                        class="metadata-label">{{ $i18n.get('label_description') }}</h3>
+                                <h3 class="metadata-label">{{ $i18n.get('label_description') }}</h3>
                                 <p 
-                                        v-tooltip="{
-                                            content: item.description != undefined ? item.description : '',
-                                            html: true,
-                                            autoHide: false,
-                                            placement: 'auto-start'
-                                        }"
                                         v-html="item.description != undefined ? item.description : ''"
                                         class="metadata-value"/>
                             </span>
@@ -375,21 +373,8 @@
                                     v-for="(column, index) in tableMetadata"
                                     :key="index"
                                     v-if="column.display && column.slug != 'thumbnail' && column.metadata_type_object != undefined && (column.metadata_type_object.related_mapped_prop != 'title')">
-                                <h3 
-                                        v-tooltip="{
-                                            content: column.name,
-                                            html: false,
-                                            autoHide: false,
-                                            placement: 'auto-start'
-                                        }"
-                                        class="metadata-label">{{ column.name }}</h3>
+                                <h3 class="metadata-label">{{ column.name }}</h3>
                                 <p 
-                                        v-tooltip="{
-                                            content: item.metadata != undefined ? renderMetadata(item.metadata, column) : '',
-                                            html: true,
-                                            autoHide: false,
-                                            placement: 'auto-start'
-                                        }"
                                         v-html="item.metadata != undefined ? renderMetadata(item.metadata, column) : ''"
                                         class="metadata-value"/>
                             </span>
@@ -397,7 +382,7 @@
                     </div>
                
                 </div>
-            </div>
+            </masonry>
             
             <!-- TABLE VIEW MODE -->
             <table 
@@ -510,7 +495,7 @@
                             <span v-if="column.metadatum == 'row_thumbnail'">
                                 <img 
                                         class="table-thumb" 
-                                        :src="item['thumbnail'].thumb ? item['thumbnail'].thumb : thumbPlaceholderPath">
+                                        :src="item['thumbnail'].tainacan_small ? item['thumbnail'].tainacan_small : (item['thumbnail'].thumb ? item['thumbnail'].thumb : thumbPlaceholderPath)">
                             </span> 
                             <p 
                                     v-tooltip="{

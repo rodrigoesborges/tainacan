@@ -46,6 +46,16 @@
             <div class="columns">
                 <div class="column is-4">
 
+                    <!-- Hook for extra Form options -->
+                    <template 
+                            v-if="formHooks != undefined && 
+                                formHooks['form-collection'] != undefined &&
+                                formHooks['form-collection']['begin-left'] != undefined">  
+                        <form 
+                            id="form-collection-begin-left"
+                            v-html="formHooks['form-collection']['begin-left']"/>
+                    </template>
+
                     <!-- Thumbnail -------------------------------- --> 
                     <b-field :addons="false">
                         <label class="label">{{ $i18n.get('label_thumbnail') }}</label>
@@ -241,9 +251,31 @@
                                 :title="$i18n.getHelperTitle('collections', 'comment_status')" 
                                 :message="$i18n.getHelperMessage('collections', 'comment_status')"/>
                     </b-field>
+
+                    <!-- Hook for extra Form options -->
+                    <template 
+                            v-if="formHooks != undefined && 
+                                formHooks['form-collection'] != undefined &&
+                                formHooks['form-collection']['end-left'] != undefined">  
+                        <form 
+                            id="form-collection-end-left"
+                            v-html="formHooks['form-collection']['end-left'] "/>
+                    </template>
+
                 </div>
                 <div class="column is-1" />
                 <div class="column">
+
+                    <!-- Hook for extra Form options -->
+                    <template 
+                            v-if="formHooks != undefined && 
+                                formHooks['form-collection'] != undefined &&
+                                formHooks['form-collection']['begin-right'] != undefined">  
+                        <form 
+                            id="form-collection-begin-right"
+                            v-html="formHooks['form-collection']['begin-right']"/>
+                    </template>
+
                     <!-- Status -------------------------------- --> 
                     <b-field
                             :addons="false" 
@@ -386,7 +418,18 @@
                                 v-model="form.slug"
                                 @focus="clearErrors('slug')"/>
                     </b-field>
+
+                    <!-- Hook for extra Form options -->
+                    <template 
+                            v-if="formHooks != undefined && 
+                                formHooks['form-collection'] != undefined &&
+                                formHooks['form-collection']['end-right'] != undefined">  
+                        <form 
+                            id="form-collection-end-right"
+                            v-html="formHooks['form-collection']['end-right']"/>
+                    </template>
                 </div>
+
             </div>
 
             <!-- Form submit -------------------------------- --> 
@@ -418,11 +461,11 @@
 import { mapActions } from 'vuex';
 import wpMediaFrames from '../../js/wp-media-frames';
 import FileItem from '../other/file-item.vue';
-import { wpAjax } from '../../js/mixins';
+import { wpAjax, formHooks } from '../../js/mixins';
 
 export default {
     name: 'CollectionEditionForm',
-    mixins: [ wpAjax ],
+    mixins: [ wpAjax, formHooks ],
     data(){
         return {
             collectionId: Number,
@@ -481,7 +524,7 @@ export default {
             viewModesList: [],
             fromImporter: '',
             newPagePath: tainacan_plugin.admin_url + 'post-new.php?post_type=page',
-            isUpdatingSlug: false,
+            isUpdatingSlug: false
         }
     },
     components: {
@@ -525,8 +568,8 @@ export default {
                 });
         }, 500),
         onSubmit() {
+           
             this.isLoading = true;
-
             this.form.moderators_ids = [];
             for (let moderator of this.moderators)
                 this.form.moderators_ids.push(moderator.id);
@@ -545,7 +588,9 @@ export default {
                 default_view_mode: this.form.default_view_mode,
                 comment_status: this.form.comment_status
             };
-            this.updateCollection(data).then(updatedCollection => {    
+            this.fillExtraFormData(data, 'collection');
+
+            this.updateCollection({collection_id: this.collectionId, collection: data }).then(updatedCollection => {    
                 
                 this.collection = updatedCollection;
 
@@ -585,6 +630,8 @@ export default {
 
             // Creates draft Collection
             let data = { name: '', description: '', status: 'auto-draft', mapper: (this.isMapped && this.mapper != false ? this.mapper : false ) };
+            this.fillExtraFormData(data, 'collection');
+            
             this.sendCollection(data).then(res => {
 
                 this.collectionId = res.id;
@@ -757,7 +804,7 @@ export default {
             }
         }
     },
-    created(){
+    mounted(){
 
         if (this.$route.query.fromImporter != undefined) 
             this.fromImporter = this.$route.query.fromImporter;

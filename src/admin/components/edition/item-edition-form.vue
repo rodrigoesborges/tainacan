@@ -23,7 +23,7 @@
                                 formHooks['form-item']['begin-left'] != undefined">  
                         <form 
                             id="form-item-begin-left"
-                            v-html="formHooks['form-item']['begin-left']"/>
+                            v-html="formHooks['form-item']['begin-left'].join('')"/>
                     </template>
 
                     <!-- Document -------------------------------- -->
@@ -307,7 +307,7 @@
                                 formHooks['form-item']['end-left'] != undefined">  
                         <form 
                             id="form-item-end-left"
-                            v-html="formHooks['form-item']['end-left'] "/>
+                            v-html="formHooks['form-item']['end-left'].join('')"/>
                     </template>
 
                 </div>
@@ -322,7 +322,7 @@
                                 formHooks['form-item']['begin-right'] != undefined">  
                         <form 
                             id="form-item-begin-right"
-                            v-html="formHooks['form-item']['begin-right']"/>
+                            v-html="formHooks['form-item']['begin-right'].join('')"/>
                     </template>
 
                     
@@ -392,7 +392,7 @@
                                 formHooks['form-item']['end-right'] != undefined">  
                         <form 
                             id="form-item-end-right"
-                            v-html="formHooks['form-item']['end-right']"/>
+                            v-html="formHooks['form-item']['end-right'].join('')"/>
                     </template>
                 </div>
             </div>

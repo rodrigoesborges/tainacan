@@ -125,6 +125,10 @@ class Entity {
     	}
     }
 
+    /**
+     * Return the entity repository
+     * @return \Tainacan\Repositories\Repository
+     */
     public function get_repository() {
         $namespace = '\Tainacan\Repositories\\'.$this->repository;
         $repository = $namespace::get_instance();

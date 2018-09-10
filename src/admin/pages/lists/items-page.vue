@@ -6,6 +6,11 @@
         <!-- SEARCH AND FILTERS --------------------- -->
         <!-- Filter menu compress button -->
         <button
+                v-tooltip="{
+                    content: isFiltersMenuCompressed ? $i18n.get('label_show_filters') : $i18n.get('label_hide_filters'),
+                    autoHide: false,
+                    placement: 'auto-start'
+                }"  
                 v-if="!openAdvancedSearch"
                 class="is-hidden-mobile"
                 id="filter-menu-compress-button"
@@ -432,8 +437,7 @@
                         :is-repository-level="isRepositoryLevel"
                         :advanced-search-results="advancedSearchResults"
                         :open-form-advanced-search="openFormAdvancedSearch"
-                        :is-do-search="isDoSearch"
-                        :metadata="metadata"/>
+                        :is-do-search="isDoSearch"/>
             </div>
 
             <!-- --------------- -->
@@ -938,15 +942,15 @@
                                     else if (metadatum.display == 'yes')
                                         display = true;
 
-                                    // // Deciding display based on user prefs
-                                    // if (prefsFetchOnlyObject != undefined && 
-                                    //     prefsFetchOnlyObject.meta != undefined) {
-                                    //     let index = prefsFetchOnlyObject.meta.findIndex(metadatumId => metadatumId == metadatum.id);
-                                    //     if (index >= 0)
-                                    //         display = true;
-                                    //     else
-                                    //         display = false;
-                                    // }
+                                    // Deciding display based on user prefs
+                                    if (prefsFetchOnlyObject != undefined && 
+                                        prefsFetchOnlyObject.meta != undefined) {
+                                        let index = prefsFetchOnlyObject.meta.findIndex(metadatumId => metadatumId == metadatum.id);
+                                        if (index >= 0)
+                                            display = true;
+                                        else
+                                            display = false;
+                                    }
 
                                     metadata.push({
                                             name: metadatum.name,
@@ -1040,7 +1044,7 @@
                                 '2': 'author_name',
                                 '3': 'title',
                                 '4': 'description'
-                            });
+                            }, true);
                             
                             this.sortingMetadata.push({
                                 name: this.$i18n.get('label_title'),
@@ -1129,14 +1133,28 @@
                 let prefsViewMode = !this.isRepositoryLevel ? 'view_mode_' + this.collectionId : 'view_mode';
                 if (this.$userPrefs.get(prefsViewMode) == undefined)
                     this.$eventBusSearch.setInitialViewMode(this.defaultViewMode);
-                else 
-                    this.$eventBusSearch.setInitialViewMode(this.$userPrefs.get(prefsViewMode));
+                else {
+                    let existingViewModeIndex = Object.keys(this.registeredViewModes).findIndex(viewMode => viewMode == this.$userPrefs.get(prefsViewMode));
+                    if (existingViewModeIndex >= 0)
+                        this.$eventBusSearch.setInitialViewMode(this.$userPrefs.get(prefsViewMode));
+                    else   
+                        this.$eventBusSearch.setInitialViewMode(this.defaultViewMode);
+                }
             } else {
                 let prefsAdminViewMode = !this.isRepositoryLevel ? 'admin_view_mode_' + this.collectionId : 'admin_view_mode';
                 if (this.$userPrefs.get(prefsAdminViewMode) == undefined)
-                    this.$eventBusSearch.setInitialAdminViewMode('cards');
-                else 
-                    this.$eventBusSearch.setInitialAdminViewMode(this.$userPrefs.get(prefsAdminViewMode));
+                    this.$eventBusSearch.setInitialAdminViewMode('table');
+                else {
+                    let existingViewMode = this.$userPrefs.get(prefsAdminViewMode);
+                    if (existingViewMode == 'cards' || 
+                        existingViewMode == 'table' || 
+                        existingViewMode == 'records' || 
+                        existingViewMode == 'grid' || 
+                        existingViewMode == 'masonry')
+                        this.$eventBusSearch.setInitialAdminViewMode(this.$userPrefs.get(prefsAdminViewMode));
+                    else
+                        this.$eventBusSearch.setInitialAdminViewMode('table');
+                }
             }
 
             // Watches window resize to adjust filter's top position and compression on mobile 

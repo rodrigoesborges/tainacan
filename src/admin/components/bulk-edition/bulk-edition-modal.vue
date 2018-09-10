@@ -18,7 +18,7 @@
                     <b-select
                             :loading="metadataIsLoading"
                             :class="{'is-field-history': bulkEditionProcedures[criterion].isDone}"
-                            :disabled="!!bulkEditionProcedures[criterion].metadatumID"
+                            :disabled="!!bulkEditionProcedures[criterion].metadatumID || metadataIsLoading"
                             class="tainacan-bulk-edition-field tainacan-bulk-edition-field-not-last"
                             :placeholder="$i18n.get('instruction_select_a_metadatum')"
                             @input="addToBulkEditionProcedures($event, 'metadatumID', criterion)">
@@ -289,7 +289,7 @@
                     collectionId: this.collectionID,
                     isRepositoryLevel: false,
                     isContextEdit: true,
-                    includeDisabled: true,
+                    includeDisabled: false,
                 }).then(() => {
                     this.metadataIsLoading = false;
                 });

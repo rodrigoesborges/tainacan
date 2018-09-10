@@ -75,6 +75,7 @@ return apply_filters( 'tainacan-admin-i18n', [
 
 	// Wordpress Status
 	'publish'                                        => __( 'Publish', 'tainacan' ),
+	'public'                                         => __( 'Public', 'tainacan' ),
 	'draft'                                          => __( 'Draft', 'tainacan' ),
 	'private'                                        => __( 'Private', 'tainacan' ),
 	'trash'                                          => __( 'Trash', 'tainacan' ),
@@ -295,6 +296,9 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'label_log_file'                                 => __( 'Log file', 'tainacan' ),
 	'label_error_log_file'	                     	 => __( 'Error Log file', 'tainacan' ),
 	'label_import_items'	                     	 => __( 'Import items', 'tainacan' ),
+	'label_hide_filters'	                     	 => __( 'Hide filters menu', 'tainacan' ),
+	'label_show_filters'	                     	 => __( 'Show filters menu', 'tainacan' ),
+	'label_select_all_items'                         => __( 'Select all items', 'tainacan' ),
 	'label_select_all'                               => __( 'Select all', 'tainacan' ),
 
 	// Instructions. More complex sentences to guide user and placeholders

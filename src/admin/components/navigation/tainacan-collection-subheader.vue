@@ -45,17 +45,21 @@
             </div>
     
             <ul class="menu-list level-right">
-                <li 
+                <li     
                         :class="activeRoute == 'ItemPage' || activeRoute == 'CollectionItemsPage' || activeRoute == 'ItemEditionForm' || activeRoute == 'ItemCreatePage' ? 'is-active':''" 
                         class="level-item">
-                    <router-link  
+                    <router-link 
                             tag="a" 
                             :to="{ path: $routerHelper.getCollectionItemsPath(id, '') }" 
                             :aria-label="$i18n.get('label_collection_items')">
-                        <span class="icon">
-                            <i class="mdi mdi-file-multiple"/>
-                        </span>
-                        <span class="menu-text">{{ $i18n.get('items') }}</span>
+                        <b-tooltip 
+                                :label="$i18n.get('items')"
+                                position="is-bottom">
+                            <span class="icon">
+                                <i class="mdi mdi-file-multiple"/>
+                            </span>
+                        </b-tooltip>
+                        <!-- <span class="menu-text">{{ $i18n.get('items') }}</span> -->
                     </router-link>
                 </li>
                 <li 
@@ -65,36 +69,49 @@
                             tag="a" 
                             :to="{ path: $routerHelper.getCollectionEditPath(id) }" 
                             :aria-label="$i18n.get('label_settings')">
-                        <span class="icon">
-                            <i class="mdi mdi-settings"/>
-                        </span>
-                        <span class="menu-text">{{ $i18n.get('label_settings') }}</span>
+                        <b-tooltip 
+                                :label="$i18n.get('label_settings')"
+                                position="is-bottom">
+                            <span class="icon">
+                                <i class="mdi mdi-settings"/>
+                            </span>
+                        </b-tooltip>
+                        <!-- <span class="menu-text">{{ $i18n.get('label_settings') }}</span> -->
                     </router-link>
                 </li>
                 <li 
                         :class="activeRoute == 'MetadataList' ? 'is-active':''"
                         class="level-item">
-                    <router-link 
+                    <router-link  
                             tag="a" 
                             :to="{ path: $routerHelper.getCollectionMetadataPath(id) }"
                             :aria-label="$i18n.get('label_collection_metadata')">
-                        <span class="icon">
-                            <i class="mdi mdi-format-list-bulleted-type"/>
-                        </span>
-                        <span class="menu-text">{{ $i18n.getFrom('metadata', 'name') }}</span>
+                        <b-tooltip 
+                                :label="$i18n.getFrom('metadata', 'name')"
+                                position="is-bottom">
+                            <span class="icon">
+                                <i class="mdi mdi-format-list-bulleted-type"/>
+                            </span>
+                        </b-tooltip>
+                        <!-- <span class="menu-text">{{ $i18n.getFrom('metadata', 'name') }}</span> -->
                     </router-link>
                 </li>
                 <li 
                         :class="activeRoute == 'FiltersList' ? 'is-active':''" 
                         class="level-item">
-                    <router-link
+                    <router-link 
                             tag="a" 
                             :to="{ path: $routerHelper.getCollectionFiltersPath(id) }" 
                             :aria-label="$i18n.get('label_collection_filters')">
-                        <span class="icon">
-                            <i class="mdi mdi-filter"/>
-                        </span>
-                        <span class="menu-text">{{ $i18n.getFrom('filters', 'name') }}</span>
+                        <b-tooltip 
+                                animated
+                                :label="$i18n.getFrom('filters', 'name')"
+                                position="is-bottom">
+                            <span class="icon">
+                                <i class="mdi mdi-filter"/>
+                            </span>
+                        </b-tooltip>
+                        <!-- <span class="menu-text">{{ $i18n.getFrom('filters', 'name') }}</span> -->
                     </router-link>
                 </li>
                 <li 
@@ -104,9 +121,14 @@
                             tag="a" 
                             :to="{ path: $routerHelper.getCollectionEventsPath(id) }" 
                             :aria-label="$i18n.get('label_collection_events')">
-                        <activities-icon />
-                        <span class="menu-text">{{ $i18n.get('events') }}</span>
+                        <b-tooltip 
+                                :label="$i18n.get('events')"
+                                position="is-bottom">
+                            <activities-icon />
+                        </b-tooltip>
+                        <!-- <span class="menu-text">{{ $i18n.get('events') }}</span> -->
                     </router-link>
+                   
                 </li>
             
             </ul>
@@ -237,7 +259,6 @@ export default {
         height: $subheader-height;
         max-height: $subheader-height;
         width: 100%;
-        overflow-y: hidden;
         padding-top: 18px;
         padding-bottom: 18px;
         padding-right: $page-side-padding;
@@ -317,6 +338,11 @@ export default {
             // overflow: hidden;
             // max-width: 50px;
 
+            svg.activities-icon {
+                top: 3px;
+                position: relative;
+            }
+
             &.is-active {
                 background-color: $turquoise4;
                 a { 
@@ -355,13 +381,13 @@ export default {
                 color: $gray4;
                 text-align: center;
                 white-space: nowrap;
-                padding: 10px;
+                padding: 9px;
                 min-width: 50px;
                 line-height: 22px;
                 border-radius: 0px;
                 position: relative;
                 align-items: center;
-                display: flex;
+                display: block;
             }
             a:focus{
                 box-shadow: none;
@@ -370,7 +396,7 @@ export default {
                 margin: 0;
                 padding: 0;
                 i {
-                    font-size: 19px !important;
+                    font-size: 18px !important;
                 }
             }
             .menu-text {
@@ -422,6 +448,17 @@ export default {
                     }
                 }
             }
+        }
+
+        .tooltip.is-primary {
+            z-index: 99;
+        }
+        .tooltip.is-primary::after {
+            background-color: $turquoise1;
+            color: $turquoise5;
+        }
+        .tooltip.is-primary::before {
+            border-bottom-color: $turquoise1;
         }
 
     }

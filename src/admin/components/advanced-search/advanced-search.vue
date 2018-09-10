@@ -1,9 +1,15 @@
 <template>
     <div>
         <section
+                style="position: relative;"
                 v-if="!metadata || metadata.length <= 0"
                 class="field is-grouped-centered section">
-            <div class="content has-text-gray has-text-centered">
+            <b-loading
+                    :is-full-page="false"
+                    :active.sync="metadataIsLoading"/>
+            <div
+                    v-if="!metadataIsLoading"
+                    class="content has-text-gray has-text-centered">
                 <p>
                     <b-icon
                             icon="format-list-checks"
@@ -78,10 +84,10 @@
                                 v-else-if="advancedSearchQuery.taxquery[searchCriterion]"
                                 :data="terms"
                                 :value="advancedSearchQuery.taxquery[searchCriterion] &&
-                                 advancedSearchQuery.taxquery[searchCriterion].btags.length > 0 ?
+                                 advancedSearchQuery.taxquery[searchCriterion].btags.length ?
                                  Array.from(new Set(advancedSearchQuery.taxquery[searchCriterion].btags)) : []"
                                 autocomplete
-                                :loading="advancedSearchQuery.taxquery[searchCriterion].isFetching"
+                                :loading="advancedSearchQuery.taxquery[searchCriterion].isFetching == true"
                                 attached
                                 ellipsis
                                 @remove="removeValueOf($event, searchCriterion)"
@@ -213,7 +219,7 @@
 
 <script>
 
-    import { mapActions, mapGetters } from 'vuex';
+    import { mapActions } from 'vuex';
     import { dateInter } from '../../js/mixins.js';
     import moment from 'moment';
 
@@ -221,7 +227,6 @@
         name: "AdvancedSearch",
         mixins: [ dateInter ],
         props: {
-            metadata: Array,
             isRepositoryLevel: false,
             isHeader: false,
             advancedSearchResults: false,
@@ -233,7 +238,39 @@
               this.searchAdvanced();
           }
         },
+        mounted(){
+          this.$root.$on('metadatumUpdated', (isRepositoryLevel) => {
+              if(isRepositoryLevel) {
+                  this.metadataIsLoading = true;
+
+                  this.fetchMetadata({
+                      collectionId: this.isRepositoryLevel ? false : this.$route.params.collectionId,
+                      isRepositoryLevel: this.isRepositoryLevel,
+                      isContextEdit: false,
+                      includeDisabled: false,
+                      isAdvancedSearch: true
+                  }).then((metadata) => {
+                      this.metadata = metadata;
+                      this.metadataIsLoading = false;
+                  });
+              }
+          });
+        },
         created(){
+
+            this.metadataIsLoading = true;
+
+            this.fetchMetadata({
+                collectionId: this.isRepositoryLevel ? false : this.$route.params.collectionId,
+                isRepositoryLevel: this.isRepositoryLevel,
+                isContextEdit: false,
+                includeDisabled: false,
+                isAdvancedSearch: true
+            }).then((metadata) => {
+                this.metadata = metadata;
+                this.metadataIsLoading = false;
+            });
+
             let locale = navigator.language;
 
             moment.locale(locale);
@@ -316,27 +353,31 @@
                 advancedSearchQuery: {
                     advancedSearch: true,
                     metaquery: {},
-                    taxquery: {
-                        isFetching: false,
-                    },
+                    taxquery: {}
                 },
                 termList: [],
                 terms: [],
                 dateMask: this.getDateLocaleMask(),
                 dateFormat: '',
+                metadataIsLoading: false,
+                metadata: [],
             }
         },
         methods: {
             ...mapActions('taxonomy', [
                 'fetchTerms'
             ]),
-            ...mapGetters('taxonomy', [
-                'getTerms'
+            ...mapActions('metadata', [
+                'fetchMetadata'
             ]),
             autoCompleteTerm: _.debounce( function(value, searchCriterion){
+                if(!value){
+                    return;
+                }
+
                 this.termList = [];
                 this.terms = [];
-                this.$set(this.advancedSearchQuery.taxquery[searchCriterion], 'isFetching', true);
+                this.$set(this.advancedSearchQuery.taxquery[searchCriterion], 'isFetching', 1);
 
                 this.fetchTerms({ 
                     taxonomyId: this.advancedSearchQuery.taxquery[searchCriterion].taxonomy_id,
@@ -349,19 +390,21 @@
                     search: { 
                         searchterm: value
                     },
-                    all: false
+                    all: true,
+                    order: 'asc',
+                    offset: 0,
+                    number: 10,
                 }).then((res) => {
                     this.termList = res.terms;
 
                     for(let term in this.termList){
                         this.terms.push(this.termList[term].name);
-                        let i = this.terms.length - 1;
-                        this.termList[term].i = i;
+                        this.termList[term].i = this.terms.length - 1;
                     }
 
-                    this.$set(this.advancedSearchQuery.taxquery[searchCriterion], 'isFetching', false);
+                    this.$set(this.advancedSearchQuery.taxquery[searchCriterion], 'isFetching', 0);
                 }).catch((error) => {
-                    this.$set(this.advancedSearchQuery.taxquery[searchCriterion], 'isFetching', false);
+                    this.$set(this.advancedSearchQuery.taxquery[searchCriterion], 'isFetching', 0);
                     throw error;
                 });
             }, 300),
@@ -437,9 +480,7 @@
                 this.advancedSearchQuery = {
                     advancedSearch: true,
                     metaquery: {},
-                    taxquery: {
-                        isFetching: false,
-                    }
+                    taxquery: {}
                 };
             },
             convertDateToMatchInDB(dateValue){
@@ -532,6 +573,9 @@
                 }
             },
             addToAdvancedSearchQuery(value, type, searchCriterion){
+                if(!value){
+                    return;
+                }
 
                 if(type == 'metadatum'){
                     const criteriaKey = value.split('-');
@@ -546,7 +590,8 @@
                                 field: 'term_id',
                                 operator: 'IN',
                                 originalMeta: value,
-                                taxonomy_id: Number(criteriaKey[1].match(/[\d]+/))
+                                taxonomy_id: Number(criteriaKey[1].match(/[\d]+/)),
+                                isFetching: 0,
                             }
                         });
                     } else {
@@ -621,6 +666,21 @@
                 width: 100% !important;
                 select{
                     width: 100% !important;
+                }
+            }
+        }
+
+        .taginput-container {
+            min-height: 32px !important;
+
+            .tags {
+                margin-bottom: calc(0.275em - 1px) !important;
+
+                .tag {
+                    height: 2em !important;
+                    padding-left: 0.75em !important;
+                    padding-right: 0.75em !important;
+                    margin-right: 0 !important;
                 }
             }
         }

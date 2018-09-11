@@ -209,6 +209,7 @@
                         taxonomy: this.taxonomy,
                         collection_id: this.collection,
                         isTaxonomy: true,
+                        query: this.query
                     },                    
                     events: {
                         appliedCheckBoxModal: (options) => { this. appliedCheckBoxModal(options) }

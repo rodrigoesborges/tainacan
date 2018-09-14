@@ -106,4 +106,38 @@ class Taxonomies extends TAINACAN_UnitTestCase {
 		$this->assertEquals(1, sizeof($terms), 'you should be able to create a term even if the taxonomy is still auto-draft');
 		
 	}
+	
+	/**
+	 * @group rewrite
+	 */
+	function test_rewrite() {
+	    global $wp_rewrite;
+	    
+	    $wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
+	    $wp_rewrite->flush_rules();
+	    
+	    $taxonomy = $this->tainacan_entity_factory->create_entity(
+	        'taxonomy',
+	        array(
+	            'name'         => 'testeRewriteTax',
+	            'description'  => 'teste Rewrite Tax Desc',
+	            'allow_insert' => 'yes',
+	            'status'       => 'publish'
+	        ),
+	        true
+        );
+	    
+	    //$wp_rewrite->flush_rules();
+	    //var_dump($wp_rewrite->rules);
+	    $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite($taxonomy->get_slug(), false));
+	    
+	    /*Test Collection Slug update
+	     $x->set('slug', 'newRewriteSlug');
+	     $x->validate();
+	     $tainacan_collection = $x->get_repository();
+	     $tainacan_collection->update($x);
+	     
+	     $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite('newRewriteSlug', false));
+	     //End: Test Collection Slug update*/
+	}
 }

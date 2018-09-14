@@ -135,6 +135,7 @@ class Taxonomies extends Repository {
 
 		$new_taxonomy = parent::insert( $taxonomy );
 		$new_taxonomy->tainacan_register_taxonomy();
+		Repository::check_rewrite($new_taxonomy->get_slug());
 
 		// return a brand new object
 		return $new_taxonomy;

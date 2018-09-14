@@ -284,7 +284,14 @@ class Collections extends Repository {
 		$this->handle_core_metadata( $new_collection );
 
 		$collection->register_collection_item_post_type();
-		flush_rewrite_rules( false ); // needed to activate items post type archive url
+		//flush_rewrite_rules( false ); // needed to activate items post type archive url
+		$slug = $collection->get_slug();
+		if($slug == '') {
+		    self::check_rewrite($collection->get_db_identifier());
+		} else {
+		    self::check_rewrite($collection->get_slug());
+		}
+		
 		$this->update_moderators( $new_collection );
 
 		return $new_collection;

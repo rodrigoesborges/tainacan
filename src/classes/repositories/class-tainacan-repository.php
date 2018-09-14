@@ -939,6 +939,35 @@ abstract class Repository {
 		
 	}
 	
+	/**
+	 * Check Rewrite rule and flush if needed and asked
+	 * 
+	 * @param string $slug
+	 * @param boolean $flush
+	 * @param boolean $hard
+	 * 
+	 * @return boolean return true if the rewrite already correct
+	 * 
+	 */
+	public static function check_rewrite($slug, $flush = true, $hard = false) {
+	    global $wp_rewrite;
+	    
+	    $rules = $wp_rewrite->rules;
+	    $find = false;
+	    foreach ($rules as $key => $value) {
+	        if (false !== stripos($key, $slug)) { // TODO: check permalink struct
+	            $find = true;
+	            break;
+	        }
+	    }
+	    
+	    if($find === false && $flush) {
+	        $wp_rewrite->flush_rules($hard);
+	    }
+	    
+	    return $find;
+	}
+	
 }
 
 ?>

@@ -127,17 +127,15 @@ class Taxonomies extends TAINACAN_UnitTestCase {
 	        true
         );
 	    
-	    //$wp_rewrite->flush_rules();
-	    //var_dump($wp_rewrite->rules);
 	    $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite($taxonomy->get_slug(), false));
 	    
-	    /*Test Collection Slug update
-	     $x->set('slug', 'newRewriteSlug');
-	     $x->validate();
-	     $tainacan_collection = $x->get_repository();
-	     $tainacan_collection->update($x);
-	     
-	     $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite('newRewriteSlug', false));
-	     //End: Test Collection Slug update*/
+	    //Test Collection Slug update
+	    $taxonomy->set('slug', 'newTaxRewriteSlug');
+	    $taxonomy->validate();
+	    $tainacan_taxonomies = $taxonomy->get_repository();
+	    $tainacan_taxonomies->update($taxonomy);
+        
+        $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite('newTaxRewriteSlug', false));
+        //End: Test Collection Slug update*/
 	}
 }

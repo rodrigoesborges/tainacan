@@ -2,6 +2,8 @@
 
 namespace Tainacan\Tests;
 
+use Respect\Validation\Rules\Slug;
+
 /**
  * Class TestCollections
  *
@@ -345,5 +347,36 @@ class Collections extends TAINACAN_UnitTestCase {
     	$this->assertEquals($diff['description']['old'], 'adasdasdsa');
     	$this->assertEquals([1 => 4, 2 => 5, 0 => 3], $diff['moderators_ids']['diff_with_index']);
     	
+    }
+    
+    /**
+     * @group rewrite
+     */
+    function test_rewrite() {
+        global $wp_rewrite;
+        
+        $wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
+        $wp_rewrite->flush_rules();
+        
+        $x = $this->tainacan_entity_factory->create_entity(
+            'collection',
+            array(
+                'name'				=> 'testeRewrite',
+                'description'		=> 'testeRewriteDesc',
+                'default_order' 	=> 'DESC',
+            ),
+            true
+        );
+        
+        $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite($x->get_db_identifier(), false));
+        
+        //Test Collection Slug update
+        $x->set('slug', 'newRewriteSlug');
+        $x->validate();
+        $tainacan_collection = $x->get_repository();
+        $tainacan_collection->update($x);
+        
+        $this->assertTrue(\Tainacan\Repositories\Repository::check_rewrite('newRewriteSlug', false));
+        //End: Test Collection Slug update
     }
 }

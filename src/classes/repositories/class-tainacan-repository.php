@@ -950,19 +950,25 @@ abstract class Repository {
 	 * 
 	 */
 	public static function check_rewrite($slug, $flush = true, $hard = false) {
+	    /** @var \WP_Rewrite $wp_rewrite **/
 	    global $wp_rewrite;
 	    
 	    $rules = $wp_rewrite->rules;
 	    $find = false;
-	    foreach ($rules as $key => $value) {
-	        if (false !== stripos($key, $slug)) { // TODO: check permalink struct
-	            $find = true;
-	            break;
-	        }
-	    }
-	    
-	    if($find === false && $flush) {
-	        $wp_rewrite->flush_rules($hard);
+	    if(is_array($rules)) { // There is a custom rewrite
+    	    foreach ($rules as $key => $value) {
+    	        if (false !== stripos($key, $slug)) { // TODO: check permalink struct
+    	            $find = true;
+    	            break;
+    	        }
+    	    }
+    	    
+    	    if($find === false && $flush) {
+    	        echo 'flush';
+    	        $wp_rewrite->flush_rules($hard);
+    	    }
+	    } else {
+	        return true;
 	    }
 	    
 	    return $find;

@@ -28,7 +28,7 @@ class Csv extends Type {
 		);
 		
 		$csv = fopen('php://memory', 'w');
-		$this->array_to_csv($response->get_data(), apply_filters('tainacan-exposer-csv', $csv));
+		$this->array_to_csv($this->get_metadata($response->get_data()), apply_filters('tainacan-exposer-csv', $csv));
 		rewind($csv);
 		$ret_csv = stream_get_contents($csv);
 		fclose($csv);
@@ -43,8 +43,23 @@ class Csv extends Type {
 	 * @return string
 	 */
 	protected function array_to_csv( $data, $csv ) {
-		fputcsv($csv, array_keys($data), apply_filters('tainacan-exposer-csv-delimiter', ';') );
-		fputcsv($csv, array_values($data), apply_filters('tainacan-exposer-csv-delimiter', ';') );
+	    if(array_key_exists(0, $data))  {
+	        $keys = array_keys($data[0]);
+	        fputcsv($csv, $keys, apply_filters('tainacan-exposer-csv-delimiter', ';') );
+	        foreach ($data as $item) {
+	            $metadata = array_values($item);
+	            $metadata = array_map(function($x) {
+	                if(is_array($x)) {
+	                    return implode(', ', $x);
+	                }
+	                return $x;
+	            }, $metadata);
+	                fputcsv($csv, $metadata, apply_filters('tainacan-exposer-csv-delimiter', ';') );
+	        }
+	    } else {
+            fputcsv($csv, array_keys($data), apply_filters('tainacan-exposer-csv-delimiter', ';') );
+            fputcsv($csv, array_values($data), apply_filters('tainacan-exposer-csv-delimiter', ';') );
+	    }
 		return $csv;
 	}
 }

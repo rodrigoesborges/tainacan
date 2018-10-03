@@ -334,7 +334,7 @@ class TAINACAN_REST_Exposers extends TAINACAN_UnitApiTestCase {
 	}
 	
 	/**
-	 * @group exposer-type-csv
+	 * @group exposer-type-csv2
 	 */
 	public function test_csv_type() {
 		global $Tainacan_Metadata, $Tainacan_Item_Metadata;
@@ -538,6 +538,54 @@ class TAINACAN_REST_Exposers extends TAINACAN_UnitApiTestCase {
 	        }
 	    }
 	} */// TODO automate test this
+	
+	/**
+	 * @group exposer-type-csv
+	 */
+	public function test_collection_csv_type() {
+	    global $Tainacan_Metadata, $Tainacan_Item_Metadata;
+	    
+	    extract($this->create_meta_requirements());
+	    
+	    $item__metadata_json = json_encode([
+	        'values'       => 'TestCollectionValues_exposers',
+	    ]);
+	    
+	    $request  = new \WP_REST_Request('POST', $this->namespace . '/item/' . $this->item->get_id() . '/metadata/' . $this->metadatum->get_id() );
+	    $request->set_body($item__metadata_json);
+	    
+	    $response = $this->server->dispatch($request);
+	    
+	    $this->assertEquals(200, $response->get_status());
+	    
+	    $item_exposer_json = json_encode([
+	        \Tainacan\Exposers\Exposers::TYPE_PARAM       => 'Csv',
+	    ]);
+	    $request = new \WP_REST_Request('GET', $this->namespace . '/collection/' . $this->collection->get_id(). '/items');
+	    $request->set_body($item_exposer_json);
+	    $response = $this->server->dispatch($request);
+	    $this->assertEquals(200, $response->get_status());
+	    $data = $response->get_data();
+	    
+	    //var_dump($data);
+	    /*$lines = explode(PHP_EOL, $data);
+	    $csv_lines = [];
+	    foreach ($lines as $line) {
+	        $csv_lines[] = str_getcsv($line, ';');
+	    }
+	    array_walk($csv_lines, function(&$a) use ($csv_lines) {
+	        if(count($a) == count($csv_lines[0])) {
+	            $a = array_combine($csv_lines[0], $a);
+	        } else {
+	            
+	        }
+	    });
+	        array_shift($csv_lines);
+	        $this->assertEquals('adasdasdsa', $csv_lines[0]['Description']);
+	        $this->assertEquals('TestValues_exposers', $csv_lines[0]['teste_Expose']);
+	        $this->assertEquals('item_teste_Expose', $csv_lines[0]['Title']);
+	    */
+	}
 	
 }
 

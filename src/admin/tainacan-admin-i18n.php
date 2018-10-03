@@ -229,6 +229,7 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'label_edit_selected_collections'                => __( 'Edit selected collections', 'tainacan' ),
 	'label_delete_permanently'                       => __( 'Delete permanently', 'tainacan' ),
 	'label_send_to_trash'                            => __( 'Send to trash', 'tainacan' ),
+    'label_export'                                   => __( 'Export selected', 'tainacan' ),
 	'label_delete_selected_taxonomies'               => __( 'Delete selected taxonomies', 'tainacan' ),
 	'label_edit_selected_items'                      => __( 'Edit selected items', 'tainacan' ),
 	'label_edit_selected_taxonomies'                 => __( 'Edit selected taxonomies', 'tainacan' ),

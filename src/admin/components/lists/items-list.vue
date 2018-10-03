@@ -45,6 +45,11 @@
                             id="item-delete-selected-items">
                         {{ isOnTrash ? $i18n.get('label_delete_permanently') : $i18n.get('label_send_to_trash') }}
                     </b-dropdown-item>
+                    <b-dropdown-item
+                            @click="exportSelectedItemsModal()"
+                            id="item-export-selected-items">
+                        {{ $i18n.get('label_export') }}
+                    </b-dropdown-item>
                 </b-dropdown>
             </div>
         </div>
@@ -559,6 +564,7 @@
 import { mapActions } from 'vuex';
 import CustomDialog from '../other/custom-dialog.vue';
 import BulkEditionModal from '../bulk-edition/bulk-edition-modal.vue';
+import BulkExposeModal from '../expose/bulk-expose-modal.vue';
 
 export default {
     name: 'ItemsList',
@@ -625,6 +631,20 @@ export default {
             this.$modal.open({
                 parent: this,
                 component: BulkEditionModal,
+                props: {
+                    modalTitle: this.$i18n.get('info_editing_items_in_bulk'),
+                    totalItems: Object.keys(this.queryAllItemsSelected).length ? this.totalItems : this.selectedItemsIDs.filter(item => item !== false).length,
+                    selectedForBulk: Object.keys(this.queryAllItemsSelected).length ? this.queryAllItemsSelected : this.selectedItemsIDs.filter(item => item !== false),
+                    objectType: this.$i18n.get('items'),
+                    collectionID: this.$route.params.collectionId,
+                },
+                width: 'calc(100% - 8.333333333%)',
+            });
+        },
+        exportSelectedItemsModal(){
+            this.$modal.open({
+                parent: this,
+                component: BulkExposeModal,
                 props: {
                     modalTitle: this.$i18n.get('info_editing_items_in_bulk'),
                     totalItems: Object.keys(this.queryAllItemsSelected).length ? this.totalItems : this.selectedItemsIDs.filter(item => item !== false).length,

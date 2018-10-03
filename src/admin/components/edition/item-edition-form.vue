@@ -8,7 +8,16 @@
                 @click="isMetadataColumnCompressed = !isMetadataColumnCompressed">
             <b-icon :icon="isMetadataColumnCompressed ? 'menu-left' : 'menu-right'" />
         </button>
-        <tainacan-title />
+        <div class="tainacan-page-title">
+            <h1 v-if="isCreatingNewItem">{{ $i18n.get('title_create_item_collection') + ' ' }}<span style="font-weight: 600;">{{ collectionName }}</span></h1>
+            <h1 v-else>{{ $i18n.get('title_edit_item') + ' ' }}<span style="font-weight: 600;">{{ (item != null && item != undefined) ? item.title : '' }}</span></h1>
+            <a 
+                    @click="$router.go(-1)"
+                    class="back-link has-text-secondary">
+                {{ $i18n.get('back') }}
+            </a>
+            <hr>
+        </div>
         <form
                 v-if="!isLoading"
                 class="tainacan-form"
@@ -312,7 +321,7 @@
                             v-html="formHooks['item']['end-left'].join('')"/>
                     </template>
 
-                </div>
+                </div> 
                 <div 
                         class="column is-4-5"
                         v-show="!isMetadataColumnCompressed">
@@ -489,8 +498,9 @@ export default {
         return {
             pageTitle: '',
             itemId: Number,
-            item: null,
+            item: {},
             collectionId: Number,
+            isCreatingNewItem: false,
             isLoading: false,
             isMetadataColumnCompressed: false,
             metadatumCollapses: [],
@@ -837,6 +847,7 @@ export default {
         this.form.collectionId = this.collectionId;
 
         if (this.$route.fullPath.split("/").pop() == "new") {
+            this.isCreatingNewItem = true;
             this.createNewItem();
         } else if (this.$route.fullPath.split("/").pop() == "edit") {
             this.isLoading = true;
@@ -933,10 +944,10 @@ export default {
     @import '../../scss/_variables.scss';
 
     #metadata-column-compress-button {
-        position: relative;
+        position: absolute;
         z-index: 99;
-        float: right;
-        top: 70px;
+        right: 0;
+        top: 148px;
         max-width: 36px;
         height: 36px;
         width: 36px;
@@ -962,8 +973,33 @@ export default {
         }
 
         .tainacan-page-title {
-            padding-left: $page-side-padding;
-            padding-right: $page-side-padding;
+            padding: 0 $page-side-padding;
+            margin-bottom: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            h1, h2 {
+                font-size: 20px;
+                font-weight: 500;
+                color: $gray5;
+                display: inline-block;
+                width: 80%;
+                flex-shrink: 1;
+                flex-grow: 1;
+            }
+            a.back-link{
+                font-weight: 500;
+                float: right;
+                margin-top: 5px;
+            }
+            hr{
+                margin: 3px 0px 4px 0px; 
+                height: 1px;
+                background-color: $secondary;
+                width: 100%;
+            }
         }
 
         .column.is-5-5 {

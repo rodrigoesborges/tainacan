@@ -8,7 +8,15 @@
                 @click="isMetadataColumnCompressed = !isMetadataColumnCompressed">
             <b-icon :icon="isMetadataColumnCompressed ? 'menu-left' : 'menu-right'" />
         </button>
-        <tainacan-title/>
+        <div class="tainacan-page-title">
+            <h1>{{ $i18n.get('title_item_page') + ' ' }}<span style="font-weight: 600;">{{ (item != null && item != undefined) ? item.title : '' }}</span></h1>
+            <a 
+                    @click="$router.go(-1)"
+                    class="back-link has-text-secondary">
+                {{ $i18n.get('back') }}
+            </a>
+            <hr>
+        </div>
         <div class="tainacan-form">
             <div class="columns">
                 <div class="column is-5-5">
@@ -256,12 +264,12 @@
                                 <div
                                         v-if="metadatum.date_i18n"
                                         class="content">
-                                    <p v-html="metadatum.date_i18n"/>
+                                    <p v-html="metadatum.date_i18n != '' ? metadatum.date_i18n : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`"/>
                                 </div>
                                 <div
                                         v-else
                                         class="content">
-                                    <p v-html="metadatum.value_as_html"/>
+                                    <p v-html="metadatum.value_as_html != '' ? metadatum.value_as_html : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`"/>
                                 </div>
                             </b-collapse>
                         </div>
@@ -298,7 +306,7 @@
 </template>
 
 <script>
-    import {mapActions, mapGetters} from 'vuex'
+    import {mapActions, mapGetters} from 'vuex';
     import FileItem from '../../components/other/file-item.vue';
     import DocumentItem from '../../components/other/document-item.vue';
     import { formHooks } from '../../js/mixins';
@@ -433,10 +441,10 @@
     @import '../../scss/_variables.scss';
 
     #metadata-column-compress-button {
-        position: relative;
+        position: absolute;
         z-index: 99;
-        float: right;
-        top: 70px;
+        right: 0;
+        top: 148px;
         max-width: 36px;
         height: 36px;
         width: 36px;
@@ -462,8 +470,33 @@
         }
 
         .tainacan-page-title {
-            padding-left: $page-side-padding;
-            padding-right: $page-side-padding;
+            padding: 0 $page-side-padding;
+            margin-bottom: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            h1, h2 {
+                font-size: 20px;
+                font-weight: 500;
+                color: $gray5;
+                display: inline-block;
+                width: 80%;
+                flex-shrink: 1;
+                flex-grow: 1;
+            }
+            a.back-link{
+                font-weight: 500;
+                float: right;
+                margin-top: 5px;
+            }
+            hr{
+                margin: 3px 0px 4px 0px; 
+                height: 1px;
+                background-color: $secondary;
+                width: 100%;
+            }
         }
 
         .tainacan-form>.columns {
@@ -495,9 +528,9 @@
                 width: 100%;
             }
         }
-            .collapse .collapse-content {
-                margin-left: 30px; 
-            }
+        .collapse .collapse-content {
+            margin-left: 30px; 
+        }
     }
 
     .field {

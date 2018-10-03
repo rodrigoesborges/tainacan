@@ -45,7 +45,7 @@
             float: right;
             top: -5px;
             padding-right: 12px;
-            width: 80px;
+            //width: 80px;
             display: flex;
             justify-content: space-between;
             visibility: hidden;
@@ -103,6 +103,7 @@
 
         .media {
             width: 100%;
+            display: flex;
 
             .list-metadata {
                 padding: 25px;

@@ -1,7 +1,7 @@
 <template>
     <div>
         <section
-                style="position: relative;"
+                :style="{ position: relative }"
                 v-if="!metadata || metadata.length <= 0"
                 class="field is-grouped-centered section">
             <b-loading
@@ -144,7 +144,7 @@
                     class="field column is-12">
                 <a
                     @click="addSearchCriteria"
-                    style="font-size: 12px;">
+                    style="font-size: 0.75rem;">
                     <b-icon
                             class="add-i"
                             icon="plus-circle"
@@ -175,7 +175,8 @@
                                 @close="removeThis(searchCriterion)"
                                 attached 
                                 closable>
-                                {{ Array.isArray(advancedSearchQuery.taxquery[searchCriterion].terms) ?
+                                {{ Array.isArray(advancedSearchQuery.taxquery[searchCriterion].terms) &&
+                                advancedSearchQuery.taxquery[searchCriterion].btags ?
                                  advancedSearchQuery.taxquery[searchCriterion].btags.toString() :
                                   advancedSearchQuery.taxquery[searchCriterion].btags }}
                         </b-tag>
@@ -232,6 +233,7 @@
             advancedSearchResults: false,
             openFormAdvancedSearch: false,
             isDoSearch: false,
+            collectionId: ''
         },
         watch: {
           isDoSearch(){
@@ -244,7 +246,7 @@
                   this.metadataIsLoading = true;
 
                   this.fetchMetadata({
-                      collectionId: this.isRepositoryLevel ? false : this.$route.params.collectionId,
+                      collectionId: this.isRepositoryLevel ? false : this.collectionId,
                       isRepositoryLevel: this.isRepositoryLevel,
                       isContextEdit: false,
                       includeDisabled: false,
@@ -261,7 +263,7 @@
             this.metadataIsLoading = true;
 
             this.fetchMetadata({
-                collectionId: this.isRepositoryLevel ? false : this.$route.params.collectionId,
+                collectionId: this.isRepositoryLevel ? false : this.collectionId,
                 isRepositoryLevel: this.isRepositoryLevel,
                 isContextEdit: false,
                 includeDisabled: false,
@@ -644,6 +646,10 @@
 
     @import '../../scss/_variables.scss';
 
+    .loading-overlay {
+        min-height: 200px;
+    }
+
     .padding-in-header {
         padding-right: 3.3%;
         padding-left: 3.7%;
@@ -744,12 +750,12 @@
 
         .advanced-search-text {
             margin: 0 12px;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: $blue5;
         }
 
         .advanced-search-text-di {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 500;
             color: #01295c;
             margin-top: 4px;

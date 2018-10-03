@@ -1,3 +1,4 @@
+import qs from 'qs';
 import { tainacan as axios } from '../../js/axios/axios';
 
 export const filter_type_mixin = {
@@ -17,20 +18,25 @@ export const filter_type_mixin = {
         query: {}
     },
     methods: {
-        getValuesPlainText(metadatumId, search, isRepositoryLevel, valuesToIgnore, offset, number, isInCheckboxModal) {
+        getValuesPlainText(metadatumId, search, isRepositoryLevel, valuesToIgnore, offset, number, isInCheckboxModal, getSelected = '0') {
+            let query_items = { 'current_query': this.query };
 
-            let url = `/collection/${this.collection}/metadata/${metadatumId}?fetch=all_metadatum_values`;
+            let url = `/collection/${this.collection}/facets/${metadatumId}?getSelected=${getSelected}&`;
 
             if(offset != undefined && number != undefined){
-                url += `&offset=${offset}&number=${number}`;
+                url += `offset=${offset}&number=${number}&`;
             }
 
             if(isRepositoryLevel){
-                url = `/metadata/${metadatumId}?fetch=all_metadatum_values`;
+                url = `/facets/${metadatumId}`;
             }
 
-            if(search){
-                url += `&search=${search}`;
+            if(search && offset != undefined && number != undefined){
+                url += `search=${search}&` + qs.stringify(query_items);
+            } else if(search){
+                url += `search=${search}&` + qs.stringify(query_items);
+            } else {
+                url += qs.stringify(query_items, { addQueryPrefix: true });
             }
 
             return axios.get(url)
@@ -40,34 +46,32 @@ export const filter_type_mixin = {
 
                     for (let metadata of res.data) {
                         if (valuesToIgnore != undefined && valuesToIgnore.length > 0) {
-                            let indexToIgnore = valuesToIgnore.findIndex(value => value == metadata.mvalue);
+                            let indexToIgnore = valuesToIgnore.findIndex(value => value == metadata.value);
 
                             if (search && isInCheckboxModal) {
                                 sResults.push({
-                                    label: metadata.mvalue,
-                                    value: metadata.mvalue
+                                    label: metadata.label,
+                                    value: metadata.value
                                 });
                             } else if (indexToIgnore < 0) {
                                 opts.push({
-                                    label: metadata.mvalue,
-                                    value: metadata.mvalue
+                                    label: metadata.label,
+                                    value: metadata.value
                                 });
                             }
                         } else {
                             if (search && isInCheckboxModal) {
                                 sResults.push({
-                                    label: metadata.mvalue,
-                                    value: metadata.mvalue
+                                    label: metadata.label,
+                                    value: metadata.value
                                 });
                             } else {
                                 opts.push({
-                                    label: metadata.mvalue,
-                                    value: metadata.mvalue
+                                    label: metadata.label,
+                                    value: metadata.value
                                 });
                             }
                         }
-
-
                     }
 
 
@@ -84,7 +88,7 @@ export const filter_type_mixin = {
                     }
 
                     if (this.filter.max_options && this.options.length >= this.filter.max_options) {
-                        let seeMoreLink = `<a style="font-size: 12px;"> ${ this.$i18n.get('label_view_all') } </a>`;
+                        let seeMoreLink = `<a style="font-size: 0.75rem;"> ${ this.$i18n.get('label_view_all') } </a>`;
 
                         if(this.options.length === this.filter.max_options){
                             this.options[this.filter.max_options-1].seeMoreLink = seeMoreLink;
@@ -98,11 +102,12 @@ export const filter_type_mixin = {
                     this.$console.error(error);
                 });
         },
-        getValuesRelationship(collectionTarget, search, valuesToIgnore, offset, number, isInCheckboxModal) {
-            let url = '/collection/' + collectionTarget + '/items?';
+        getValuesRelationship(collectionTarget, search, valuesToIgnore, offset, number, isInCheckboxModal, getSelected = '0') {
+            let query_items = { 'current_query': this.query };
+            let url = '/collection/' + this.filter.collection_id + '/facets/' + this.filter.metadatum.metadatum_id + `?getSelected=${getSelected}&`;
 
             if(offset != undefined && number != undefined){
-                url += `offset=${offset}&perpage=${number}`;
+                url += `offset=${offset}&number=${number}`;
             } else {
                 url += `nopaging=1`
             }
@@ -111,7 +116,7 @@ export const filter_type_mixin = {
                 url += `&search=${search}`;
             }
 
-            return axios.get(url + '&fetch_only[0]=thumbnail&fetch_only[1]=title&fetch_only[2]=id')
+            return axios.get(url + '&fetch_only[0]=thumbnail&fetch_only[1]=title&fetch_only[2]=id&' + qs.stringify(query_items))
                 .then(res => {
                     let sResults = [];
                     let opts = [];
@@ -119,32 +124,32 @@ export const filter_type_mixin = {
                     if (res.data.length > 0) {
                         for (let item of res.data) {
                             if (valuesToIgnore != undefined && valuesToIgnore.length > 0) {
-                                let indexToIgnore = valuesToIgnore.findIndex(value => value == item.id);
+                                let indexToIgnore = valuesToIgnore.findIndex(value => value == item.value);
 
                                 if (search && isInCheckboxModal) {
                                     sResults.push({
-                                        label: metadata.mvalue,
-                                        value: metadata.mvalue
+                                        label: item.label,
+                                        value: item.value
                                     });
                                 } else if (indexToIgnore < 0) {
                                     opts.push({
-                                        label: item.title,
-                                        value: item.id,
-                                        img: (item.thumbnail.thumb ? item.thumbnail.thumb : this.thumbPlaceholderPath)
+                                        label: item.label,
+                                        value: item.value,
+                                        img: (item.img ? item.img : this.thumbPlaceholderPath)
                                     });
                                 }
                             } else {
                                 if (search && isInCheckboxModal) {
                                     sResults.push({
-                                        label: item.title,
-                                        value: item.id,
-                                        img: (item.thumbnail.thumb ? item.thumbnail.thumb : this.thumbPlaceholderPath)
+                                        label: item.label,
+                                        value: item.value,
+                                        img: (item.img ? item.img : this.thumbPlaceholderPath)
                                     });
                                 } else {
                                     opts.push({
-                                        label: item.title,
-                                        value: item.id,
-                                        img: (item.thumbnail.thumb ? item.thumbnail.thumb : this.thumbPlaceholderPath)
+                                        label: item.label,
+                                        value: item.value,
+                                        img: (item.img ? item.img : this.thumbPlaceholderPath)
                                     });
                                 }
                             }
@@ -164,7 +169,7 @@ export const filter_type_mixin = {
                     }
 
                     if (this.filter.max_options && this.options.length >= this.filter.max_options) {
-                        let seeMoreLink = `<a style="font-size: 12px;"> ${ this.$i18n.get('label_view_all') } </a>`;
+                        let seeMoreLink = `<a style="font-size: 0.75rem;"> ${ this.$i18n.get('label_view_all') } </a>`;
 
                         if(this.options.length === this.filter.max_options){
                             this.options[this.filter.max_options-1].seeMoreLink = seeMoreLink;

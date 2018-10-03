@@ -2,7 +2,9 @@
     <div>
         <div class="page-container repository-level-page">
             <tainacan-title />
-            <b-tabs v-model="activeTab">    
+            <b-tabs 
+                    @change="onChangeTab($event)"
+                    v-model="tabIndex">    
                 <b-tab-item :label="$i18n.get('taxonomy')">
                     <form 
                             v-if="taxonomy != null && taxonomy != undefined" 
@@ -93,20 +95,19 @@
                         </b-field>
 
                         <!-- Allow Insert -->
-                        <b-field 
-                                :addons="false"
-                                :label="$i18n.get('label_taxonomy_allow_new_terms')">
-                            <help-button 
-                                :title="$i18n.getHelperTitle('taxonomies', 'allow_insert')" 
-                                :message="$i18n.getHelperMessage('taxonomies', 'allow_insert')"/>
-                            <div class="block" >
-                                <b-checkbox
-                                        v-model="form.allowInsert"
-                                        true-value="yes"
-                                        false-value="no">
-                                    {{ labelNewTerms() }}
-                                </b-checkbox>
-                            </div>
+                        <b-field :addons="false">
+                            <label class="label is-inline">
+                                    {{ $i18n.get('label_taxonomy_allow_new_terms') }}
+                                    <b-switch
+                                            id="tainacan-checkbox-allow-insert" 
+                                            size="is-small"
+                                            v-model="form.allowInsert"
+                                            true-value="yes"
+                                            false-value="no" />
+                                    <help-button 
+                                        :title="$i18n.getHelperTitle('taxonomies', 'allow_insert')" 
+                                        :message="$i18n.getHelperMessage('taxonomies', 'allow_insert')"/>
+                                </label>
                         </b-field>
 
                         <!-- Hook for extra Form options -->
@@ -164,7 +165,7 @@
         data(){
             return {
                 taxonomyId: String,
-                activeTab: 0,
+                tabIndex: 0,
                 taxonomy: null,
                 isLoadingTaxonomy: false,
                 isUpdatingSlug: false,
@@ -237,6 +238,14 @@
             ...mapGetters('taxonomy',[
                 'getTaxonomy',
             ]),
+            onChangeTab(tab) {
+                this.tabIndex = tab;
+                if (this.tabIndex == 1) {
+                    this.$router.push({query: {tab: 'terms'}});
+                } else {
+                    this.$router.push({query: {}});
+                }
+            },
             onSubmit() {
 
                 this.isLoadingTaxonomy = true;
@@ -349,9 +358,12 @@
         },
         mounted(){
   
-            if (this.$route.fullPath.split("/").pop() === "new") {
+            if (this.$route.query.tab == 'terms')
+                this.tabIndex = 1;
+
+            if (this.$route.path.split("/").pop() === "new") {
                 this.createNewTaxonomy();
-            } else if (this.$route.fullPath.split("/").pop() === "edit" || this.$route.fullPath.split("/").pop() === "terms") {
+            } else if (this.$route.path.split("/").pop() === "edit") {
 
                 this.isLoadingTaxonomy = true;
 
@@ -377,9 +389,6 @@
 
                     this.isLoadingTaxonomy = false;
                 });
-
-                if (this.$route.fullPath.split("/").pop() === "terms") 
-                    this.activeTab = 1;
             }
         }
     }

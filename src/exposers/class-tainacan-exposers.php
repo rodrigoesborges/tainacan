@@ -18,6 +18,8 @@ class Exposers {
 	const MAPPER_CLASS_PREFIX = 'Tainacan\Exposers\Mappers\\';
 	const MAPPER_PARAM = 'mapper';
 	const TYPE_PARAM = 'exposer';
+	const ITEMS_LIMIT = 500;
+	const ITEMS_LIMIT_LOGGED = 500;
 	
 	public static function get_instance() {
 		if ( ! isset( self::$instance ) ) {
@@ -430,6 +432,10 @@ class Exposers {
 	    $mappers = $Tainacan_Exposers->get_mappers(\OBJECT);
 	    $types = $Tainacan_Exposers->get_types(\OBJECT);
 	    $urls = [];
+	    if(strpos($base_url, 'http') === false) {
+	        if( strpos($base_url, '/') !== 0 ) $base_url = '/'.$base_url;
+	        $base_url = esc_url_raw( rest_url() ) . TAINACAN_REST_NAMESPACE . $base_url; 
+	    }
 	    foreach ($types as $type) {
 	        $url = $base_url.(strpos($base_url, '?') === false ? '?' : '&').self::TYPE_PARAM.'='.$type->slug;
 	        $urls[$type->slug] = [$url];

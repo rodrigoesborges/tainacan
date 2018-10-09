@@ -33,7 +33,9 @@ class REST_Exposer_Controller extends REST_Controller {
 	 */
 	public function get_urls( $request ) {
 		$Tainacan_Exposers = \Tainacan\Exposers\Exposers::get_instance();
-		$params = json_decode($request->get_body(), true);
+		
+		$params = $this->get_request_params($request);
+		
 		$base_url = $params['baseurl'];
 		
 		$prepared = $Tainacan_Exposers->get_exposer_urls($base_url);
@@ -47,11 +49,26 @@ class REST_Exposer_Controller extends REST_Controller {
 	 * @return bool|\WP_Error
 	 */
 	public function get_urls_permissions_check( $request ) {
-	    $params = json_decode($request->get_body(), true);
-	    if( array_key_exists('baseurl', $params) && !empty($params['baseurl'])) {
+	    $params = $this->get_request_params($request);
+	    
+	    if( is_array($params) && array_key_exists('baseurl', $params) && !empty($params['baseurl'])) {
 	        return true;
 	    }
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @param \WP_REST_Request $request
+	 * @return array
+	 */
+	protected function get_request_params($request) {
+	    $params = $request->get_params();
+	    $boby_params = json_decode($request->get_body(), true);
+	    if(is_array($boby_params)) {
+	        $params = array_merge($params, $boby_params);
+	    }
+	    return $params;
 	}
 	
 }

@@ -53,7 +53,7 @@
                     <b-dropdown-item
                             @click="exportSelectedItemsModal()"
                             id="item-export-selected-items">
-                        {{ $i18n.get('label_export') }}
+                        {{ $i18n.get('label_exposer') }}
                     </b-dropdown-item>
                     <b-dropdown-item
                             v-if="collectionId && isOnTrash"
@@ -746,7 +746,7 @@ export default {
                 parent: this,
                 component: ExposeModal,
                 props: {
-                    modalTitle: this.$i18n.get('info_editing_items_in_bulk'),
+                    modalTitle: this.$i18n.get('info_exposing_items'),
                     totalItems: Object.keys(this.queryAllItemsSelected).length ? this.totalItems : this.selectedItemsIDs.filter(item => item !== false).length,
                     selectedForBulk: Object.keys(this.queryAllItemsSelected).length ? this.queryAllItemsSelected : this.selectedItemsIDs.filter(item => item !== false),
                     objectType: this.$i18n.get('items'),

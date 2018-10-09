@@ -587,6 +587,25 @@ class TAINACAN_REST_Exposers extends TAINACAN_UnitApiTestCase {
 	    */
 	}
 	
+	/**
+	 * @group exposer_urls
+	 */
+	public function test_get_exposer_urls() {
+	    $url_json = json_encode([
+	        'baseurl'       => 'http://example.com/?id=10',
+	    ]);
+	    $request  = new \WP_REST_Request('GET', $this->namespace . '/exposers/urls');
+	    $request->set_body($url_json);
+        $response = $this->server->dispatch($request);
+	    $this->assertEquals(200, $response->get_status());
+	    
+	    $data = $response->get_data();
+	    
+	    $Tainacan_Exposers = \Tainacan\Exposers\Exposers::get_instance();
+	    $types = $Tainacan_Exposers->get_types();
+	    $this->assertEquals(count($types), count($data));
+	}
+	
 }
 
 ?>

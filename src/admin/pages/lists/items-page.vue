@@ -109,6 +109,14 @@
                     </router-link>
                 </div>
             </section>
+            <section
+                    class="is-grouped-centered section">
+                <button
+                        @click="exportFilterModal()"
+                        id="export-filtered-items">
+                    {{ $i18n.get('label_expose') }}
+                </button>
+            </section>
 
         </aside>
         <!-- </transition> -->
@@ -697,6 +705,7 @@
     import AvailableImportersModal from '../../components/other/available-importers-modal.vue';
     import CollectionsModal from '../../components/other/collections-modal.vue';
     import { mapActions, mapGetters } from 'vuex';
+    import ExposeModal from '../../components/expose/expose-modal.vue';
 
     export default {
         name: 'ItemsPage',
@@ -1140,7 +1149,22 @@
                         this.searchControlHeight = this.$refs['search-control'] ? this.$refs['search-control'].clientHeight + this.$refs['search-control'].offsetTop : 0;
                     this.isFiltersMenuCompressed = jQuery(window).width() <= 768;
                 });
-            }
+            },
+            exportFilterModal(){
+                this.$modal.open({
+                    parent: this,
+                    component: ExposeModal,
+                    props: {
+                        modalTitle: this.$i18n.get('info_exposing_items'),
+                        totalItems: this.totalItems,
+                        selectedForBulk: [],
+                        objectType: this.$i18n.get('items'),
+                        collectionID: this.collectionId,
+                        baseurl: '/collection/' + this.collectionId +'/items' + window.location.hash.substr(1)
+                    },
+                    width: 'calc(100% - 8.333333333%)',
+                });
+            },
         },
         created() {
             

@@ -232,6 +232,7 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'label_delete_permanently'                       => __( 'Delete permanently', 'tainacan' ),
 	'label_send_to_trash'                            => __( 'Send to trash', 'tainacan' ),
     'label_export'                                   => __( 'Export selected', 'tainacan' ),
+    'label_expose'                                   => __( 'Expose items', 'tainacan' ),
 	'label_delete_selected_taxonomies'               => __( 'Delete selected taxonomies', 'tainacan' ),
 	'label_edit_selected_items'                      => __( 'Edit selected items', 'tainacan' ),
 	'label_edit_selected_taxonomies'                 => __( 'Edit selected taxonomies', 'tainacan' ),
@@ -457,6 +458,7 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'info_no_parent_term_found'                      => __( 'No valid parent term was found with this name.', 'tainacan' ),
 	'info_warning_changing_parent_term'              => __( 'Warning! Changing parent term will reload the terms list, thus uncheking any selection.', 'tainacan' ),
 	'info_warning_selected_items_remove_from_trash'  => __( 'Do you really want to remove from trash the selected items?', 'tainacan'),
+    'info_exposing_items'                            => __( 'Exposing filtered Items', 'tainacan'),
 
 	// Tainacan Metadatum Types
 	'tainacan-text'                                  => __( 'Text', 'tainacan' ),

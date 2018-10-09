@@ -655,7 +655,7 @@
 import { mapActions, mapGetters } from 'vuex';
 import CustomDialog from '../other/custom-dialog.vue';
 import BulkEditionModal from '../bulk-edition/bulk-edition-modal.vue';
-import BulkExposeModal from '../expose/bulk-expose-modal.vue';
+import ExposeModal from '../expose/expose-modal.vue';
 
 export default {
     name: 'ItemsList',
@@ -744,13 +744,14 @@ export default {
         exportSelectedItemsModal(){
             this.$modal.open({
                 parent: this,
-                component: BulkExposeModal,
+                component: ExposeModal,
                 props: {
                     modalTitle: this.$i18n.get('info_editing_items_in_bulk'),
                     totalItems: Object.keys(this.queryAllItemsSelected).length ? this.totalItems : this.selectedItemsIDs.filter(item => item !== false).length,
                     selectedForBulk: Object.keys(this.queryAllItemsSelected).length ? this.queryAllItemsSelected : this.selectedItemsIDs.filter(item => item !== false),
                     objectType: this.$i18n.get('items'),
                     collectionID: this.$route.params.collectionId,
+                    baseurl: ''
                 },
                 width: 'calc(100% - 8.333333333%)',
             });

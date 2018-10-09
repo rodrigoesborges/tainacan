@@ -2,10 +2,10 @@ import axios from '../../../axios/axios';
 
 export const fetchExposersUrls = ({ commit }, { baseurl }) => {
     return new Promise((resolve, reject) => {
-        var param = {
+        let params = {
             baseurl: baseurl
         };
-        axios.tainacan.get('/exposers/urls', param)
+        axios.tainacan.get('/exposers/urls', {params: params})
             .then((res) => {
                 let exposersUrls = res.data;
                 commit('setExposersUrls', exposersUrls);

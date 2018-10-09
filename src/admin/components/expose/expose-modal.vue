@@ -11,8 +11,8 @@
         <div class="tainacan-form">
             <!-- Exposers --------------------------------------------- -->
             <div>
-                <b-loading :active.sync="isLoadingMetadatumMappers"/>
-                <div v-if="!isLoadingMetadatumMappers">
+                <b-loading :active.sync="isLoadingExposerUrls"/>
+                <div v-if="!isLoadingExposerUrls">
                     <a
                             class="collapse-all"
                             @click="urls_open = !urls_open">
@@ -23,10 +23,12 @@
                     </a>
                     <div>
                         <div
-                                v-for="(exposer, index) of selectedForBulk[0].exposer_urls"
+                                v-for="(exposer, index) of exposer_urls"
                                 :key="index"
                                 class="field">
-                            <b-collapse :open="urls_open">
+                            <b-collapse
+                                    :open="urls_open"
+                                    class="show">
                                 <label
                                         class="label"
                                         slot="trigger"
@@ -62,45 +64,39 @@
                         {{ $i18n.get('close') }}
                     </button>
                 </p>
-                <p class="control">
-                    <button
-                            class="button is-turquoise5">
-                            {{ $i18n.get('new_action') }}
-                    </button>
-                    <button
-                            class="button is-success"
-                            type="button"
-                            @click="$eventBusSearch.loadItems(); $parent.close();">
-                        {{ $i18n.get('finish') }}
-                    </button>
-                </p>
             </footer>
         </div>
     </div>
 </template>
 
 <script>
-    import { mapActions } from 'vuex';
+    import { mapActions, mapGetters } from 'vuex';
 
     export default {
-        name: "BulkExposeModal",
+        name: "ExposeModal",
         props: {
             modalTitle: String,
             totalItems: Array,
             objectType: String,
             selectedForBulk: Object,
             collectionID: Number,
+            baseurl: String
         },
         created(){
-            this.isLoadingMetadatumMappers = true;
+            this.isLoadingExposerUrls = true;
             this.fetchMetadatumMappers()
             .then(() => {
-                this.isLoadingMetadatumMappers = false;
+                this.fetchExposersUrls({baseurl: this.baseurl})
+                .then(() => {
+                    this.isLoadingExposerUrls = false;
+                })
+                .catch(() => {
+                    this.isLoadingExposerUrls = false;
+                });
             })
             .catch(() => {
-                this.isLoadingMetadatumMappers = false;
+                this.isLoadingExposerUrls = false;
             });
-            console.log(JSON.stringify(this.selectedForBulk));
         },
         computed: {
             metadatum_mappers: {
@@ -108,15 +104,30 @@
                     return this.getMetadatumMappers();
                 }
             },
+            exposer_urls: {
+                get() {
+                    return this.getExposersUrls();
+                }
+            }
         },
         data() {
             return {
-                isLoadingMetadatumMappers: false,
+                isLoadingExposerUrls: false,
+                urls_open: false,
             }
         },
         methods: {
             ...mapActions('metadata', [
                 'fetchMetadatumMappers',
+            ]),
+            ...mapActions('exposer', [
+                'fetchExposersUrls'
+            ]),
+            ...mapGetters('exposer',[
+                'getExposersUrls'
+            ]),
+            ...mapGetters('metadata',[
+                'getMetadatumMappers'
             ]),
             extractExposerLabel(urlString, typeSlug) {
                 var url = new URL(urlString);

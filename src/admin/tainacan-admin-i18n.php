@@ -31,6 +31,7 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'mapping'                                        => __( 'Mapping', 'tainacan' ),
 	'importers'                                      => __( 'Importers', 'tainacan' ),
 	'processes'                                      => __( 'Processes', 'tainacan' ),
+	'sequence'                                       => __( 'Sequence', 'tainacan' ),
 
 	// Actions
 	'close'                                          => __( 'Close', 'tainacan' ),
@@ -44,6 +45,7 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'remove_value'                                   => __( 'Remove value', 'tainacan' ),
 	'save'                                           => __( 'Save', 'tainacan' ),
 	'next'                                           => __( 'Next', 'tainacan' ),
+	'previous'                                       => __( 'Previous', 'tainacan' ),
 	'back'                                           => __( 'Back', 'tainacan' ),
 	'exit'                                           => __( 'Exit', 'tainacan' ),
 	'see'                                            => __( 'View', 'tainacan' ),
@@ -234,7 +236,8 @@ return apply_filters( 'tainacan-admin-i18n', [
     'label_export'                                   => __( 'Export selected', 'tainacan' ),
     'label_expose'                                   => __( 'Expose items', 'tainacan' ),
 	'label_delete_selected_taxonomies'               => __( 'Delete selected taxonomies', 'tainacan' ),
-	'label_edit_selected_items'                      => __( 'Edit selected items', 'tainacan' ),
+	'label_bulk_edit_selected_items'                 => __( 'Bulk edit selected items', 'tainacan' ),
+	'label_sequence_edit_selected_items'             => __( 'Edit selected items in sequence', 'tainacan' ),
 	'label_edit_selected_taxonomies'                 => __( 'Edit selected taxonomies', 'tainacan' ),
 	'label_select_all_collections_page'              => __( 'Select all collections on page', 'tainacan' ),
 	'label_select_all_items_page'                    => __( 'Select all items on page', 'tainacan' ),
@@ -312,6 +315,8 @@ return apply_filters( 'tainacan-admin-i18n', [
 	'label_show_metadata'	                     	 => __( 'Show metadata', 'tainacan' ),
 	'label_all_terms'                                => __( 'All terms', 'tainacan' ),
 	'label_selected_terms'                           => __( 'Selected terms', 'tainacan'),
+	'label_editing_item_number'                      => __( 'Editing item n.', 'tainacan'),
+	'label_sequence_editing_item'                    => __( 'Sequence editing: Item', 'tainacan'),
 
 	// Instructions. More complex sentences to guide user and placeholders
 	'instruction_delete_selected_collections'        => __( 'Delete selected collections', 'tainacan' ),

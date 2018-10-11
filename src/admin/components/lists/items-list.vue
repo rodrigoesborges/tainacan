@@ -42,7 +42,12 @@
                     <b-dropdown-item
                             v-if="$route.params.collectionId && $userCaps.hasCapability('edit_others_posts') && !isOnTrash"
                             @click="openBulkEditionModal()">
-                        {{ $i18n.get('label_edit_selected_items') }}
+                        {{ $i18n.get('label_bulk_edit_selected_items') }}
+                    </b-dropdown-item>
+                    <b-dropdown-item
+                            v-if="$route.params.collectionId && $userCaps.hasCapability('edit_others_posts') && !isOnTrash"
+                            @click="sequenceEditSelectedItems()">
+                        {{ $i18n.get('label_sequence_edit_selected_items') }}
                     </b-dropdown-item>
                     <b-dropdown-item
                             v-if="collectionId"
@@ -182,8 +187,7 @@
                     <!-- Title -->
                     <div
                             :style="{
-                             'padding-left': !collectionId ? '0.5rem !important' : '2.75rem',
-                             'margin-left': !collectionId ? '0 !important' : '24px'
+                                'padding-left': !collectionId ? '0 !important' : '1rem'
                             }"
                             @click="onClickItem($event, item, index)"
                             class="metadata-title">
@@ -721,6 +725,10 @@ export default {
         ...mapGetters('bulkedition', [
             'getGroupID'
         ]),
+        ...mapGetters('search', [
+            'getOrder',
+            'getOrderBy'
+        ]),
         openBulkEditionModal(){
             this.$modal.open({
                 parent: this,
@@ -733,6 +741,17 @@ export default {
                     collectionID: this.$route.params.collectionId,
                 },
                 width: 'calc(100% - 8.333333333%)',
+            });
+        },
+        sequenceEditSelectedItems() {
+            this.createEditGroup({
+                object: Object.keys(this.queryAllItemsSelected).length ? this.queryAllItemsSelected : this.selectedItemsIDs.filter(item => item !== false),
+                collectionID: this.collectionId,
+                order: this.getOrder(),
+                orderBy: this.getOrderBy()
+            }).then(() => {
+                let sequenceId = this.getGroupID();
+                this.$router.push(this.$routerHelper.getCollectionSequenceEditPath(this.collectionId, sequenceId, 1));
             });
         },
         selectAllItemsOnPage() {

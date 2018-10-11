@@ -358,6 +358,10 @@ export default {
         if (this.taxonomyId !== String) {
             this.loadTerms(0);
         }
+        this.$root.$on('onChildTermDeleted', (parentTermId) => {
+            if ((parentTermId == 0 || parentTermId == undefined ) && this.totalTerms > 0)
+                this.totalTerms--;
+        });
         this.$termsListBus.$on('editTerm', (term) => {
 
             // Position edit form in a visible area
@@ -454,6 +458,29 @@ export default {
         }
         &::before {
             border-color: transparent transparent transparent $gray2 !important;
+        }
+    }
+    .parent-term>div>.opened-term.term-item:first-child {
+        cursor: default;
+        background-color: $gray1 !important;
+
+        &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 100%;
+            right: -20px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-color: transparent transparent transparent $gray1;
+            border-left-width: 24px;
+            border-top-width: 20px;
+            border-bottom-width: 20px;
+            top: 0;
+        }
+        &:hover:before {
+            border-color: transparent transparent transparent $gray1;
         }
     }
 

@@ -44,7 +44,7 @@
                     <tr     
                             :key="index"
                             v-for="(item, index) of items">
-
+                        
                         <!-- Item Displayed Metadata -->
                         <td 
                                 :key="index"    
@@ -64,12 +64,11 @@
                                                                                                             column.metadata_type_object.primitive_type == 'term' || 
                                                                                                             column.metadata_type_object.primitive_type == 'compound') : false,
                                         'column-large-width' : column.metadata_type_object != undefined ? (column.metadata_type_object.primitive_type == 'long_string' || column.metadata_type_object.related_mapped_prop == 'description') : false,
-                                }"
-                                @click="goToItemPage(item)">
-
+                                }">
+                            <a :href="item.url">
                             <p
                                     v-tooltip="{
-                                        content: item.title,
+                                        content: item.title != undefined && item.title != '' ? item.title : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`,
                                         html: true,
                                         autoHide: false,
                                         placement: 'auto-start'
@@ -77,10 +76,10 @@
                                     v-if="collectionId == undefined &&
                                           column.metadata_type_object != undefined && 
                                           column.metadata_type_object.related_mapped_prop == 'title'"
-                                    v-html="item.title != undefined ? item.title : ''"/>
+                                    v-html="item.title != undefined && item.title != '' ? item.title : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`"/>
                             <p
                                     v-tooltip="{
-                                        content: item.description,
+                                        content: item.description != undefined && item.description != '' ? item.description : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`,
                                         html: true,
                                         autoHide: false,
                                         placement: 'auto-start'
@@ -88,10 +87,10 @@
                                     v-if="collectionId == undefined &&
                                           column.metadata_type_object != undefined && 
                                           column.metadata_type_object.related_mapped_prop == 'description'"
-                                    v-html="item.description != undefined ? item.description : ''"/>
+                                    v-html="item.description != undefined && item.description != '' ? item.description : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`"/>
                             <p
                                     v-tooltip="{
-                                        content: renderMetadata( item.metadata[column.slug] ),
+                                        content: renderMetadata(item.metadata, column) != '' ? renderMetadata(item.metadata, column) : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`,
                                         html: true,
                                         autoHide: false,
                                         placement: 'auto-start'
@@ -101,13 +100,14 @@
                                           column.metadatum !== 'row_actions' &&
                                           column.metadatum !== 'row_creation' &&
                                           column.metadatum !== 'row_author'"
-                                    v-html="renderMetadata( item.metadata[column.slug] )"/>
+                                    v-html="renderMetadata(item.metadata, column) != '' ? renderMetadata(item.metadata, column) : `<span class='has-text-gray is-italic'>` + $i18n.get('label_value_not_informed') + `</span>`"/>
 
                             <span v-if="column.metadatum == 'row_thumbnail'">
                                 <img 
                                         class="table-thumb" 
                                         :src="item['thumbnail'].tainacan_small ? item['thumbnail'].tainacan_small : (item['thumbnail'].thumb ? item['thumbnail'].thumb : thumbPlaceholderPath)">
                             </span> 
+                        </a>
                         </td>
                     </tr>
                 </tbody>
@@ -132,10 +132,9 @@ export default {
         }
     },
     methods: {
-        goToItemPage(item) {
-            window.location.href = item.url;   
-        },
-        renderMetadata(metadata) {
+        renderMetadata(itemMetadata, column) {
+
+            let metadata = (itemMetadata != undefined && itemMetadata[column.slug] != undefined) ? itemMetadata[column.slug] : false;
 
             if (!metadata) {
                 return '';
@@ -150,7 +149,9 @@ export default {
 </script>
 
 <style>
-
+    td>a:hover {
+        text-decoration: none !important;
+    }
 </style>
 
 

@@ -187,7 +187,7 @@ class Metadata extends Repository {
 				'type'        => __( 'string' ),
 				'validation'  => v::stringType()->in( [ 'yes', 'no', 'never' ] ),
 				'description' => __( 'Display by default on listing or do not display or never display.', 'tainacan' ),
-				'default'     => 'yes'
+				'default'     => 'no'
 			],
 			'semantic_uri'          => [
 				'map'         => 'meta',
@@ -767,7 +767,7 @@ class Metadata extends Repository {
 	}
 
 	/**
-	 * returns all core items from a specific collection
+	 * returns all core metadata from a specific collection
 	 *
 	 * @param Entities\Collection $collection
 	 *
@@ -783,7 +783,8 @@ class Metadata extends Repository {
 					'value'   => $this->core_metadata,
 					'compare' => 'IN'
 				]
-			]
+			],
+			'include_disabled' => true
 		], 'OBJECT' );
 
 	}

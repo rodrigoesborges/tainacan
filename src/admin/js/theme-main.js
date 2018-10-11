@@ -26,7 +26,6 @@ import FilterTaginput from '../../classes/filter-types/taginput/Taginput.vue';
 
 import FilterTaxonomyCheckbox from '../../classes/filter-types/taxonomy/Checkbox.vue';
 import FilterTaxonomyTaginput from '../../classes/filter-types/taxonomy/Taginput.vue';
-import FilterTaxonomySelectbox from '../../classes/filter-types/taxonomy/Selectbox.vue';
 
 import TaincanFormItem from '../../classes/metadata-types/tainacan-form-item.vue';
 import TaincanFiltersList from '../../classes/filter-types/tainacan-filter-item.vue';
@@ -36,6 +35,7 @@ import ViewModeTable from '../../theme-helper/view-mode-table.vue';
 import ViewModeCards from '../../theme-helper/view-mode-cards.vue';
 import ViewModeRecords from '../../theme-helper/view-mode-records.vue';
 import ViewModeMasonry from '../../theme-helper/view-mode-masonry.vue';
+import ViewModeSlideshow from '../../theme-helper/view-mode-slideshow.vue';
 
 // Remaining imports
 import HelpButton from '../components/other/help-button.vue';
@@ -78,7 +78,6 @@ Vue.component('tainacan-filter-checkbox', FilterCheckbox);
 Vue.component('tainacan-filter-taginput', FilterTaginput);
 Vue.component('tainacan-filter-taxonomy-checkbox', FilterTaxonomyCheckbox);
 Vue.component('tainacan-filter-taxonomy-taginput', FilterTaxonomyTaginput);
-Vue.component('tainacan-filter-taxonomy-selectbox', FilterTaxonomySelectbox);
 
 /* Others */
 Vue.component('help-button', HelpButton);
@@ -91,6 +90,7 @@ Vue.component('view-mode-table', ViewModeTable);
 Vue.component('view-mode-cards', ViewModeCards);
 Vue.component('view-mode-records', ViewModeRecords);
 Vue.component('view-mode-masonry', ViewModeMasonry);
+Vue.component('view-mode-slideshow', ViewModeSlideshow);
 
 Vue.use(eventBusSearch, { store: store, router: routerTheme});
 
@@ -115,6 +115,9 @@ export const ThemeItemsListing =  new Vue({
         
         if (this.$el.attributes['default-view-mode'] != undefined)
             this.defaultViewMode = this.$el.attributes['default-view-mode'].value;
+        else
+            this.defaultViewMode = 'cards';
+
         if (this.$el.attributes['enabled-view-modes'] != undefined)
             this.enabledViewModes = this.$el.attributes['enabled-view-modes'].value.split(',');
 

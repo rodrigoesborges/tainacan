@@ -86,12 +86,8 @@ function tainacan_the_document() {
  * @return bool True if item has document, false if it does not
  */
 function tainacan_has_document() {
-	$item = tainacan_get_item();
 	
-	if (!$item)
-		return;
-	
-	$document = $item->get_document();
+	$document = tainacan_get_the_document();
 
 	return ! empty($document);
 	
@@ -182,13 +178,17 @@ function tainacan_the_faceted_search() {
 
 	$props = ' ';
 	
+	$default_view_mode = apply_filters( 'tainacan-default-view-mode-for-themes', 'masonry' );
+	$enabled_view_modes = apply_filters( 'tainacan-enabled-view-modes-for-themes', ['table', 'cards', 'masonry'] );
+	
 	// if in a collection page
 	$collection_id = tainacan_get_collection_id();
 	if ($collection_id) {
+		
 		$props .= 'collection-id="' . $collection_id . '" ';
 		$collection = new  \Tainacan\Entities\Collection($collection_id);
-		$props .= 'default-view-mode="' . $collection->get_default_view_mode() . '" ';
-		$props .= 'enabled-view-modes="' . implode(',', $collection->get_enabled_view_modes()) . '" ';
+		$default_view_mode = $collection->get_default_view_mode();
+		$enabled_view_modes = $collection->get_enabled_view_modes();
 	}
 	
 	// if in a tainacan taxonomy
@@ -197,6 +197,9 @@ function tainacan_the_faceted_search() {
 		$props .= 'term-id="' . $term->term_id . '" ';
 		$props .= 'taxonomy="' . $term->taxonomy . '" ';
 	}
+	
+	$props .= 'default-view-mode="' . $default_view_mode . '" ';
+	$props .= 'enabled-view-modes="' . implode(',', $enabled_view_modes) . '" ';
 
 	echo "<div id='tainacan-items-page' $props ></div>";
 
@@ -278,7 +281,11 @@ function tainacan_register_view_mode($slug, $args = []) {
  */
 function tainacan_get_item($post_id = 0) {
 	$post = get_post( $post_id );
-
+	
+	if (!$post) {
+		return null;
+	}
+	
 	$theme_helper = \Tainacan\Theme_Helper::get_instance();
 	
 	if (!$theme_helper->is_post_an_item($post))

@@ -62,7 +62,9 @@
             </a>
         </span>
     </div>
-    <transition-group name="filter-item">
+    <transition-group 
+            class="children-area"
+            name="filter-item">
         <div    
                 class="term-item"
                 :style="{
@@ -127,6 +129,9 @@ export default {
             'clearTerms',
             'updateChildTermLocal'
         ]),
+        teste() {
+            this.totalTerms = this.totalTerms - 1;
+        },
         addNewChildTerm() {
             this.showChildren = true;
             this.$termsListBus.onAddNewChildTerm(this.term.id);
@@ -207,7 +212,7 @@ export default {
                                 termId: this.term.id, 
                                 parent: this.term.parent })
                             .then(() => {
-                                this.totalTerms = this.totalTerms - 1;
+                                this.$root.$emit('onChildTermDeleted', this.term.parent);
                             })
                             .catch((error) => {
                                 this.$console.log(error);
@@ -228,7 +233,11 @@ export default {
             });  
         }
     },
-    created() {
+    created() { 
+        this.$root.$on('onChildTermDeleted', (parentTermId) => {
+            if (this.term.id == parentTermId && this.totalTerms > 0)
+                this.totalTerms--;
+        });
         this.$termsListBus.$on('editTerm', () => {
             this.isEditingTerm = true;
         });
@@ -271,6 +280,7 @@ export default {
                 border-color: transparent transparent transparent $gray2 !important;
             }
         }
+
 
         .children-icon {
             color: $blue2;
@@ -340,7 +350,7 @@ export default {
             user-select: none;
         }
 
-        &.opened-term:first-child {
+        &.opened-term>div:first-child>div {
             cursor: default;
             background-color: $gray1;
 

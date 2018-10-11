@@ -1,17 +1,24 @@
 <template>
     <div class="block">
+        <span 
+                v-if="isLoading"
+                style="width: 100%"
+                class="icon has-text-centered loading-icon">
+            <div class="control has-icons-right is-loading is-clearfix" />
+        </span>
         <div
-                v-for="(option, index) in options"
+                v-for="(option, index) in options.slice(0, filter.max_options)"
                 :key="index"
                 class="metadatum">
             <b-checkbox
+                    v-if="index <= filter.max_options - 1"
                     v-model="selected"
                     :native-value="option.value">
                 {{ option.label }}
             </b-checkbox>
             <div
                     class="view-all-button-container"
-                    v-if="option.seeMoreLink"
+                    v-if="option.seeMoreLink && index == options.slice(0, filter.max_options).length - 1"
                     @click="openCheckboxModal()"
                     v-html="option.seeMoreLink"/>
         </div>
@@ -21,7 +28,7 @@
 <script>
     import { tainacan as axios } from '../../../js/axios/axios';
     import { filter_type_mixin } from '../filter-types-mixin';
-    import CheckboxFilterModal from '../../../admin/components/other/checkbox-filter-modal.vue';
+    import CheckboxRadioModal from '../../../admin/components/other/checkbox-radio-modal.vue';
 
     export default {
         created(){
@@ -52,34 +59,32 @@
                 if (filterTag.filterId == this.filter.id) {
 
                     let selectedIndex = this.selected.findIndex(option => option == filterTag.singleValue);
-                    let alternativeIndex = this.options.findIndex(option => option.label == filterTag.singleValue);
+                    let optionIndex = this.options.findIndex(option => option.label == filterTag.singleValue);
+                    let alternativeIndex;
+
+                    if (optionIndex >= 0) {
+                        alternativeIndex = this.selected.findIndex(option => this.options[optionIndex].value == option);
+                    }
 
                     if (selectedIndex >= 0 || alternativeIndex >= 0) {
 
-                        let newSelected = this.selected.slice();
-                        newSelected.splice(selectedIndex, 1); 
+                        selectedIndex >= 0 ? this.selected.splice(selectedIndex, 1) : this.selected.splice(alternativeIndex, 1); 
 
                         this.$emit('input', {
                             filter: 'checkbox',
                             compare: 'IN',
                             metadatum_id: this.metadatum,
                             collection_id: ( this.collection_id ) ? this.collection_id : this.filter.collection_id,
-                            value: newSelected
+                            value: this.selected
                         });
 
                         this.$eventBusSearch.$emit( 'sendValuesToTags', {
                             filterId: this.filter.id,
-                            value: newSelected
+                            value: this.selected
                         });
 
                         this.selectedValues();
                     }
-                }
-            });
-
-            this.$root.$on('appliedCheckBoxModal', (labels) => {
-                if(labels.length){
-                    this.selectedValues();
                 }
             });
         },
@@ -99,8 +104,8 @@
         },
         mixins: [filter_type_mixin],
         watch: {
-            selected: function(val){
-                this.selected = val;
+            selected: function(){
+                //this.selected = val;
                 this.onSelect();
             }
         },
@@ -113,35 +118,40 @@
                     let collectionTarget = ( this.metadatum_object && this.metadatum_object.metadata_type_options.collection_id ) ?
                         this.metadatum_object.metadata_type_options.collection_id : this.collection_id;
 
-                    promise = this.getValuesRelationship( collectionTarget, null, [], 0, this.filter.max_options);
+                    promise = this.getValuesRelationship( collectionTarget, null, [], 0, this.filter.max_options, false, '1');
+                    promise
+                        .then(() => {
 
-                    promise.then(() => {
-                        if(this.options.length > this.filter.max_options){
-                            this.options.splice(this.filter.max_options);
-                        }
-                    }).catch((error) => {
-                        this.$console.error(error);
+                        this.isLoading = false;
+                            if(this.options.length > this.filter.max_options){
+                                this.options.splice(this.filter.max_options);
+                            }
+                        }).catch((error) => {
+                            this.$console.error(error);
                     })
                 } else {
-                    promise = this.getValuesPlainText( this.metadatum, null, this.isRepositoryLevel, [], 0, this.filter.max_options );
+                    promise = this.getValuesPlainText( this.metadatum, null, this.isRepositoryLevel, [], 0, this.filter.max_options, false, '1' );
+                    promise
+                        .then(() => {
 
-                    promise.then(() => {
-                        if(this.options.length > this.filter.max_options){
-                            this.options.splice(this.filter.max_options);
-                        }
-                    }).catch((error) => {
-                        this.$console.error(error);
-                    })
+                        this.isLoading = false;
+                            if(this.options.length > this.filter.max_options){
+                                this.options.splice(this.filter.max_options);
+                            }
+                        }).catch((error) => {
+                            this.$console.error(error);
+                        })
                 }
 
-                promise.then(() => {
-                    this.isLoading = false;
-                    this.selectedValues()
-                })
-                .catch( error => {
-                    this.$console.log('error select', error );
-                    this.isLoading = false;
-                });
+                promise
+                    .then(() => {
+                        this.isLoading = false;
+                        this.selectedValues()
+                    })
+                    .catch( error => {
+                        this.$console.log('error select', error );
+                        this.isLoading = false;
+                    });
             },
             onSelect(){
                 this.$emit('input', {
@@ -155,11 +165,11 @@
                 let onlyLabels = [];
 
                 if(!isNaN(this.selected[0])){
-                    for (let option of this.options) {
-                        let value = this.selected.find(item => item == option.value);
-
-                        if (value != undefined) {
-                            onlyLabels.push(option.label);
+                    for (let aSelected of this.selected) {
+                        let valueIndex = this.options.findIndex(option => option.value == aSelected);
+                        
+                        if (valueIndex >= 0) {
+                            onlyLabels.push(this.options[valueIndex].label);
                         }
                     }
                 }
@@ -185,7 +195,7 @@
             openCheckboxModal() {
                 this.$modal.open({
                     parent: this,
-                    component: CheckboxFilterModal,
+                    component: CheckboxRadioModal,
                     props: {
                         //parent: parent,
                         filter: this.filter,
@@ -197,6 +207,10 @@
                         metadatum_type: this.type,
                         metadatum_object: this.metadatum_object,
                         isRepositoryLevel: this.isRepositoryLevel,
+                        query: this.query
+                    },
+                    events: {
+                        appliedCheckBoxModal: () => this.loadOptions()
                     }
                 });
             }
@@ -208,5 +222,11 @@
     .view-all-button-container {
         display: flex;
         padding-left: 18px;
+    }
+
+    .is-loading:after {
+        border: 2px solid white !important;
+        border-top-color: #dbdbdb !important;
+        border-right-color: #dbdbdb !important;
     }
 </style>

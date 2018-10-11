@@ -56,7 +56,7 @@ export default {
     @import "../admin/scss/_tooltips.scss";
     @import "../admin/scss/_tainacan-form.scss";
     @import "../admin/scss/_filters-menu-modal.scss";
-    
+
     .theme-items-list {
         position: relative;
         display: flex;
@@ -163,7 +163,7 @@ export default {
             .gray-icon, .gray-icon .icon {
                 color: $gray4 !important;
                 i::before {
-                    font-size: 21px;
+                    font-size: 1.3125rem;
                 }
             }
             .dropdown-item {
@@ -175,7 +175,7 @@ export default {
                 margin-left: 4px;
 
                 &.icon i::before, .gray-icon i::before {
-                    font-size: 19px !important;
+                    font-size: 1.1875px !important;
                 }
             }
         }
@@ -183,6 +183,7 @@ export default {
         #items-list-area {
             width: 100%;
             overflow-y: hidden;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             margin-left: 0;
             &.spaced-to-right {

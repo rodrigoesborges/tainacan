@@ -110,6 +110,7 @@
                 </div>
             </section>
             <section
+                    v-if="!isLoadingFilters && !isLoadingItems && !isLoadingMetadata"
                     class="is-grouped-centered section">
                 <button
                         @click="exportFilterModal()"

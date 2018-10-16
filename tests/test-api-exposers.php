@@ -628,6 +628,17 @@ class TAINACAN_REST_Exposers extends TAINACAN_UnitApiTestCase {
 	    $data = $response->get_data();
 	    $this->assertEquals(count($types), count($data));
 	    
+	    $request  = new \WP_REST_Request('GET', $this->namespace . '/exposers/urls');
+	    $request->set_param('baseurl', '?id=13');
+	    $request->set_param('itemscount', '10000');
+	    $response = $this->server->dispatch($request);
+	    $this->assertEquals(200, $response->get_status());
+	    
+	    $data = $response->get_data();
+	    
+	    $this->assertEquals(intval(ceil(10000/\Tainacan\Exposers\Exposers::ITEMS_LIMIT_LOGGED)), count($data['oai-pmh']));
+	    
+	    
 	}
 	
 }

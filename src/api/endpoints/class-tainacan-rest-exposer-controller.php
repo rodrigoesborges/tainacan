@@ -37,8 +37,9 @@ class REST_Exposer_Controller extends REST_Controller {
 		$params = $this->get_request_params($request);
 		
 		$base_url = $params['baseurl'];
+		$itemsCount = array_key_exists('itemscount', $params) ? $params['itemscount'] : 1;
 		
-		$prepared = $Tainacan_Exposers->get_exposer_urls($base_url);
+		$prepared = $Tainacan_Exposers->get_exposer_urls($base_url, $itemsCount);
 
 		return new \WP_REST_Response($prepared, 200);
 	}

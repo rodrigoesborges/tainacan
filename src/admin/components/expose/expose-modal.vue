@@ -76,7 +76,7 @@
         name: "ExposeModal",
         props: {
             modalTitle: String,
-            totalItems: Array,
+            totalItems: Number,
             objectType: String,
             selectedForBulk: Object,
             collectionID: Number,
@@ -86,7 +86,7 @@
             this.isLoadingExposerUrls = true;
             this.fetchMetadatumMappers()
             .then(() => {
-                this.fetchExposersUrls({baseurl: this.baseurl})
+                this.fetchExposersUrls({baseurl: this.baseurl, itemsCount: this.totalItems})
                 .then(() => {
                     this.isLoadingExposerUrls = false;
                 })

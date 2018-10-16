@@ -1,9 +1,10 @@
 import axios from '../../../axios/axios';
 
-export const fetchExposersUrls = ({ commit }, { baseurl }) => {
+export const fetchExposersUrls = ({ commit }, { baseurl, itemsCount }) => {
     return new Promise((resolve, reject) => {
         let params = {
-            baseurl: baseurl
+            baseurl: baseurl,
+            itemscount: itemsCount 
         };
         axios.tainacan.get('/exposers/urls', {params: params})
             .then((res) => {

@@ -478,7 +478,7 @@ class Exposers {
 	 */
 	public function filter_prepare_filters($args, $request) {
 	    $limit = is_user_logged_in() ? self::ITEMS_LIMIT_LOGGED : self::ITEMS_LIMIT ;
-	    if(array_key_exists('posts_per_page', $args) {
+	    if(array_key_exists('posts_per_page', $args) ) {
 	        $limit = min([ $limit, $args['posts_per_page'] ]);
 	    }
 	    $args['posts_per_page'] = $limit;

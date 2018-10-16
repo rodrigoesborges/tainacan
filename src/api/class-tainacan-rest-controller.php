@@ -138,7 +138,7 @@ class REST_Controller extends \WP_REST_Controller {
 
 		$args['perm'] = 'readable';
 
-		return $args;
+		return apply_filters('tainacan-rest-prepare-filters', $args, $request);
 	}
 
 	/**

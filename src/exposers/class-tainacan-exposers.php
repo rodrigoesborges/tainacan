@@ -46,6 +46,7 @@ class Exposers {
 		add_filter( 'rest_request_after_callbacks', [$this, 'rest_request_after_callbacks'], 10, 3 ); //exposer types
 		add_filter( 'tainacan-rest-response', [$this, 'rest_response'], 10, 2 ); // exposer mapper
 		add_filter( 'tainacan-admin-i18n', [$this, 'mappers_i18n']);
+		add_filter( 'tainacan-rest-prepare-filters', [$this, 'filter_prepare_filters'], 10, 2 );
 	}
 	
 	/**
@@ -425,9 +426,10 @@ class Exposers {
 	/**
 	 * 
 	 * @param string $base_url url base for exposer parameters append
+	 * @param int $items_count total number of fetched items
 	 * @return string|string[][]
 	 */
-	public static function get_exposer_urls($base_url = '') {
+	public static function get_exposer_urls($base_url = '', $items_count = false ) {
 	    $Tainacan_Exposers = self::get_instance();
 	    $mappers = $Tainacan_Exposers->get_mappers(\OBJECT);
 	    $types = $Tainacan_Exposers->get_types(\OBJECT);
@@ -436,9 +438,15 @@ class Exposers {
 	        if( strpos($base_url, '/') !== 0 ) $base_url = '/'.$base_url;
 	        $base_url = esc_url_raw( rest_url() ) . TAINACAN_REST_NAMESPACE . $base_url; 
 	    }
+	    
+	    $pages = ceil( $items_count / ( is_user_logged_in() ? self::ITEMS_LIMIT_LOGGED : self::ITEMS_LIMIT ) );
+	    
 	    foreach ($types as $type) {
 	        $url = $base_url.(strpos($base_url, '?') === false ? '?' : '&').self::TYPE_PARAM.'='.$type->slug;
 	        $urls[$type->slug] = [$url];
+	        for($i = 2; $i <= $pages; $i++) {
+	            $urls[$type->slug][] = $url.'&paged='.($i - 1);
+	        }
 	        if(is_array($type->get_mappers())) {
 	            $first = true; // first is default, jump
 	            foreach ($type->get_mappers() as $type_mapper) {
@@ -447,13 +455,33 @@ class Exposers {
 	                    continue;
 	                }
 	                $urls[$type->slug][] = $url.'&'.self::MAPPER_PARAM.'='.$type_mapper;
+	                for($i = 2; $i <= $pages; $i++) {
+	                    $urls[$type->slug][] = $url.'&'.self::MAPPER_PARAM.'='.$type_mapper.'&paged='.($i - 1) ;
+	                }
 	            }
 	        } else {
 	            foreach ($mappers as $mapper) {
 	                $urls[$type->slug][] = $url.'&'.self::MAPPER_PARAM.'='.$mapper->slug;
+	                for($i = 2; $i <= $pages; $i++) {
+	                    $urls[$type->slug][] = $url.'&'.self::MAPPER_PARAM.'='.$mapper->slug.'&paged='.($i - 1);
+	                }
 	            }
 	        }
 	    }
 	    return $urls;
+	}
+	
+	/**
+	 * enforce limits on exposing Items
+	 * @param array $args
+	 * @param \WP_REST_Request $request
+	 */
+	public function filter_prepare_filters($args, $request) {
+	    $limit = is_user_logged_in() ? self::ITEMS_LIMIT_LOGGED : self::ITEMS_LIMIT ;
+	    if(array_key_exists('posts_per_page', $args) {
+	        $limit = min([ $limit, $args['posts_per_page'] ]);
+	    }
+	    $args['posts_per_page'] = $limit;
+	    return $args;
 	}
 }

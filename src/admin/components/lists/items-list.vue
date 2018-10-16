@@ -760,7 +760,7 @@ export default {
                     selectedForBulk: Object.keys(this.queryAllItemsSelected).length ? this.queryAllItemsSelected : this.selectedItemsIDs.filter(item => item !== false),
                     objectType: this.$i18n.get('items'),
                     collectionID: this.$route.params.collectionId,
-                    baseurl: ''
+                    baseurl: '/collection/' + this.$route.params.collectionId +'/items' + window.location.hash.substr(1)
                 },
                 width: 'calc(100% - 8.333333333%)',
              });

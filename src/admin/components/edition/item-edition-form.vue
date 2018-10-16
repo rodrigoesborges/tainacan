@@ -416,9 +416,11 @@
         </transition>
         <footer class="footer">
             <!-- Sequence Progress -->
-            <div class="sequence-progress-background"/>
             <div 
-                    v-if="itemPosition != undefined && group != null && group.items_count != undefined"
+                    v-if="isOnSequenceEdit"
+                    class="sequence-progress-background"/>
+            <div 
+                    v-if="isOnSequenceEdit && itemPosition != undefined && group != null && group.items_count != undefined"
                     :style="{ width: (itemPosition/group.items_count)*100 + '%' }"
                     class="sequence-progress"/>
             
@@ -1071,13 +1073,6 @@ export default {
         // Sets feedback variables
         eventBus.$on('isUpdatingValue', (status) => {
             this.isUpdatingValues = status;
-                // if (this.isUpdatingValues) {
-                //     this.$toast.open({
-                //         duration: 2000,
-                //         message: this.$i18n.get('info_updating_metadata_values'),
-                //         position: 'is-bottom',
-                //     })
-                // }
         });
         eventBus.$on('hasErrorsOnForm', (hasErrors) => {
             if (hasErrors)
@@ -1086,6 +1081,10 @@ export default {
                 this.formErrorMessage = '';
         });
         this.cleanLastUpdated();
+    },
+    beforeDestroy () {
+        eventBus.$off('isUpdatingValue');
+        eventBus.$off('hasErrorsOnForm');
     },
     beforeRouteLeave ( to, from, next ) {
         if (this.item.status == 'auto-draft') {

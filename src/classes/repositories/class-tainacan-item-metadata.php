@@ -52,6 +52,13 @@ class Item_Metadata extends Repository {
 			$diffs = $this->diff( $old, $item_metadata );
 		}
 
+        if( $item_metadata->get_metadatum()->get_accept_suggestion() && !$item_metadata->get_item()->can_edit() ){
+            $this->insert_log( $item_metadata, $diffs );
+            return false;
+        } elseif( !$item_metadata->get_item()->can_edit() ){
+            throw new \Exception( 'User not allowed to collaborate' );
+        }
+
 		$unique = ! $item_metadata->is_multiple();
 
 		$metadata_type = $item_metadata->get_metadatum()->get_metadata_type_object();

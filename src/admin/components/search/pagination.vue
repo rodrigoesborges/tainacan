@@ -1,5 +1,8 @@
 <template>
-    <div class="pagination-area">
+    <div 
+            role="navigation"
+            :aria-label="$i18n.get('label_list_pagination')"
+            class="pagination-area">
         <div 
                 style="flex-grow: 1;"
                 class="shown-items is-hidden-mobile">
@@ -13,10 +16,12 @@
         </div> 
         <div class="items-per-page">
             <b-field 
+                    id="items-per-page-select"
                     horizontal 
                     :label="$i18n.get('label_items_per_page')"> 
                 <b-select 
                         :value="itemsPerPage"
+                        aria-labelledby="items-per-page-select"
                         @input="onChangeItemsPerPage">
                     <option value="12">12 &nbsp;</option>
                     <option value="24">24 &nbsp;</option>
@@ -28,11 +33,13 @@
         <div class="go-to-page items-per-page">
             <b-field 
                     horizontal 
+                    id="go-to-page-dropdown"
                     :label="$i18n.get('label_go_to_page')"> 
                 <b-dropdown 
                         position="is-top-right"
                         @change="onPageChange">
                     <button
+                            aria-labelledby="go-to-page-dropdown"
                             class="button is-white"
                             slot="trigger">
                         <span>{{ page }}</span>

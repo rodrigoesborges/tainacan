@@ -14,6 +14,8 @@
         <!-- SEARCH AND FILTERS --------------------- -->
         <!-- Filter menu compress button -->
         <button
+                aria-controls="filters-desktop-aside"
+                :aria-expanded="!isFiltersMenuCompressed"
                 v-tooltip="{
                     delay: {
                         show: 500,
@@ -27,6 +29,7 @@
                 class="is-hidden-mobile"
                 id="filter-menu-compress-button"
                 :style="{ top: !isOnTheme ? (isRepositoryLevel ? '172px' : '120px') : '76px' }"
+                :aria-label="isFiltersMenuCompressed ? $i18n.get('label_show_filters') : $i18n.get('label_hide_filters')"
                 @click="isFiltersMenuCompressed = !isFiltersMenuCompressed">
             <span class="icon">
                 <i 
@@ -36,10 +39,13 @@
         </button>
         <!-- Filters mobile modal button -->
         <button 
+                aria-controls="filters-mobile-modal"
+                :aria-expanded="!isFiltersMenuCompressed"
                 v-if="!openAdvancedSearch && !(registeredViewModes[viewMode] != undefined && registeredViewModes[viewMode].full_screen)"
                 class="is-hidden-tablet"
-                id="filter-menu-compress-button"
+                id="filter-menu-compress-button-mobile"
                 :style="{ top: !isOnTheme ? (isRepositoryLevel ? (searchControlHeight + 100) : (searchControlHeight + 70) + 'px') : (searchControlHeight - 25) + 'px' }"
+                :aria-label="isFiltersMenuCompressed ? $i18n.get('label_show_filters') : $i18n.get('label_hide_filters')"
                 @click="isFilterModalActive = !isFilterModalActive">
             <span class="icon">
                 <i 
@@ -52,6 +58,9 @@
         <!-- Side bar with search and filters -->
         <!-- <transition name="filters-menu"> -->
         <aside
+                id="filters-desktop-aside"
+                role="region"
+                aria-labelledby="filters-label-landmark"
                 :style="{ top: searchControlHeight + 'px' }"
                 v-if="!isFiltersMenuCompressed && 
                         !openAdvancedSearch && 
@@ -67,7 +76,7 @@
                             class="input is-small"
                             :placeholder="$i18n.get('instruction_search')"
                             type="search"
-                            autocomplete="on"
+                            :aria-label="$i18n.get('instruction_search') + ' ' + $i18n.get('items')"
                             :value="searchQuery"
                             @input="futureSearchQuery = $event.target.value"
                             @keyup.enter="updateSearch()">
@@ -80,16 +89,24 @@
                         </span>
                 </div>
             </div>
-            <a
+            <button
                     @click="openAdvancedSearch = !openAdvancedSearch"
-                    class="is-size-7 is-pulled-right is-hidden-mobile">{{ $i18n.get('advanced_search') }}</a>
+                    arial-controls="advanced-search-container"
+                    :aria-expanded="openAdvancedSearch"
+                    class="link-style is-size-7 is-pulled-right is-hidden-mobile">
+                {{ $i18n.get('advanced_search') }}
+            </button>
             
-            <h3 class="has-text-weight-semibold">{{ $i18n.get('filters') }}</h3>
-            <a
+            <h3 
+                    id="filters-label-landmark"
+                    class="has-text-weight-semibold">
+                {{ $i18n.get('filters') }}
+            </h3>
+            <button
                     v-if="!isLoadingFilters &&
                     ((filters.length >= 0 &&
                     isRepositoryLevel) || filters.length > 0)"
-                    class="collapse-all is-size-7"
+                    class="link-style collapse-all"
                     @click="collapseAll = !collapseAll">
                 {{ collapseAll ? $i18n.get('label_collapse_all') : $i18n.get('label_expand_all') }}
                 <span class="icon">
@@ -97,7 +114,7 @@
                             :class="{ 'tainacan-icon-arrowdown' : collapseAll, 'tainacan-icon-arrowright' : !collapseAll }"
                             class="has-text-secondary tainacan-icon tainacan-icon-20px"/>
                 </span>
-            </a>
+            </button>
 
             <br>
             <br>
@@ -141,6 +158,8 @@
 
             <!-- SEARCH CONTROL ------------------------- -->
             <div
+                    :aria-label="$i18n.get('label_sort_visualization')"
+                    role="region"
                     ref="search-control"
                     v-if="!openAdvancedSearch && !(registeredViewModes[viewMode] != undefined && registeredViewModes[viewMode].full_screen)"
                     class="search-control">
@@ -221,6 +240,7 @@
                             :disabled="totalItems <= 0 || adminViewMode == 'grid'|| adminViewMode == 'cards' || adminViewMode == 'masonry'"
                             class="show">
                         <button
+                                :aria-label="$i18n.get('label_displayed_metadata')"
                                 class="button is-white"
                                 slot="trigger">
                             <span>{{ $i18n.get('label_displayed_metadata') }}</span>
@@ -259,6 +279,7 @@
                                 :disabled="totalItems <= 0"
                                 @input="onChangeOrderBy($event)">
                             <button
+                                    :aria-label="$i18n.get('label_sorting')"
                                     class="button is-white"
                                     slot="trigger">
                                 <span>{{ $i18n.get('label_sorting') }}</span>
@@ -302,6 +323,7 @@
                         <!-- Order ASC vs DESC buttons -->
                         <button
                                 class="button is-white is-small"
+                                :aria-label="$i18n.get('label_sort_ascending')"
                                 :disabled="totalItems <= 0 || order == 'DESC'"
                                 @click="onChangeOrder()">
                             <span class="icon is-small gray-icon">
@@ -310,6 +332,7 @@
                         </button>
                         <button
                                 :disabled="totalItems <= 0 || order == 'ASC'"
+                                :aria-label="$i18n.get('label_sort_descending')"
                                 class="button is-white is-small"
                                 @click="onChangeOrder()">
                             <span class="icon is-small gray-icon">
@@ -330,6 +353,7 @@
                                 position="is-bottom-left"
                                 :aria-label="$i18n.get('label_view_mode')">
                             <button 
+                                    :aria-label="$i18n.get('label_view_mode')"
                                     class="button is-white" 
                                     slot="trigger">
                                 <span 
@@ -365,6 +389,7 @@
                                 position="is-bottom-left"
                                 :aria-label="$i18n.get('label_view_mode')">
                             <button
+                                    :aria-label="$i18n.get('label_view_mode')"
                                     class="button is-white"
                                     slot="trigger">
                                 <span>
@@ -433,6 +458,7 @@
                         class="search-control-item">
                     <button 
                             class="button is-white"
+                            :aria-label="$i18n.get('label_slideshow')"
                             @click="onChangeViewMode(viewModeOption)"
                             v-for="(viewModeOption, index) of enabledViewModes"
                             :key="index"
@@ -449,6 +475,7 @@
                 <div class="search-control-item">
                     <button 
                             class="button is-white"
+                            :aria-label="$i18n.get('label_urls')"
                             :disabled="this.totalItems == undefined || this.totalItems <= 0"
                             @click="openExposersModal()">
                         <span class="gray-icon">
@@ -460,13 +487,15 @@
 
                 <!-- Text simple search (used on mobile, instead of the one from filter list)-->
                 <div class="is-hidden-tablet search-control-item">
-                    <div class="search-area">
+                    <div 
+                            role="search"
+                            class="search-area">
                         <div class="control has-icons-right  is-small is-clearfix">
                             <input
                                     class="input is-small"
                                     :placeholder="$i18n.get('instruction_search')"
                                     type="search"
-                                    autocomplete="on"
+                                    :aria-label="$i18n.get('instruction_search') + ' ' + $i18n.get('items')"
                                     :value="searchQuery"
                                     @input="futureSearchQuery = $event.target.value"
                                     @keyup.enter="updateSearch()">
@@ -484,7 +513,10 @@
             </div>
 
             <!-- ADVANCED SEARCH -->
-            <div v-if="openAdvancedSearch">
+            <div
+                    id="advanced-search-container"
+                    role="search"
+                    v-if="openAdvancedSearch">
 
                 <div class="tnc-advanced-search-close"> 
                     <div class="advanced-search-criteria-title">
@@ -560,8 +592,18 @@
                         !openAdvancedSearch &&
                         !(registeredViewModes[viewMode] != undefined && registeredViewModes[viewMode].full_screen)" />
 
+            
             <!-- ITEMS LISTING RESULTS ------------------------- -->
-            <div class="above-search-control">
+            <div 
+                    aria-labelledby="items-list-landmark"
+                    role="region"
+                    class="above-search-control">
+
+                <h3 
+                        id="items-list-landmark"
+                        class="is-hidden">
+                    {{ $i18n.get('label_items_list') }}
+                </h3>
 
                 <div 
                         v-show="(showLoading && 
@@ -653,6 +695,8 @@
         </div>
        
         <b-modal
+                role="region"
+                aria-labelledby="filters-label-landmark-modal"
                 id="filters-mobile-modal"
                 ref="filters-mobile-modal"
                 class="tainacan-form is-hidden-tablet"                
@@ -660,12 +704,18 @@
                 :width="736"
                 animation="slide-menu">
             <div class="modal-inner-content">
-                <h3 class="has-text-weight-semibold">{{ $i18n.get('filters') }}</h3>
-                <a
+                <h3 
+                        id="filters-label-landmark-modal"
+                        class="has-text-weight-semibold">
+                    {{ $i18n.get('filters') }}
+                </h3>
+                <button
+                        aria-controls="filters-items-list"
+                        :aria-expanded="!collapseAll"
                         v-if="!isLoadingFilters &&
                         ((filters.length >= 0 &&
                         isRepositoryLevel) || filters.length > 0)"
-                        class="collapse-all is-size-7"
+                        class="link-style collapse-all"
                         @click="collapseAll = !collapseAll">
                     {{ collapseAll ? $i18n.get('label_collapse_all') : $i18n.get('label_expand_all') }}
                     <span class="icon">
@@ -673,12 +723,13 @@
                                 :class="{ 'tainacan-icon-arrowdown' : collapseAll, 'tainacan-icon-arrowright' : !collapseAll }"
                                 class="has-text-secondary tainacan-icon tainacan-icon-20px"/>
                     </span>
-                </a>
+                </button>
 
                 <br>
                 <br>
 
                 <filters-items-list
+                        id="filters-items-list"
                         v-if="!isLoadingFilters &&
                             ((filters.length >= 0 && isRepositoryLevel) || filters.length > 0)"
                         :filters="filters"
@@ -1357,6 +1408,7 @@
     .collapse-all {
         display: inline-flex;
         align-items: center;
+        font-size: 0.75rem !important;
     }
 
     .advanced-search-criteria-title {
@@ -1496,7 +1548,8 @@
         }
 
     }
-    #filter-menu-compress-button {
+    #filter-menu-compress-button,
+    #filter-menu-compress-button-mobile {
         position: absolute;
         z-index: 99;
         top: 120px;
